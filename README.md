@@ -225,6 +225,7 @@ from datetime import UTC, datetime
 from donewise_harness.contracts import Action, EvidenceSource
 from donewise_harness.ports import ReadResult, WriteResult
 
+
 class TinyCalendar:
     source = EvidenceSource.FAKE_CALENDAR
 
@@ -233,22 +234,23 @@ class TinyCalendar:
 
     def write(self, req):
         if req.action != Action.CALENDAR_CREATE:
-            return WriteResult(status="error", provider_ref=None,
-                               version=None, error="Create only")
+            return WriteResult(status="error", provider_ref=None, version=None, error="Create only")
         key = req.target.event_id
         if key in self.events:
-            return WriteResult(status="already_exists", provider_ref=key,
-                               version="1", error=None)
+            return WriteResult(status="already_exists", provider_ref=key, version="1", error=None)
         self.events[key] = req.target.model_copy(deep=True)
-        return WriteResult(status="acked", provider_ref=key,
-                           version="1", error=None)
+        return WriteResult(status="acked", provider_ref=key, version="1", error=None)
 
     def read(self, req):
         key = req.provider_ref or req.target.event_id
         observed = self.events.get(key)
-        return ReadResult(found=observed is not None, observed=observed,
-                          version="1" if observed else None,
-                          observed_at=datetime.now(UTC), source=self.source)
+        return ReadResult(
+            found=observed is not None,
+            observed=observed,
+            version="1" if observed else None,
+            observed_at=datetime.now(UTC),
+            source=self.source,
+        )
 
     def replay_is_safe(self, req):
         return False
