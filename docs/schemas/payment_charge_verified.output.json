@@ -125,6 +125,15 @@
       "title": "FaultKind",
       "type": "string"
     },
+    "GrantedBy": {
+      "enum": [
+        "session_ui",
+        "mcp_client",
+        "elicitation"
+      ],
+      "title": "GrantedBy",
+      "type": "string"
+    },
     "NextAction": {
       "enum": [
         "NONE",
@@ -405,6 +414,17 @@
           "type": "null"
         }
       ]
+    },
+    "granted_by": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GrantedBy"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": [

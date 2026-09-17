@@ -30,7 +30,7 @@ class MCPClient:
                 if sid := response.headers.get("mcp-session-id"):
                     self.mcp_session_id = sid
 
-            auth = {"X-DoneWise-Run-Id": self.run_id}
+            auth = {"X-DoneWise-Run-Id": self.run_id, "X-DoneWise-Channel": "session-ui"}
             if self.settings.mcp_bearer_token:
                 auth["Authorization"] = "Bearer " + self.settings.mcp_bearer_token
             async with httpx2.AsyncClient(

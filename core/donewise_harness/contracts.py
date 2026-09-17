@@ -81,6 +81,7 @@ class EvidenceSource(StrEnum):
 class GrantedBy(StrEnum):
     SESSION_UI = "session_ui"
     MCP_CLIENT = "mcp_client"
+    ELICITATION = "elicitation"
 
 
 class FaultKind(StrEnum):
@@ -311,6 +312,7 @@ class PaymentChargeResult(Receipt):
     charges_applied: Count
     approval_id: ApprovalId | None
     approval_request: ApprovalRequest | None
+    granted_by: GrantedBy | None = None
 
     @model_validator(mode="after")
     def payment_consistency(self) -> Self:
@@ -347,6 +349,7 @@ class OperationView(Receipt):
     # Preserve payment-specific presentation when operation_get resolves a pending charge.
     payment_intent_id: PaymentIntentId | None = None
     charges_applied: Count | None = None
+    granted_by: GrantedBy | None = None
 
     @model_validator(mode="after")
     def payment_observation(self) -> Self:

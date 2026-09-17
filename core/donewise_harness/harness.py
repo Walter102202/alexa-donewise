@@ -374,12 +374,15 @@ class Harness:
         token = self.consent_token_for(ctx.run_id)
         if token is None or not hmac.compare_digest(inp.consent_token.encode(), token.encode()):
             raise PermissionError("UNAUTHORIZED: consent_token is not valid for this session")
-        request = self.registry.approval(inp.approval_request_id)
+        return self._grant_request(inp.approval_request_id, ctx, granted_by)
+
+    def _grant_request(self, request_id: str, ctx: Context, granted_by: GrantedBy):
+        request = self.registry.approval(request_id)
         if request is None or request["kind"] != "request" or request["run_id"] != ctx.run_id:
             raise LookupError("approval request not found")
         if datetime.fromisoformat(request["expires_at"]) <= self.clock.now():
             raise TimeoutError("APPROVAL_EXPIRED: the approval request expired")
-        existing = self.registry.grant_for_request(inp.approval_request_id)
+        existing = self.registry.grant_for_request(request_id)
         if existing is not None:
             return self._grant_result(existing)
         approval_id = new_id("apr_")
@@ -387,7 +390,7 @@ class Harness:
         self.registry.insert_approval(
             approval_id=approval_id,
             kind="grant",
-            request_id=inp.approval_request_id,
+            request_id=request_id,
             intent_id=request["intent_id"],
             amount_minor=request["amount_minor"],
             currency=request["currency"],
@@ -398,6 +401,33 @@ class Harness:
             run_id=ctx.run_id,
         )
         return self._grant_result(self.registry.approval(approval_id))
+
+    @serialized_submission
+    def complete_elicitation(
+        self, inp: PaymentChargeInput, ctx: Context, pending: PaymentChargeResult, accepted: bool
+    ) -> PaymentChargeResult:
+        """Trusted server-only path after validated MCP elicitation, never an exposed tool."""
+        self._enter(ctx)
+        op = self.registry.operation(pending.operation_id)
+        if op is None or op["run_id"] != ctx.run_id or pending.approval_request is None:
+            raise LookupError("approval operation not found")
+        # Another invocation may have consumed approval while this client was deciding.
+        if self.registry.approval_use_for_operation(op["operation_id"]) is not None:
+            return self.payment_charge(inp, ctx)
+        if not accepted:
+            return self._rejection(
+                PaymentChargeResult,
+                ctx,
+                Action.PAYMENT_CHARGE,
+                pending.expected,
+                Rejected(Outcome.REJECTED, ReasonCode.NO_APPROVAL, NextAction.ASK_USER),
+                self._payment_extra(op, None),
+                operation=op,
+            )
+        request_id = pending.approval_request.approval_request_id
+        with self._lock("submission:" + request_id):
+            grant = self._grant_request(request_id, ctx, GrantedBy.ELICITATION)
+        return self.payment_charge(inp.model_copy(update={"approval_id": grant.approval_id}), ctx)
 
     def operation_get(self, operation_id: str, ctx: Context) -> OperationView:
         self._enter(ctx)
@@ -614,10 +644,13 @@ class Harness:
     def _payment_extra(self, op, approval_id: str | None) -> dict[str, Any]:
         latest = self.registry.latest_receipt(op["operation_id"])
         data = json.loads(latest["receipt_json"]) if latest else {}
+        approval_id = approval_id or data.get("approval_id")
+        grant = self.registry.approval(approval_id) if approval_id else None
         return {
             "payment_intent_id": data.get("payment_intent_id"),
             "charges_applied": data.get("charges_applied", 0),
-            "approval_id": approval_id or data.get("approval_id"),
+            "approval_id": approval_id,
+            "granted_by": grant["granted_by"] if grant else None,
             "approval_request": None,
         }
 
@@ -1127,6 +1160,7 @@ class Harness:
             else data.get("payment_intent_id"),
             "charges_applied": res.writes_applied,
             "approval_id": data.get("approval_id"),
+            "granted_by": data.get("granted_by"),
             "approval_request": None,
         }
 
@@ -1169,6 +1203,7 @@ class Harness:
             history=history,
             payment_intent_id=data.get("payment_intent_id"),
             charges_applied=data.get("charges_applied"),
+            granted_by=data.get("granted_by"),
         )
 
     def _lock(self, key: str):

@@ -61,12 +61,17 @@ async def test_official_client_contract_and_pending(live):
     captured = []
 
     async def trace(response):
-        if response.headers.get("mcp-session-id") and response.headers.get(
-            "content-type", ""
-        ).startswith("application/json"):
+        if response.headers.get("mcp-session-id") and response.request.method == "POST":
             await response.aread()
             if response.content:
-                captured.append((response.headers.get("mcp-session-id"), response.json()))
+                frames = [
+                    json.loads(line[5:])
+                    for line in response.text.splitlines()
+                    if line.startswith("data:")
+                ]
+                if response.headers.get("content-type", "").startswith("application/json"):
+                    frames = [response.json()]
+                captured.extend((response.headers["mcp-session-id"], frame) for frame in frames)
 
     async with httpx2.AsyncClient(
         headers={
@@ -153,6 +158,8 @@ async def test_official_client_contract_and_pending(live):
                     "approval_grant", {"approval_request_id": request, "consent_token": token}
                 )
                 pay["approval_id"] = grant.structured_content["approval_id"]
+                assert grant.structured_content["granted_by"] == "mcp_client"
+                assert h.registry.approval(pay["approval_id"])["granted_by"] == "mcp_client"
                 await client.post(
                     url + "/admin/faults",
                     json={"run_id": "run_wire", "kind": "drop_response_after_write"},
@@ -286,3 +293,103 @@ def test_invalid_pending_budget(monkeypatch, budget):
     monkeypatch.setenv("DONEWISE_PENDING_AFTER", budget)
     with pytest.raises(ValueError):
         Settings()
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "action,approve,outcome",
+    [
+        ("accept", True, "VERIFIED"),
+        ("decline", None, "REJECTED"),
+        ("cancel", None, "REJECTED"),
+        ("accept", False, "REJECTED"),
+        ("accept", "true", "REJECTED"),
+        ("timeout", None, "NEEDS_APPROVAL"),
+    ],
+)
+async def test_payment_elicitation_official_client(tmp_path, monkeypatch, action, approve, outcome):
+    from mcp.types import ElicitResult
+
+    monkeypatch.setattr(
+        "donewise_server.tools.ELICITATION_TIMEOUT", 0.05 if action == "timeout" else 120
+    )
+    app = build_app(
+        Settings(
+            data_dir=tmp_path, demo_admin_token="", pending_after=None, fake_payment_delay_seconds=0
+        )
+    )
+    h = app.state.harness
+    trace = []
+
+    async def capture(request):
+        if request.method == "POST":
+            trace.append({"direction": "client -> server", "message": json.loads(request.content)})
+
+    async def consent(ctx, params):
+        trace.append(
+            {
+                "direction": "server -> client",
+                "method": "elicitation/create",
+                "params": params.model_dump(mode="json", by_alias=True, exclude_none=True),
+            }
+        )
+        assert params.message == "Approve a $60 test charge to Ridge Plumbing for the deposit?"
+        assert params.requested_schema["properties"]["approve"]["type"] == "boolean"
+        assert list(params.requested_schema["properties"]) == ["approve"]
+        if action == "timeout":
+            await anyio.sleep(0.15)
+            return ElicitResult(action="accept", content={"approve": True})
+        return ElicitResult(
+            action=action, content={"approve": approve} if approve is not None else None
+        )
+
+    with serving(app) as url:
+        async with httpx2.AsyncClient(event_hooks={"request": [capture]}) as http:
+            async with streamable_http_client(url + "/mcp", http_client=http) as streams:
+                async with ClientSession(*streams, elicitation_callback=consent) as session:
+                    await session.initialize()
+                    pay = {
+                        "submission_id": "elicited",
+                        "amount_minor": 6000,
+                        "currency": "USD",
+                        "payee": "Ridge Plumbing",
+                        "concept": "deposit",
+                    }
+                    result = await session.call_tool("payment_charge_verified", pay)
+                    assert not result.is_error
+                    data = result.structured_content
+                    trace.append({"direction": "server -> client", "tool_result": data})
+                    assert data["outcome"] == outcome
+                    assert len(h.payments.intents()) == (1 if outcome == "VERIFIED" else 0)
+                    assert data["writes_applied"] == (1 if outcome == "VERIFIED" else 0)
+                    if outcome == "VERIFIED":
+                        assert data["granted_by"] == "elicitation"
+                        grant = h.registry.approval(data["approval_id"])
+                        assert grant["granted_by"] == "elicitation"
+                        assert grant["intent_id"] == data["intent_id"]
+                        assert (grant["amount_minor"], grant["currency"], grant["payee"]) == (
+                            6000,
+                            "USD",
+                            "Ridge Plumbing",
+                        )
+                        replay = await session.call_tool("payment_charge_verified", pay)
+                        assert replay.structured_content["receipt_id"] == data["receipt_id"]
+                        assert h.payments.write_calls == 1
+                        assert sum(t.get("method") == "elicitation/create" for t in trace) == 1
+                    else:
+                        assert data["reason_code"] == "NO_APPROVAL"
+                        assert data["next_action"] == (
+                            "GRANT_APPROVAL" if action == "timeout" else "ASK_USER"
+                        )
+                        assert h.payments.write_calls == 0
+                        assert (
+                            h.registry._one("SELECT * FROM approvals WHERE kind = 'grant'") is None
+                        )
+                    if action == "timeout":
+                        await anyio.sleep(0.2)
+                        assert (
+                            h.payments.write_calls == 0
+                        )  # Late acceptance never authorizes a charge.
+    trace_path = tmp_path / "elicitation-trace.json"
+    trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
+    print(f"Elicitation trace ({action}, {approve}): {trace_path}")

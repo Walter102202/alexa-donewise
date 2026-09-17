@@ -136,6 +136,15 @@
       "title": "FaultKind",
       "type": "string"
     },
+    "GrantedBy": {
+      "enum": [
+        "session_ui",
+        "mcp_client",
+        "elicitation"
+      ],
+      "title": "GrantedBy",
+      "type": "string"
+    },
     "HistoryEntry": {
       "additionalProperties": false,
       "properties": {
@@ -458,6 +467,17 @@
       ],
       "default": null,
       "title": "Charges Applied"
+    },
+    "granted_by": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/GrantedBy"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     }
   },
   "required": [

@@ -96,6 +96,7 @@ async def test_five_scripted_turns_over_mcp_and_sse(mcp):
         payments = [r["result"] for r in receipts if r["result"].get("action") == "PAYMENT_CHARGE"]
         assert [r["outcome"] for r in payments] == ["NEEDS_APPROVAL", "PENDING", "VERIFIED"]
         assert payments[-1]["charges_applied"] == 1
+        assert payments[-1]["granted_by"] == "session_ui"
         moves = [
             r["result"] for r in receipts if r["result"].get("action") == "CALENDAR_RESCHEDULE"
         ]

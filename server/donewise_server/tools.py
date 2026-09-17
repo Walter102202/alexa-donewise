@@ -8,11 +8,18 @@ import anyio
 from donewise_harness import contracts as c
 from donewise_harness.harness import Context as HarnessContext
 from donewise_harness.registry import RegistryUnavailable
+from donewise_harness.spoken import amount
 from mcp.server.mcpserver import Context
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.server.mcpserver.tools import Tool
 from mcp.types import CallToolResult, TextContent
-from pydantic import TypeAdapter, ValidationError
+from pydantic import StrictBool, TypeAdapter, ValidationError
+
+ELICITATION_TIMEOUT = 120
+
+
+class PaymentConsent(c.Contract):
+    approve: StrictBool
 
 
 def invalid_input(exc: ValidationError, model) -> ToolError:
@@ -65,7 +72,38 @@ def make_tools(harness):
             inp = model.model_validate(values, context={"now": harness.clock.now()})
             context = harness_context(ctx)
             arg = inp.operation_id if model is c.OperationGetInput else inp
-            result = await anyio.to_thread.run_sync(partial(method, arg, context))
+            kwargs = {}
+            if model is c.ApprovalGrantInput:
+                kwargs["granted_by"] = (
+                    c.GrantedBy.SESSION_UI
+                    if ctx.headers.get("x-donewise-channel") == "session-ui"
+                    else c.GrantedBy.MCP_CLIENT
+                )
+            result = await anyio.to_thread.run_sync(partial(method, arg, context, **kwargs))
+            capability = ctx.client_capabilities.elicitation if ctx.client_capabilities else None
+            if (
+                model is c.PaymentChargeInput
+                and inp.approval_id is None
+                and result.outcome == c.Outcome.NEEDS_APPROVAL
+                and capability is not None
+                and (capability.form is not None or capability.url is None)
+            ):
+                try:
+                    with anyio.fail_after(ELICITATION_TIMEOUT):
+                        consent = await ctx.elicit(
+                            f"Approve a {amount(result.expected)} test charge to {inp.payee} "
+                            f"for the {inp.concept}?",
+                            PaymentConsent,
+                        )
+                    accepted = consent.action == "accept" and consent.data.approve is True
+                except TimeoutError:
+                    accepted = None  # Return the durable NEEDS_APPROVAL receipt unchanged.
+                except ValueError:
+                    accepted = False  # Missing or non-boolean content never grants consent.
+                if accepted is not None:
+                    result = await anyio.to_thread.run_sync(
+                        partial(harness.complete_elicitation, inp, context, result, accepted)
+                    )
         except ValidationError as exc:
             raise invalid_input(exc, model) from None
         except PermissionError:

@@ -37,7 +37,8 @@
     "GrantedBy": {
       "enum": [
         "session_ui",
-        "mcp_client"
+        "mcp_client",
+        "elicitation"
       ],
       "title": "GrantedBy",
       "type": "string"

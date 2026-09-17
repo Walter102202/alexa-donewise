@@ -25,6 +25,7 @@ from starlette.responses import JSONResponse
 
 from .admin import register_admin
 from .config import Settings
+from .local import HTTP_LOOP
 from .resources import register_resources
 from .tools import make_tools
 
@@ -49,25 +50,33 @@ class BearerMiddleware:
         session_id = None
         body = bytearray()
         is_json = False
+        is_sse = False
+
+        async def record(payload):
+            try:
+                version = json.loads(payload).get("result", {}).get("protocolVersion")
+            except (ValueError, AttributeError):
+                return
+            if version:
+                await anyio.to_thread.run_sync(self.registry.record_protocol, session_id, version)
 
         async def capture(message):
-            nonlocal session_id, is_json
+            nonlocal session_id, is_json, is_sse
             if message["type"] == "http.response.start":
                 response_headers = Headers(raw=message["headers"])
                 session_id = response_headers.get("mcp-session-id")
                 is_json = "application/json" in response_headers.get("content-type", "")
-            elif message["type"] == "http.response.body" and session_id and is_json:
+                is_sse = "text/event-stream" in response_headers.get("content-type", "")
+            elif message["type"] == "http.response.body" and session_id and (is_json or is_sse):
                 body.extend(message.get("body", b""))
-                if not message.get("more_body"):
-                    try:
-                        result = json.loads(body).get("result", {})
-                        version = result.get("protocolVersion")
-                    except (ValueError, AttributeError):
-                        version = None
-                    if version:
-                        await anyio.to_thread.run_sync(
-                            self.registry.record_protocol, session_id, version
-                        )
+                if is_sse:
+                    while b"\n" in body:
+                        line, _, rest = body.partition(b"\n")
+                        body[:] = rest
+                        if line.startswith(b"data:"):
+                            await record(line[5:].strip())
+                elif not message.get("more_body"):
+                    await record(body)
             await send(message)
 
         await self.app(scope, receive, capture)
@@ -125,7 +134,7 @@ def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=
     register_admin(server, settings, harness)
     app = server.streamable_http_app(
         streamable_http_path="/mcp",
-        json_response=True,
+        json_response=False,
         host=settings.host,
         transport_security=TransportSecuritySettings(
             allowed_hosts=list(
@@ -179,7 +188,7 @@ def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=
 
 def main():
     settings = Settings()
-    uvicorn.run(build_app(settings), host=settings.host, port=settings.port)
+    uvicorn.run(build_app(settings), host=settings.host, port=settings.port, loop=HTTP_LOOP)
 
 
 if __name__ == "__main__":
