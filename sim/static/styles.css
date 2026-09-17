@@ -1,0 +1,97 @@
+/* Visual direction by Codex (donewise-evening.codex.html), approved by Walter 2026-09-16, as ported from
+   design/mockups/donewise-3min.html. Rules from the prototype are kept verbatim; the additions from PRD §5.2
+   (mode badge, input row, approve button, fault tag, contrast card, audit panel, voice toggle) are at the end. */
+html,body{margin:0;background:#e9e4da}
+body{padding:24px;display:grid;place-items:start center}
+@media(max-width:680px){body{padding:0}}
+#dw-evening{color-scheme:light dark;--de-bg:light-dark(#f4f0e8,#222924);--de-paper:light-dark(#fffdf8,#2a332e);--de-ink:light-dark(#25352f,#edf1e9);--de-muted:light-dark(#637168,#b0bdb2);--de-line:light-dark(#d6dcd1,#48564b);--de-accent:light-dark(#236a65,#a3d6cc);--de-on:light-dark(#fff,#173a33);--de-tint:light-dark(#e7eee5,#334237);--de-green:light-dark(#2c7051,#a3d8b5);--de-warn:light-dark(#8a5c1c,#eac28b);--de-warning:light-dark(#f4ead8,#443a2c);font:400 15px/1.55 'IBM Plex Sans',sans-serif;color:var(--de-ink);background:var(--de-bg);border-radius:20px;overflow:clip;text-align:left;width:100%;max-width:1180px}
+#dw-evening *{box-sizing:border-box}#dw-evening h2,#dw-evening h3,#dw-evening p{margin:0}#dw-evening button{font:inherit;cursor:pointer}#dw-evening button:focus-visible,#dw-evening summary:focus-visible,#dw-evening a:focus-visible,#dw-evening input:focus-visible{outline:3px solid var(--de-accent);outline-offset:4px}#dw-evening [hidden]{display:none!important}
+#dw-evening svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#dw-evening .de-head{padding:20px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--de-line)}
+#dw-evening .de-brand{display:flex;align-items:center;gap:10px;font:400 30px/1 'Instrument Serif',Georgia,serif}
+#dw-evening .de-mark{width:30px;height:30px;border-radius:50%;background:var(--de-accent);color:var(--de-on);display:grid;place-items:center}
+#dw-evening .de-small{font-size:12px;color:var(--de-muted)}
+#dw-evening .de-preview{padding:10px 28px 19px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--de-muted)}
+#dw-evening .de-grid{display:grid;grid-template-columns:1.15fr 1fr}
+#dw-evening .de-talk{padding:27px 30px;display:flex;flex-direction:column;gap:23px;min-width:0}
+#dw-evening .de-heading{display:flex;justify-content:space-between;gap:12px;align-items:start}
+#dw-evening h2{font:400 37px/1.12 'Instrument Serif',Georgia,serif;letter-spacing:-.4px;max-width:340px}
+#dw-evening .de-clock{font-size:16px;color:var(--de-accent);font-variant-numeric:tabular-nums;white-space:nowrap;padding-top:4px}
+#dw-evening .de-subtitle{font-size:12px;color:var(--de-muted);margin-top:9px}
+#dw-evening .de-user{align-self:flex-end;padding:15px 18px;background:var(--de-tint);border-radius:18px 18px 3px 18px;max-width:94%;font-size:15px}
+#dw-evening .de-user small{display:block;font-size:11px;color:var(--de-muted);margin-bottom:6px}
+#dw-evening .de-answer-label{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--de-accent);margin-bottom:8px}
+#dw-evening .de-answer{font-size:19px;line-height:1.5}
+#dw-evening .de-source{font-size:12px;color:var(--de-muted);border-left:2px solid var(--de-line);padding-left:12px;margin-top:14px}
+#dw-evening .de-gap{padding:11px 14px;background:var(--de-warning);color:var(--de-warn);font-size:12px;border-radius:7px;display:flex;gap:8px;align-items:center}
+#dw-evening .de-history{margin-top:auto;padding-top:14px;border-top:1px solid var(--de-line);font-size:12px;color:var(--de-muted)}
+#dw-evening summary{cursor:pointer;padding:6px 0;color:var(--de-accent)}
+#dw-evening .de-past{padding:12px 0;border-bottom:1px solid var(--de-line)}
+#dw-evening .de-past p{margin-top:5px}#dw-evening .de-past b{color:var(--de-ink);font-weight:500}
+#dw-evening .de-side{background:var(--de-tint);padding:25px;min-width:0}
+#dw-evening .de-side-label{display:flex;gap:7px;align-items:center;font-size:12px;color:var(--de-muted);margin-bottom:14px}
+#dw-evening .de-receipt{position:relative;background:var(--de-paper);padding:23px;border-radius:12px 12px 0 0;box-shadow:0 8px 20px #15251a08}
+#dw-evening .de-receipt:after{content:'';position:absolute;bottom:-9px;height:10px;left:0;right:0;background:linear-gradient(135deg,var(--de-paper) 25%,transparent 25%) -10px 0/20px 20px,linear-gradient(225deg,var(--de-paper) 25%,transparent 25%) -10px 0/20px 20px}
+#dw-evening .de-receipt h3{font-weight:500;font-size:15px}
+#dw-evening .de-value{font-size:43px;line-height:1.2;letter-spacing:-1.5px;margin:19px 0 5px;font-variant-numeric:tabular-nums}
+#dw-evening .de-status{font-size:12px;color:var(--de-warn);margin:16px 0;padding-bottom:15px;border-bottom:1px dashed var(--de-line);display:flex;align-items:center;gap:6px}
+#dw-evening .de-status[data-tone=ok]{color:var(--de-green)}
+#dw-evening .de-facts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px;margin:0;font-size:12px}
+#dw-evening dt{color:var(--de-muted)}#dw-evening dd{margin:0;text-align:right;overflow-wrap:anywhere}
+#dw-evening .de-evidence{margin-top:14px;font-size:11px;color:var(--de-muted)}#dw-evening .de-evidence p{margin:8px 0;overflow-wrap:anywhere}
+#dw-evening .de-saved{margin-top:30px}
+#dw-evening .de-saved h3{font-size:12px;font-weight:500;margin-bottom:7px}
+#dw-evening .de-record{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--de-line);font-size:12px}
+#dw-evening .de-record span{color:var(--de-muted)}#dw-evening .de-record strong{font-weight:500;text-align:right}
+/* Demo controls: not part of the product UI. In the implementation this bar sends the next scripted input
+   through the MCP client; every state above comes from a persisted, verified receipt. */
+#dw-evening .de-director{border-top:2px dashed var(--de-line);background:var(--de-paper);padding:14px 28px 16px}
+#dw-evening .de-director-label{font-size:11px;color:var(--de-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+#dw-evening .de-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#dw-evening .de-chapters{display:flex;gap:8px;flex-wrap:wrap}
+#dw-evening .de-chapter{display:flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid var(--de-line);border-radius:8px;background:transparent;color:var(--de-muted);font-size:12px}
+#dw-evening .de-chapter[aria-pressed=true]{background:var(--de-tint);color:var(--de-ink);border-color:var(--de-accent)}
+#dw-evening .de-chapter b{font-weight:500;color:var(--de-accent);font-variant-numeric:tabular-nums}
+#dw-evening .de-nav{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#dw-evening .de-back{border:1px solid var(--de-line);background:transparent;color:var(--de-ink);border-radius:8px;padding:11px 15px;font-size:13px;min-height:44px}
+#dw-evening .de-back:disabled{opacity:.4;cursor:default}
+#dw-evening .de-next{border:0;border-radius:8px;background:var(--de-accent);color:var(--de-on);padding:12px 18px;font-size:13px;min-height:44px;max-width:100%}
+#dw-evening .de-count{font-size:11px;color:var(--de-muted)}
+#dw-evening .de-bottom{padding:12px 28px 16px;font-size:11px;color:var(--de-muted);background:var(--de-paper)}
+@media(max-width:680px){#dw-evening{border-radius:0}#dw-evening .de-grid{grid-template-columns:1fr}#dw-evening .de-talk{padding:22px;gap:20px}#dw-evening .de-side{padding:22px 22px 28px}#dw-evening h2{font-size:32px}#dw-evening .de-head,#dw-evening .de-preview,#dw-evening .de-director,#dw-evening .de-bottom{padding-left:22px;padding-right:22px}#dw-evening .de-heading{flex-wrap:wrap}#dw-evening .de-count{order:3;width:100%}#dw-evening .de-next{flex:1}#dw-evening .de-chapter{min-height:44px}#dw-evening .de-value{font-size:38px}}
+
+/* ---- Additions from PRD §5.2, in the same language ---- */
+#dw-evening .de-loading{padding:40px 28px;color:var(--de-muted);font-size:13px}
+#dw-evening .de-head-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#dw-evening .de-mode{font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid var(--de-line);color:var(--de-muted);letter-spacing:.04em;text-transform:lowercase}
+#dw-evening .de-mode[data-mode=connected]{color:var(--de-green);border-color:var(--de-green)}
+#dw-evening .de-voice{margin-left:auto;border:1px solid var(--de-line);background:transparent;color:var(--de-muted);border-radius:999px;padding:3px 10px;font-size:11px;min-height:28px}
+#dw-evening .de-voice[aria-pressed=true]{color:var(--de-accent);border-color:var(--de-accent)}
+#dw-evening .de-approve-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+#dw-evening .de-approve{border:0;border-radius:8px;background:var(--de-accent);color:var(--de-on);padding:12px 18px;font-size:14px;min-height:44px}
+#dw-evening .de-input{display:flex;gap:8px;align-items:stretch}
+#dw-evening .de-input input{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--de-ink);background:var(--de-paper);border:1px solid var(--de-line);border-radius:10px;padding:10px 14px;min-height:44px}
+#dw-evening .de-input input::placeholder{color:var(--de-muted)}
+#dw-evening .de-mic,#dw-evening .de-send{min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--de-line);background:var(--de-paper);color:var(--de-accent);display:grid;place-items:center;padding:0 12px;font-size:13px}
+#dw-evening .de-mic svg{width:18px;height:18px}
+#dw-evening .de-mic[aria-pressed=true]{background:var(--de-accent);color:var(--de-on);border-color:var(--de-accent)}
+#dw-evening .de-mic:disabled{opacity:.4;cursor:default}
+#dw-evening .de-input-note{font-size:11px;color:var(--de-muted);margin-top:-14px}
+#dw-evening .de-links{margin-left:auto;display:flex;gap:12px}
+#dw-evening .de-links a{color:var(--de-accent);text-decoration:none;border-bottom:1px solid transparent;padding:6px 0;min-height:28px}
+#dw-evening .de-links a:hover,#dw-evening .de-links a[aria-expanded=true]{border-bottom-color:var(--de-accent)}
+#dw-evening .de-receipt-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+#dw-evening .de-receipt-tab{border:1px solid var(--de-line);background:transparent;color:var(--de-muted);border-radius:999px;padding:3px 10px;font-size:11px;min-height:28px}
+#dw-evening .de-receipt-tab[aria-pressed=true]{color:var(--de-accent);border-color:var(--de-accent)}
+#dw-evening .de-fault-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--de-warn);background:var(--de-warning);border-radius:6px;padding:4px 9px;margin:-6px 0 14px}
+#dw-evening .de-hist-list{margin:8px 0 0;padding-left:18px}
+#dw-evening .de-hist-list li{margin:5px 0;overflow-wrap:anywhere}
+#dw-evening .de-hist-list b{font-weight:500;color:var(--de-ink);font-variant-numeric:tabular-nums}
+#dw-evening .de-contrast,#dw-evening .de-audit{margin-top:22px;background:var(--de-paper);border:1px dashed var(--de-line);border-radius:12px;padding:18px 20px}
+#dw-evening .de-contrast h3,#dw-evening .de-audit h3{font-size:13px;font-weight:500;margin-bottom:8px}
+#dw-evening .de-placeholder{display:inline-block;font-size:12px;color:var(--de-warn);background:var(--de-warning);border-radius:6px;padding:5px 10px;margin-bottom:8px}
+#dw-evening .de-audit-op{padding:10px 0;border-top:1px solid var(--de-line);font-size:12px}
+#dw-evening .de-audit-op:first-child{border-top:0}
+#dw-evening .de-audit-op b{font-weight:500}
+#dw-evening .de-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media(max-width:680px){#dw-evening .de-head-right{width:100%}#dw-evening .de-links{width:100%;margin-left:0}#dw-evening .de-side-label{flex-wrap:wrap}#dw-evening .de-voice,#dw-evening .de-receipt-tab{min-height:44px;padding:8px 14px}#dw-evening .de-links a{min-height:44px;display:inline-flex;align-items:center}}

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DoneWise · An evening with Clara</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<div id="dw-evening" aria-label="DoneWise: an evening with Clara">
+ <header class="de-head">
+  <div class="de-brand"><span class="de-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span>DoneWise</div>
+  <div class="de-head-right">
+   <span class="de-small">Simulated Alexa+ experience · Local sandbox</span>
+   <span class="de-mode" id="de-mode" data-mode="sandbox">sandbox</span>
+  </div>
+ </header>
+ <div class="de-preview"><span id="de-preview-left">An evening with Clara · 3-minute cut</span><span id="de-preview-right"></span></div>
+ <p class="de-loading" id="de-loading">Loading receipts…</p>
+ <div class="de-grid" id="de-grid" hidden>
+  <section class="de-talk" aria-label="Clara's conversation with Alexa+">
+   <div><div class="de-heading"><h2 id="de-title"></h2><time class="de-clock" id="de-time"></time></div><p class="de-subtitle" id="de-subtitle"></p></div>
+   <div class="de-gap" id="de-gap" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><span id="de-gap-text"></span></div>
+   <div class="de-user" id="de-user-wrap"><small>Clara</small><p id="de-user"></p></div>
+   <div>
+    <div class="de-answer-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 10v3M6 6v11M10 3v18M14 8v7M18 5v13M22 10v3"/></svg><span>Alexa+ · spoken from the receipt</span><button type="button" class="de-voice" id="de-voice" aria-pressed="true" title="Read the spoken phrase aloud">Voice on</button></div>
+    <p class="de-answer" id="de-answer" aria-live="polite"></p>
+    <div class="de-approve-wrap" id="de-approve-wrap" hidden><button type="button" class="de-approve" id="de-approve"></button><span class="de-small" id="de-approve-note"></span></div>
+    <p class="de-source" id="de-source"></p>
+   </div>
+   <details class="de-history"><summary id="de-history-label">Earlier in this conversation</summary><div id="de-history"></div></details>
+   <form class="de-input" id="de-input" autocomplete="off">
+    <label class="de-visually-hidden" for="de-text">Say something to Alexa+</label>
+    <input type="text" id="de-text" placeholder="Type or tap the microphone…">
+    <button type="button" class="de-mic" id="de-mic" aria-label="Speak" title="Speak"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3M8 21h8"/></svg></button>
+    <button type="submit" class="de-send" aria-label="Send">Send</button>
+   </form>
+   <p class="de-input-note" id="de-input-note" hidden></p>
+  </section>
+  <aside class="de-side" aria-label="Receipts and saved tasks">
+   <div class="de-side-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1zM8 7h8M8 11h8M8 15h5"/></svg><span>What backs this answer</span><span class="de-links"><a href="#" id="de-link-receipt">Receipt</a><a href="#" id="de-link-audit" aria-expanded="false">Audit</a></span></div>
+   <div class="de-receipt">
+    <div class="de-receipt-tabs" id="de-receipt-tabs" hidden></div>
+    <h3 id="de-receipt-title"></h3><p class="de-small" id="de-receipt-sub"></p>
+    <div class="de-value" id="de-value"></div><p class="de-small" id="de-value-sub"></p>
+    <div class="de-status" id="de-status"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></svg><span id="de-status-text"></span></div>
+    <p class="de-fault-tag" id="de-fault-tag" hidden></p>
+    <dl class="de-facts" id="de-facts"></dl>
+    <details class="de-evidence"><summary>Where this answer comes from</summary><div id="de-evidence"></div><ol class="de-hist-list" id="de-op-history" hidden></ol></details>
+   </div>
+   <section class="de-contrast" id="de-contrast" hidden>
+    <h3>Same fault, same model, without DoneWise</h3>
+    <p class="de-placeholder">Pending: fed by evaluation run</p>
+    <p class="de-small">Baseline reply and Stripe test dashboard for this run appear here, labelled with the evaluation run ID. Never written by hand.</p>
+   </section>
+   <section class="de-audit" id="de-audit" hidden>
+    <h3>Audit</h3>
+    <p class="de-small" id="de-audit-session">MCP session: not connected</p>
+    <div id="de-audit-ops"></div>
+   </section>
+   <section class="de-saved"><h3>Clara's tasks · this conversation</h3><div id="de-records"></div></section>
+  </aside>
+ </div>
+ <footer class="de-director" aria-label="Demo controls">
+  <div class="de-director-label">Demo controls · not part of the product</div>
+  <div class="de-controls">
+   <nav class="de-chapters" aria-label="Chapters" id="de-chapters"></nav>
+   <div class="de-nav"><button type="button" class="de-back" id="de-prev">Back</button><span class="de-count" id="de-count"></span><button type="button" class="de-next" id="de-next">Continue</button></div>
+  </div>
+ </footer>
+ <p class="de-bottom" id="de-bottom">Week 1 build: states, times and receipts are read from a fixture of validated receipts. Nothing is connected to Alexa, Google Calendar or Stripe yet. The demo bar shows the next receipt; in the product it sends the next scripted input.</p>
+</div>
+<script src="/static/app.js"></script>
+</body>
+</html>
