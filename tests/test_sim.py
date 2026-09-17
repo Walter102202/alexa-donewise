@@ -29,20 +29,20 @@ def mcp(tmp_path):
 
 
 @asynccontextmanager
-async def simulation(mcp, llm=None):
+async def simulation(mcp, llm=None, *, ui_mode=None, admin_token="admin"):
     server, url = mcp
     app = build_app(
         Settings(
             mcp_url=url + "/mcp",
             mcp_bearer_token="bearer",
-            demo_admin_token="admin",
+            demo_admin_token=admin_token,
             llm_provider="none",
         ),
         llm=llm,
     )
     with serving(app) as sim_url:
         async with httpx.AsyncClient(base_url=sim_url, timeout=30) as client:
-            response = await client.post("/session")
+            response = await client.post("/session", json={"ui_mode": ui_mode} if ui_mode else None)
             assert response.status_code == 200, response.text
             metadata = response.json()
             events = []
@@ -208,7 +208,12 @@ class AdversarialLLM:
 
 @pytest.mark.anyio
 async def test_model_cannot_grant_or_replace_receipt_speech(mcp):
-    async with simulation(mcp, AdversarialLLM()) as (client, metadata, events, app):
+    async with simulation(mcp, AdversarialLLM(), ui_mode="voice") as (
+        client,
+        metadata,
+        events,
+        app,
+    ):
         sid = metadata["session_id"]
         await act(client, sid, "/turn", {"text": "Book the plumber"})
         speech = [e["data"] for e in events if e["event"] == "assistant"]
@@ -261,3 +266,79 @@ async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provi
     await model.reply([], [])
     assert "2026-10-01 23:59:00 -0700 America/Los_Angeles" in prompts[0]
     assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in prompts[1]
+
+
+@pytest.mark.anyio
+async def test_fault_controls_restore_consume_and_isolate_modes(mcp):
+    import threading
+
+    release = threading.Event()
+
+    class CreateLLM:
+        async def reply(self, messages, tools):
+            while not release.is_set():
+                await asyncio.sleep(0.01)
+            if messages[-1]["content"][0]["type"] == "tool_result":
+                return Reply()
+            return Reply(
+                tool_calls=[
+                    ToolCall("create", "calendar_create_verified", calendar_args("fault-create"))
+                ]
+            )
+
+    async with simulation(mcp, CreateLLM(), ui_mode="voice") as (client, metadata, events, app):
+        sid = metadata["session_id"]
+        prefix = f"/session/{sid}"
+        fault = {"kind": "ack_without_write", "uses": 2}
+        assert metadata["ui_mode"] == "voice" and not metadata["llm_enabled"]
+        assert (await client.post(prefix + "/script/next")).status_code == 409
+        responses = await asyncio.gather(
+            client.post(prefix + "/faults", json=fault),
+            client.post(prefix + "/faults", json=fault),
+        )
+        assert sorted(r.status_code for r in responses)[0] == 200
+        assert sum(r.status_code == 200 for r in responses) == 1
+        state = (await client.get(prefix + "/state")).json()
+        assert state["fault_state"]["armed"] == {"ack_without_write": 2}
+        assert not state["busy"]
+        # Block the model until both overlapping mutations have been rejected.
+        try:
+            response = await client.post(prefix + "/turn", json={"text": "Create an event"})
+            assert response.status_code == 200
+            assert (await client.post(prefix + "/faults", json=fault)).status_code == 409
+            assert (
+                await client.post(prefix + "/mode", json={"ui_mode": "scripted"})
+            ).status_code == 409
+        finally:
+            release.set()
+        for _ in range(250):
+            state = (await client.get(prefix + "/state")).json()
+            if not state["busy"]:
+                break
+            await asyncio.sleep(0.05)
+        assert not state["busy"]
+        await asyncio.sleep(0.05)
+        assert state["fault_state"]["armed"] == {}
+        assert state["fault_state"]["fired"] == ["ack_without_write"] * 2
+        assert any(e["event"] == "fault" and e["data"]["state"]["armed"] for e in events)
+        assert any(e["event"] == "fault" and e["data"]["state"]["fired"] for e in events)
+        changed = await client.post(prefix + "/mode", json={"ui_mode": "scripted"})
+        new = changed.json()
+        assert new["run_id"] != metadata["run_id"] and new["fault_state"]["armed"] == {}
+        new_prefix = f"/session/{new['session_id']}"
+        assert (await client.post(new_prefix + "/faults", json=fault)).status_code == 409
+        assert (
+            await client.post(new_prefix + "/turn", json={"text": "Book the plumber"})
+        ).status_code == 409
+        assert (await client.get(prefix + "/state")).json()["receipts"] == state["receipts"]
+
+
+@pytest.mark.anyio
+async def test_fault_endpoint_disabled_without_admin(mcp):
+    async with simulation(mcp, ui_mode="voice", admin_token="") as (client, metadata, _, __):
+        assert not metadata["admin_enabled"]
+        response = await client.post(
+            f"/session/{metadata['session_id']}/faults",
+            json={"kind": "drop_response_after_write", "uses": 1},
+        )
+        assert response.status_code == 404

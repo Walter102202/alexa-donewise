@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlsplit
 
 import uvicorn
@@ -23,8 +24,12 @@ class TurnInput(BaseModel):
 
 
 class FaultInput(BaseModel):
-    kind: str
+    kind: Literal["drop_response_after_write", "ack_without_write"]
     uses: int = Field(default=1, ge=1, le=100)
+
+
+class ModeInput(BaseModel):
+    ui_mode: Literal["voice", "scripted"]
 
 
 def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
@@ -61,9 +66,8 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     async def index():
         return FileResponse(SIM_ROOT / "static" / "index.html")
 
-    @app.post("/session")
-    async def create_session():
-        session = Session(settings, llm or make_llm(settings))
+    async def new_session(ui_mode=None):
+        session = Session(settings, llm or make_llm(settings), ui_mode)
         try:
             await session.start()
         except Exception:
@@ -72,6 +76,18 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
             ) from None
         sessions[session.id] = session
         return session.metadata()
+
+    @app.post("/session")
+    async def create_session(body: ModeInput | None = None):
+        return await new_session(body.ui_mode if body else None)
+
+    @app.post("/session/{session_id}/mode")
+    async def change_mode(session_id: str, body: ModeInput):
+        session = get_session(session_id)
+        if session.busy:
+            raise HTTPException(409, "Wait for the current action before changing mode")
+        async with session.lock:
+            return await new_session(body.ui_mode)
 
     @app.get("/session/{session_id}/events")
     async def events(session_id: str, request: Request):
@@ -89,11 +105,12 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     @app.get("/session/{session_id}/state")
     async def state(session_id: str):
         session = get_session(session_id)
+        await session.refresh_faults()
         return {
             **session.metadata(),
             "receipts": session.receipts,
             "step": session.step,
-            "busy": bool(session.task and not session.task.done()),
+            "busy": session.busy,
             "pending_approval": session.pending_approval["request"]
             if session.pending_approval
             else None,
@@ -102,6 +119,10 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     @app.post("/session/{session_id}/turn")
     async def turn(session_id: str, body: TurnInput):
         session = get_session(session_id)
+        if session.ui_mode == "scripted" and not (
+            session.pending_approval and agent.is_affirmation(body.text)
+        ):
+            raise HTTPException(409, "Free input requires a new voice session")
         return launch(session, lambda: agent.turn(session, body.text))
 
     @app.post("/session/{session_id}/approve")
@@ -116,6 +137,8 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
         session = get_session(session_id)
         if not settings.demo_admin_token:
             raise HTTPException(404, "Demo controls disabled")
+        if session.ui_mode != "scripted":
+            raise HTTPException(409, "Script controls require a new scripted session")
         if session.step >= 5:
             raise HTTPException(409, "Script complete")
         return launch(session, lambda: scripted.next_step(session))
@@ -129,12 +152,19 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
         if not settings.demo_admin_token:
             raise HTTPException(404, "Demo controls disabled")
         session = get_session(session_id)
+        if session.ui_mode != "voice":
+            raise HTTPException(409, "Scripted sessions arm their own faults")
+        if session.busy:
+            raise HTTPException(409, "Wait for the current action before arming a fault")
+        expected_uses = 1 if body.kind == "drop_response_after_write" else 2
+        if body.uses != expected_uses:
+            raise HTTPException(400, "Use the fault preset's exact number of uses")
         async with session.lock:
             try:
                 await session.arm(body.kind, body.uses)
             except RuntimeError:
                 raise HTTPException(400, "Fault could not be armed") from None
-        return {"ok": True}
+        return {"ok": True, "fault_state": session.fault_state}
 
     app.mount("/static", StaticFiles(directory=SIM_ROOT / "static"), name="static")
     app.mount("/fixtures", StaticFiles(directory=SIM_ROOT / "fixtures"), name="fixtures")

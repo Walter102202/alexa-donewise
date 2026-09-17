@@ -83,7 +83,7 @@ class MCPClient:
         text = "\n".join(item.text for item in result.content if hasattr(item, "text"))
         return result.structured_content, result.is_error, text
 
-    async def admin(self, path, payload):
+    async def admin(self, path, payload=None):
         if not self.settings.demo_admin_token:
             raise RuntimeError("Demo admin capability is not configured")
         parts = urlsplit(self.settings.mcp_url)
@@ -91,7 +91,10 @@ class MCPClient:
         async with httpx2.AsyncClient(
             headers={"X-Demo-Admin-Token": self.settings.demo_admin_token}
         ) as client:
-            response = await client.post(url, json={"run_id": self.run_id, **payload})
+            if payload is None:
+                response = await client.get(url, params={"run_id": self.run_id})
+            else:
+                response = await client.post(url, json={"run_id": self.run_id, **payload})
             if response.status_code != 200:
                 raise RuntimeError("Demo admin request failed")
             return response.json()

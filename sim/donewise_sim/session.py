@@ -12,10 +12,12 @@ class ToolCallError(RuntimeError):
 
 
 class Session:
-    def __init__(self, settings, llm):
+    def __init__(self, settings, llm, ui_mode=None):
         self.id = uuid4().hex
         self.run_id = "run_" + uuid4().hex
         self.settings, self.llm = settings, llm
+        self.ui_mode = ui_mode or ("scripted" if settings.llm_provider == "none" else "voice")
+        self.fault_state = None
         self.client = MCPClient(settings, self.run_id)
         self.consent_token = None
         self.messages = []
@@ -41,6 +43,7 @@ class Session:
             if self.settings.demo_admin_token:
                 token = await self.client.admin("consent-token", {})
                 self.consent_token = token["consent_token"]
+                await self.refresh_faults()
         except BaseException:
             await self.client.close()
             raise
@@ -50,6 +53,10 @@ class Session:
             "session_id": self.id,
             "run_id": self.run_id,
             "mode": self.settings.mode,
+            "ui_mode": self.ui_mode,
+            "llm_enabled": self.settings.llm_provider != "none",
+            "fault_state": self.fault_state,
+            "event_cursor": len(self.events),
             "tools": [t["name"] for t in self.tools],
             "protocol_version": self.client.protocol_version,
             "mcp_session_id": self.client.mcp_session_id,
@@ -89,7 +96,7 @@ class Session:
         if result.get("outcome") == "PENDING":
             await self.emit("assistant", {"text": result["spoken"], "source": "spoken"})
         if fault := result.get("fault_injected"):
-            await self.emit("fault", {"kind": fault, "fired": True})
+            await self.refresh_faults(kind=fault)
 
     async def execute(self, tool, arguments):
         if tool not in {t["name"] for t in self.tools}:
@@ -140,8 +147,33 @@ class Session:
         return result
 
     async def arm(self, kind, uses=1):
-        await self.client.admin("faults", {"kind": kind, "uses": uses})
-        await self.emit("fault", {"kind": kind, "armed": True})
+        state = await self.refresh_faults()
+        if state is None or state["armed"]:
+            raise RuntimeError("Fault state unavailable or a fault is already armed")
+        try:
+            self.fault_state = await self.client.admin("faults", {"kind": kind, "uses": uses})
+        except Exception:
+            # A lost response must never make the next click accumulate another use.
+            await self.refresh_faults()
+            raise
+        await self.emit("fault", {"kind": kind, "state": self.fault_state})
+
+    async def refresh_faults(self, kind=None):
+        if not self.settings.demo_admin_token:
+            return None
+        try:
+            state = await self.client.admin("faults")
+        except Exception:
+            state = None
+        changed = state != self.fault_state
+        self.fault_state = state
+        if changed or kind:
+            await self.emit("fault", {"kind": kind, "state": state})
+        return state
+
+    @property
+    def busy(self):
+        return self.lock.locked() or bool(self.task and not self.task.done())
 
     async def speak_receipts(self):
         spoken = [r["spoken"] for r in self.turn_spoken.values() if r.get("outcome") != "PENDING"]
@@ -149,7 +181,7 @@ class Session:
             await self.emit("assistant", {"text": " ".join(spoken), "source": "spoken"})
 
     def launch(self, action):
-        if self.task and not self.task.done():
+        if self.busy:
             return False
 
         async def run():
@@ -167,6 +199,7 @@ class Session:
                     )
                     await self.speak_receipts()
                 finally:
+                    await self.refresh_faults()
                     await self.emit("status", {"status": "idle", "step": self.step})
 
         self.task = asyncio.create_task(run())

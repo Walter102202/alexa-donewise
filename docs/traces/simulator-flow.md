@@ -42,3 +42,31 @@ because these are two requested deliveries, spanning real TCP lifecycle, thread 
 consent/LLM/SSE boundaries. Test server startup and the week-one world are reused; no second MCP
 fixture server was added. `uv.lock` and `initialize.json` are generated artifacts.
 The optional fault proxy is deferred until real-adapter integration (step 1).
+
+## Step 3A — voice controls (17 September 2026)
+
+Validated against the real local MCP server with Fake adapters and `LLM_PROVIDER=none`.
+Chrome 153 on Windows used `http://localhost:8082`; 8080 was already occupied and left alone.
+MCP ran on 8767, data in `%TEMP%/donewise-step3-acceptance`.
+
+- The five scripted turns completed. Run `run_08302e7ff4b644b5aa890aca4f486d5f` persisted one
+  $60 charge, `pi_23cdb8475e5f48e98da1e615e83fc9ff`, and the event ended at 10–11 AM.
+  The fault panel showed one lost response and two consumed false acknowledgements. The payment
+  JSON independently contained exactly one charge; no live provider was contacted.
+- Changing to Free voice created a separate run, hid the whole chapter bar and displayed the live
+  voice label plus the explicit model-off limitation. Manual drop armed once, released the controls,
+  and survived reload with one use remaining. Text input reached NoLLM without executing a write.
+- With a browser recognition double, the transcript was visible before submission, no POST occurred
+  before `onend`, and exactly one occurred after it. `not-allowed`, `no-speech` and `aborted` sent none.
+  With a synthesis double, the mic was disabled while speech was pending and enabled after ending.
+  These are UI wiring checks, **not real microphone capture or acoustic echo acceptance**.
+- At 390 px the page had no horizontal overflow. The only recorded console resource error was the
+  existing missing favicon (404); no application exception was observed.
+
+Verification: `uv run pytest -q` **120 passed in 29.71 s**; `uv run ruff check .`,
+`uv run ruff format --check .`, `node --check sim/static/app.js` passed (format was normalized after
+pytest, no semantic change). Two new simulator tests protect fault endpoint disablement and real
+TCP/SSE armed/consumed state, concurrent-arm exclusion, busy-mode rejection and run isolation.
+
+Still pending: human Chrome microphone/TTS rehearsal and the five-turn voice story with a real LLM.
+No claim of acoustic acceptance or connected Google/Stripe/LLM execution is made.

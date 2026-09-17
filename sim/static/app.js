@@ -123,6 +123,7 @@ const isRecap = (tool, r) => tool === 'receipts_recap' || Array.isArray(r.items)
 /* ---------- state ---------- */
 
 let LIVE = null, LIVE_BUSY = false, LIVE_STEP = 0, LIVE_ERROR = "", eventSource = null;
+let controlBusy = false, recognizing = null, speaking = false;
 
 let STATES = [];
 
@@ -268,7 +269,7 @@ function renderReceipt(receipt, meta) {
 
   text('value', value); text('value-sub', valueSub);
 
-  text('status-text', status); get('status').dataset.tone = tone;
+  text('status-text', status); get('status').dataset.tone = tone; get('status').hidden = false;
 
   fill(get('facts'), facts);
 
@@ -460,9 +461,15 @@ function go(i) { receiptIndex = Number.MAX_SAFE_INTEGER; renderState(STATES[(i +
 
 function speak(phrase) {
 
-  if (!voiceOn || !('speechSynthesis' in window) || !phrase) return;
+  if (!voiceOn || !('speechSynthesis' in window) || !phrase || recognizing) return;
 
-  try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(phrase); u.lang = 'en-US'; speechSynthesis.speak(u); } catch (e) { /* ignore */ }
+  try {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(phrase); u.lang = 'en-US';
+    speaking = true; updateControls();
+    u.onend = u.onerror = () => { speaking = false; updateControls(); };
+    speechSynthesis.speak(u);
+  } catch (_) { speaking = false; updateControls(); }
 
 }
 
@@ -474,7 +481,7 @@ get('voice').addEventListener('click', () => {
 
   try { localStorage.setItem('dw-voice', voiceOn ? 'on' : 'off'); } catch (e) { /* ignore */ }
 
-  if (!voiceOn && 'speechSynthesis' in window) speechSynthesis.cancel();
+  if (!voiceOn && 'speechSynthesis' in window) { speechSynthesis.cancel(); speaking = false; updateControls(); }
 
 });
 
@@ -490,17 +497,36 @@ get('mic').addEventListener('click', () => {
 
   if (!Recognition) { note('Speech recognition is not supported in this browser. Type instead.'); return; }
 
-  const rec = new Recognition(); rec.lang = 'en-US'; rec.interimResults = false;
+  if (!LIVE || LIVE_BUSY || controlBusy || recognizing || ttsActive()) return;
+  const rec = new Recognition(); rec.lang = 'en-US'; rec.interimResults = true;
+  let finalText = '', failed = false;
+  recognizing = rec; updateControls();
 
   get('mic').setAttribute('aria-pressed', 'true'); note('Listening…');
 
-  rec.onresult = e => { const value = e.results[0][0].transcript; get('text').value = value; note(''); if (LIVE) postLive('/turn', {text: value}); };
+  rec.onresult = e => {
+    const results = Array.from(e.results);
+    get('text').value = results.map(r => r[0].transcript).join(' ');
+    finalText = results.filter(r => r.isFinal).map(r => r[0].transcript).join(' ').trim();
+  };
 
-  rec.onerror = e => note(`Microphone: ${e.error}`);
+  rec.onerror = e => {
+    failed = true;
+    note(e.error === 'not-allowed' ? 'Microphone permission denied. Allow it for this origin or type instead.' :
+      e.error === 'no-speech' ? 'No speech detected. Try the microphone again or type instead.' :
+      `Microphone stopped (${e.error}). Nothing sent; type instead.`);
+  };
 
-  rec.onend = () => get('mic').setAttribute('aria-pressed', 'false');
+  rec.onend = () => {
+    recognizing = null; get('mic').setAttribute('aria-pressed', 'false'); updateControls();
+    if (!failed && finalText) { get('text').value = finalText; sendText(finalText); }
+    else if (!failed) note('No final speech detected. Nothing sent; type instead.');
+  };
 
-  try { rec.start(); } catch (e) { note('Could not start the microphone.'); }
+  try { rec.start(); } catch (_) {
+    failed = true; recognizing = null; get('mic').setAttribute('aria-pressed', 'false');
+    updateControls(); note('Could not start the microphone. Type instead.');
+  }
 
 });
 
@@ -510,11 +536,21 @@ get('input').addEventListener('submit', e => {
 
   const v = get('text').value.trim();
 
-  if (LIVE && v) { postLive('/turn', {text: v}); get('text').value = ''; }
+  if (LIVE && v) sendText(v);
 
   else note(v ? 'Fixture mode: use Continue to browse the recorded receipts.' : '');
 
 });
+
+function ttsActive() {
+  return speaking || ('speechSynthesis' in window && (speechSynthesis.speaking || speechSynthesis.pending));
+}
+
+async function sendText(value) {
+  if (LIVE_BUSY || controlBusy || recognizing) return;
+  // The server permits only a pending affirmation in scripted mode.
+  if (await postLive('/turn', {text: value})) get('text').value = '';
+}
 
 
 
@@ -563,22 +599,26 @@ get('prev').addEventListener('click', () => { if (index > 0) { if (LIVE) { index
 function liveBusy(value) {
 
   LIVE_BUSY = value;
+  updateControls();
+}
 
-  get('next').disabled = value || LIVE_STEP >= 5 || !LIVE.admin_enabled;
-
-  get('approve').disabled = value;
-
-  get('input').querySelector('[type="submit"]').disabled = value;
-
-  get('text').disabled = value;
-
-  get('mic').disabled = value || !Recognition;
-
+function updateControls() {
+  if (!LIVE) return;
+  const busy = LIVE_BUSY || controlBusy || Boolean(recognizing);
+  get('next').disabled = busy || LIVE_STEP >= 5 || !LIVE.admin_enabled;
+  get('approve').disabled = busy;
+  get('input').querySelector('[type="submit"]').disabled = busy;
+  get('text').disabled = busy;
+  get('mic').disabled = busy || !Recognition || ttsActive();
+  get('session-mode').disabled = busy;
+  const armed = !LIVE.fault_state || Object.keys(LIVE.fault_state.armed).length > 0;
+  get('fault-drop').disabled = get('fault-ack').disabled = busy || armed || LIVE.ui_mode !== 'voice';
+  get('fault-refresh').disabled = busy;
 }
 
 async function postLive(path, body) {
 
-  if (LIVE_BUSY) return;
+  if (LIVE_BUSY || controlBusy || recognizing) return false;
 
   LIVE_ERROR = ''; liveBusy(true); note('');
 
@@ -594,9 +634,73 @@ async function postLive(path, body) {
 
     if (!response.ok) throw new Error((await response.json()).detail || `HTTP ${response.status}`);
 
-  } catch (error) { note(error.message); liveBusy(false); }
+    return true;
+  } catch (error) { LIVE_ERROR = error.message; note(error.message); liveBusy(false); return false; }
 
 }
+
+function renderFaults() {
+  const state = LIVE.fault_state;
+  const armed = state ? Object.entries(state.armed).map(([kind, uses]) => `${FAULT_TEXT[kind]} (${uses} remaining)`) : [];
+  const fired = state?.fired || [];
+  const parts = [];
+  if (!state) parts.push('Fault state unavailable. Refresh before arming.');
+  else {
+    if (armed.length) parts.push(`Fault armed: ${armed.join(', ')}`);
+    if (fired.length) parts.push(`Fault injected on purpose: ${FAULT_TEXT[fired.at(-1)]} · ${fired.length} consumed in this session`);
+    if (!armed.length && !fired.length) parts.push('No faults armed or injected.');
+  }
+  if (LIVE.ui_mode === 'scripted') parts.push('Scripted session: faults arm automatically.');
+  text('fault-state', parts.join(' '));
+  get('gap').hidden = !armed.length && !fired.length;
+  text('gap-text', parts[0]);
+  updateControls();
+}
+
+async function refreshFaults() {
+  const response = await fetch(`/session/${LIVE.session_id}/state`);
+  if (!response.ok) throw new Error('Unable to refresh session state.');
+  const state = await response.json();
+  LIVE.fault_state = state.fault_state; LIVE_BUSY = state.busy; renderFaults();
+}
+
+async function faultControl(kind, uses) {
+  if (LIVE_BUSY || controlBusy || recognizing) return;
+  controlBusy = true; updateControls();
+  try {
+    if (kind) {
+      const response = await fetch(`/session/${LIVE.session_id}/faults`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({kind, uses})
+      });
+      if (!response.ok) throw new Error((await response.json()).detail || 'Fault could not be armed.');
+    }
+    note('');
+  } catch (error) { note(`${error.message} No automatic retry.`); }
+  finally {
+    try { await refreshFaults(); } catch (_) { LIVE.fault_state = null; renderFaults(); }
+    controlBusy = false; updateControls();
+  }
+}
+
+get('fault-drop').addEventListener('click', () => faultControl('drop_response_after_write', 1));
+get('fault-ack').addEventListener('click', () => faultControl('ack_without_write', 2));
+get('fault-refresh').addEventListener('click', () => faultControl());
+get('session-mode').addEventListener('change', async () => {
+  const ui_mode = get('session-mode').value;
+  if (LIVE_BUSY || controlBusy || recognizing) { get('session-mode').value = LIVE.ui_mode; return; }
+  controlBusy = true; updateControls();
+  try {
+    const response = await fetch(`/session/${LIVE.session_id}/mode`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ui_mode})
+    });
+    if (!response.ok) throw new Error((await response.json()).detail || 'Could not change mode.');
+    eventSource?.close();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    speaking = false;
+    loadSession(await response.json());
+  } catch (error) { note(error.message); get('session-mode').value = LIVE.ui_mode; }
+  finally { controlBusy = false; updateControls(); }
+});
 
 function renderLive() {
 
@@ -661,7 +765,8 @@ function connectEvents() {
 
   eventSource = new EventSource(`/session/${LIVE.session_id}/events`);
 
-  const on = (name, fn) => eventSource.addEventListener(name, e => fn(JSON.parse(e.data)));
+  const replayThrough = LIVE.event_cursor || 0;
+  const on = (name, fn) => eventSource.addEventListener(name, e => fn(JSON.parse(e.data), Number(e.lastEventId) <= replayThrough));
 
   on('user', data => {
 
@@ -669,11 +774,12 @@ function connectEvents() {
 
     index = STATES.length - 1; receiptIndex = Number.MAX_SAFE_INTEGER;
 
-    get('gap').hidden = true; get('approve-wrap').hidden = true; renderLive();
+    get('approve-wrap').hidden = true; renderLive();
 
   });
 
-  on('status', data => {
+  on('status', (data, replayed) => {
+    if (replayed) return;
 
     if (data.step != null) LIVE_STEP = data.step;
 
@@ -701,22 +807,23 @@ function connectEvents() {
 
   });
 
-  on('assistant', data => {
+  on('assistant', (data, replayed) => {
 
     if (STATES.length) STATES.at(-1).answer = data.text;
 
-    text('answer', data.text); speak(data.text);
+    text('answer', data.text); if (!replayed) speak(data.text);
 
     if (data.source === 'model') text('source', 'Model · no operation result');
 
   });
 
-  on('fault', data => {
+  on('fault', (data, replayed) => {
+    if (replayed) return;
+    LIVE.fault_state = data.state; renderFaults();
+  });
 
-    get('gap').hidden = false;
-
-    text('gap-text', `Fault ${data.fired ? 'injected' : 'armed'}: ${FAULT_TEXT[data.kind] || data.kind}`);
-
+  eventSource.addEventListener('open', () => {
+    refreshFaults().catch(() => { LIVE.fault_state = null; renderFaults(); });
   });
 
   eventSource.addEventListener('error', e => {
@@ -741,11 +848,21 @@ async function tryConnect() {
 
   if (!response.ok) throw new Error('Server not connected');
 
-  LIVE = await response.json(); RUN_ID = LIVE.run_id; LIVE_STEP = LIVE.step || 0;
+  loadSession(await response.json());
+}
+
+function loadSession(session) {
+  LIVE = session; RUN_ID = LIVE.run_id; LIVE_STEP = LIVE.step || 0; LIVE_ERROR = '';
 
   try { sessionStorage.setItem('donewise-session', LIVE.session_id); } catch (_) { /* no storage */ }
 
-  STATES = [];
+  STATES = []; index = 0; receiptIndex = Number.MAX_SAFE_INTEGER;
+  for (const id of ['time', 'source', 'value', 'value-sub', 'receipt-sub', 'answer', 'user', 'text']) {
+    if (id === 'text') get(id).value = ''; else text(id, '');
+  }
+  for (const id of ['facts', 'evidence', 'op-history', 'records', 'history', 'audit-ops', 'receipt-tabs']) get(id).replaceChildren();
+  for (const id of ['approve-wrap', 'fault-tag', 'status', 'receipt-tabs', 'gap']) get(id).hidden = true;
+  note('');
 
   text('mode', LIVE.mode); get('mode').dataset.mode = LIVE.mode;
 
@@ -759,7 +876,13 @@ async function tryConnect() {
 
   get('chapters').replaceChildren(); get('contrast').hidden = true;
 
-  root.querySelector('.de-director').hidden = !LIVE.admin_enabled;
+  root.querySelector('.de-director').hidden = !LIVE.admin_enabled || LIVE.ui_mode === 'voice';
+  get('session-controls').hidden = false; get('session-mode').value = LIVE.ui_mode;
+  get('session-label').hidden = false;
+  text('session-label', LIVE.ui_mode === 'voice' ? 'live voice session' : 'scripted session');
+  text('llm-note', LIVE.llm_enabled ? 'Language model configured · connection not yet validated' : 'Language model off · input check only');
+  get('fault-panel').hidden = !LIVE.admin_enabled;
+  renderFaults();
 
   get('loading').hidden = true; get('grid').hidden = false;
 

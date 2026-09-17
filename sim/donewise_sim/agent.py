@@ -17,6 +17,8 @@ async def turn(session, text):
     await session.emit("user", {"text": text})
     session.messages.append({"role": "user", "content": [{"type": "text", "text": text}]})
     if session.pending_approval and is_affirmation(text):
+        if session.ui_mode == "scripted" and session.step == 1:
+            await session.arm("drop_response_after_write")
         result = await session.approve()
         if session.step == 1 and session.script_args:
             session.step = 2

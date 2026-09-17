@@ -94,4 +94,8 @@ body{padding:24px;display:grid;place-items:start center}
 #dw-evening .de-audit-op:first-child{border-top:0}
 #dw-evening .de-audit-op b{font-weight:500}
 #dw-evening .de-visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+#dw-evening .de-session-controls{border-top:2px dashed var(--de-line);padding:16px 28px;background:var(--de-paper)}
+#dw-evening .de-session-controls select{font:inherit;min-height:44px;max-width:100%;padding:8px;margin:0 0 10px 8px;border:1px solid var(--de-line);border-radius:8px;color:var(--de-ink);background:var(--de-paper)}
+#dw-evening #de-fault-panel{margin-top:12px}#dw-evening #de-fault-state{margin-top:10px}
+#dw-evening button:disabled{cursor:default;opacity:.45}#dw-evening select:focus-visible{outline:3px solid var(--de-accent);outline-offset:4px}
 @media(max-width:680px){#dw-evening .de-head-right{width:100%}#dw-evening .de-links{width:100%;margin-left:0}#dw-evening .de-side-label{flex-wrap:wrap}#dw-evening .de-voice,#dw-evening .de-receipt-tab{min-height:44px;padding:8px 14px}#dw-evening .de-links a{min-height:44px;display:inline-flex;align-items:center}}

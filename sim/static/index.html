@@ -14,6 +14,7 @@
   <div class="de-head-right">
    <span class="de-small">Simulated Alexa+ experience · Local sandbox</span>
    <span class="de-mode" id="de-mode" data-mode="sandbox">sandbox</span>
+   <span class="de-mode" id="de-session-label" hidden></span>
   </div>
  </header>
  <div class="de-preview"><span id="de-preview-left">An evening with Clara · 3-minute cut</span><span id="de-preview-right"></span></div>
@@ -62,6 +63,21 @@
    <section class="de-saved"><h3>Clara's tasks · this conversation</h3><div id="de-records"></div></section>
   </aside>
  </div>
+ <section class="de-session-controls" id="de-session-controls" aria-label="Session controls" hidden>
+  <div class="de-director-label">Demo controls · not part of the product</div>
+  <label for="de-session-mode">Session mode</label>
+  <select id="de-session-mode"><option value="scripted">Scripted</option><option value="voice">Free voice</option></select>
+  <p class="de-small">Changing mode starts a new conversation. Previous records are kept.</p>
+  <p class="de-small" id="de-llm-note"></p>
+  <div id="de-fault-panel" hidden>
+   <div class="de-controls">
+    <button type="button" class="de-back" id="de-fault-drop">Drop the response after the charge</button>
+    <button type="button" class="de-back" id="de-fault-ack">Acknowledge without writing, twice</button>
+    <button type="button" class="de-back" id="de-fault-refresh">Refresh fault state</button>
+   </div>
+   <p class="de-small" id="de-fault-state" role="status"></p>
+  </div>
+ </section>
  <footer class="de-director" aria-label="Demo controls">
   <div class="de-director-label">Demo controls · not part of the product</div>
   <div class="de-controls">
