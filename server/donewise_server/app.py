@@ -10,6 +10,9 @@ import anyio
 import uvicorn
 from donewise_adapters.fake_calendar import FakeCalendar
 from donewise_adapters.fake_payments import FakePayments
+from donewise_adapters.fault_proxy import FaultProxy
+from donewise_adapters.google_calendar import GoogleCalendar
+from donewise_adapters.stripe_test import StripeTest
 from donewise_harness.faults import FaultBoard
 from donewise_harness.harness import Harness
 from donewise_harness.reconcile import Reconciler
@@ -71,21 +74,46 @@ class BearerMiddleware:
 
 
 def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=24)) -> Starlette:
-    settings.data_dir.mkdir(parents=True, exist_ok=True)
-    registry = Registry(settings.data_dir / "registry.sqlite", clock=clock)
+    # Settings is mutable: revalidate immediately before constructing any provider or state.
+    settings.__post_init__()
     faults = FaultBoard()
     if settings.mode == "connected":
-        logger.warning("Connected configuration validated; using Fake adapters until step 1")
-    harness = Harness(
-        registry=registry,
-        calendar=FakeCalendar(settings.data_dir / "calendar.json", faults=faults, clock=clock),
-        payments=FakePayments(
+        payments = StripeTest(
+            settings.stripe_secret_key,
+            clock=clock,
+            run_id=lambda: faults.active_run,
+            transport=FaultProxy(faults),
+        )
+        try:
+            calendar = GoogleCalendar(
+                settings.google_service_account_json,
+                settings.google_calendar_id,
+                clock=clock,
+                run_id=lambda: faults.active_run,
+                transport=FaultProxy(faults),
+            )
+        except Exception:
+            payments.close()
+            raise
+    else:
+        settings.data_dir.mkdir(parents=True, exist_ok=True)
+        calendar = FakeCalendar(settings.data_dir / "calendar.json", faults=faults, clock=clock)
+        payments = FakePayments(
             settings.data_dir / "payments.json",
             faults=faults,
             delay_seconds=settings.fake_payment_delay_seconds,
             clock=clock,
             idempotency_window=payment_window,
-        ),
+        )
+    settings.data_dir.mkdir(parents=True, exist_ok=True)
+    registry = Registry(settings.data_dir / "registry.sqlite", clock=clock)
+    harness = Harness(
+        registry=registry,
+        calendar=calendar,
+        payments=payments,
+        calendar_id=settings.google_calendar_id
+        if settings.mode == "connected"
+        else "sandbox_calendar",
         faults=faults,
         consent_token_for=settings.consent_token_for,
         pending_after=settings.pending_after,
@@ -125,16 +153,21 @@ def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=
 
     @asynccontextmanager
     async def lifespan(app):
-        await anyio.to_thread.run_sync(harness.recover_pending)
-        await anyio.to_thread.run_sync(reconciler.run_once)
-        async with sdk_lifespan(app):
-            async with anyio.create_task_group() as group:
-                group.start_soon(reconcile_loop)
-                try:
-                    yield
-                finally:
-                    group.cancel_scope.cancel()
-        await anyio.to_thread.run_sync(harness.wait_for_workers)
+        try:
+            await anyio.to_thread.run_sync(harness.recover_pending)
+            await anyio.to_thread.run_sync(reconciler.run_once)
+            async with sdk_lifespan(app):
+                async with anyio.create_task_group() as group:
+                    group.start_soon(reconcile_loop)
+                    try:
+                        yield
+                    finally:
+                        group.cancel_scope.cancel()
+        finally:
+            await anyio.to_thread.run_sync(harness.wait_for_workers)
+            if settings.mode == "connected":
+                calendar.close()
+                payments.close()
 
     app.router.lifespan_context = lifespan
     app.add_middleware(BearerMiddleware, token=settings.mcp_bearer_token, registry=registry)

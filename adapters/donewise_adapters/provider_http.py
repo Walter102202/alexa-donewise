@@ -10,9 +10,9 @@ from donewise_harness.ports import ReadResult, WriteResult
 
 
 class ProviderHTTP:
-    def __init__(self, base_url, *, client=None, clock=None, run_id=None):
+    def __init__(self, base_url, *, client=None, transport=None, clock=None, run_id=None):
         self.base_url = base_url.rstrip("/")
-        self.client = client or httpx.Client(timeout=10, trust_env=False)
+        self.client = client or httpx.Client(timeout=10, trust_env=False, transport=transport)
         self._owns_client = client is None
         self.clock = clock or SystemClock()
         self._run_id: str | Callable | None = run_id

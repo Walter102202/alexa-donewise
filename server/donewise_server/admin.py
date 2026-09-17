@@ -71,6 +71,11 @@ def register_admin(server, settings, harness):
     async def reset(request: Request):
         if response := denied(request):
             return response
+        if settings.mode == "connected":
+            return JSONResponse(
+                {"error": "Reset is sandbox-only; connected provider evidence is retained"},
+                status_code=409,
+            )
         try:
             data = RunInput.model_validate(await request.json())
         except (ValidationError, json.JSONDecodeError):

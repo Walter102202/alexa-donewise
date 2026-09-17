@@ -1,4 +1,4 @@
-"""Local demo configuration. Connected mode remains fake until step 1 is approved."""
+"""Local demo configuration; connected mode permits Stripe test keys only."""
 
 import hashlib
 import hmac
@@ -38,6 +38,8 @@ class Settings:
         self.data_dir = Path(self.data_dir)
         if self.mode not in ("sandbox", "connected"):
             raise ValueError("DONEWISE_MODE must be sandbox or connected")
+        if self.stripe_secret_key and not self.stripe_secret_key.startswith("sk_test_"):
+            raise ValueError("Stripe requires a sk_test_ key; real money is forbidden")
         if self.mode == "connected":
             if not self.stripe_secret_key.startswith("sk_test_"):
                 raise ValueError("Connected mode requires a Stripe sk_test_ key")
