@@ -4,6 +4,7 @@ import hmac
 import json
 import logging
 from contextlib import asynccontextmanager
+from datetime import timedelta
 
 import anyio
 import uvicorn
@@ -69,23 +70,26 @@ class BearerMiddleware:
         await self.app(scope, receive, capture)
 
 
-def build_app(settings: Settings) -> Starlette:
+def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=24)) -> Starlette:
     settings.data_dir.mkdir(parents=True, exist_ok=True)
-    registry = Registry(settings.data_dir / "registry.sqlite")
+    registry = Registry(settings.data_dir / "registry.sqlite", clock=clock)
     faults = FaultBoard()
     if settings.mode == "connected":
         logger.warning("Connected configuration validated; using Fake adapters until step 1")
     harness = Harness(
         registry=registry,
-        calendar=FakeCalendar(settings.data_dir / "calendar.json", faults=faults),
+        calendar=FakeCalendar(settings.data_dir / "calendar.json", faults=faults, clock=clock),
         payments=FakePayments(
             settings.data_dir / "payments.json",
             faults=faults,
             delay_seconds=settings.fake_payment_delay_seconds,
+            clock=clock,
+            idempotency_window=payment_window,
         ),
         faults=faults,
         consent_token_for=settings.consent_token_for,
         pending_after=settings.pending_after,
+        clock=clock,
     )
     reconciler = Reconciler(registry, harness)
     server = MCPServer("DoneWise", tools=make_tools(harness))

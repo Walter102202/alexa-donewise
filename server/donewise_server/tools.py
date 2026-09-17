@@ -1,5 +1,7 @@
 """Six flat MCP tools, validated against the existing application contracts."""
 
+from collections.abc import Callable
+from datetime import datetime
 from functools import partial
 
 import anyio
@@ -28,12 +30,15 @@ class SafeTool(Tool):
     """Validate the full contract before SDK errors can echo secret input values."""
 
     input_contract: type[c.Contract] = c.Contract
+    validation_now: Callable[[], datetime] | None = None
 
     async def run(self, arguments, context, convert_result=False):
         if self.name == "approval_grant" and not arguments.get("consent_token"):
             raise ToolError("UNAUTHORIZED: consent capability required")
         try:
-            self.input_contract.model_validate(arguments)
+            self.input_contract.model_validate(
+                arguments, context={"now": self.validation_now()} if self.validation_now else None
+            )
         except ValidationError as exc:
             raise invalid_input(exc, self.input_contract) from None
         return await super().run(arguments, context, convert_result)
@@ -57,7 +62,7 @@ def harness_context(ctx: Context) -> HarnessContext:
 def make_tools(harness):
     async def invoke(model, method, ctx, values):
         try:
-            inp = model.model_validate(values)
+            inp = model.model_validate(values, context={"now": harness.clock.now()})
             context = harness_context(ctx)
             arg = inp.operation_id if model is c.OperationGetInput else inp
             result = await anyio.to_thread.run_sync(partial(method, arg, context))
@@ -203,6 +208,7 @@ def make_tools(harness):
     for fn, spec in zip(functions, c.TOOL_SPECS, strict=True):
         tool = SafeTool.from_function(fn, description=spec.description, structured_output=True)
         tool.input_contract = spec.input_model
+        tool.validation_now = harness.clock.now
         # SDK argument-model titles/config differ from Contract; publish the canonical schema.
         # invoke() validates the full model as well, including cross-field validators.
         tool.parameters = spec.input_model.model_json_schema()

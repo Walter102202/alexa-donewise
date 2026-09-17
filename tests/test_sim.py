@@ -266,6 +266,9 @@ async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provi
     await model.reply([], [])
     assert "2026-10-01 23:59:00 -0700 America/Los_Angeles" in prompts[0]
     assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in prompts[1]
+    model.prompt_factory = lambda: "Evaluation baseline: direct writes and optional reads."
+    await model.reply([], [])
+    assert prompts[2] == "Evaluation baseline: direct writes and optional reads."
 
 
 @pytest.mark.anyio
@@ -334,11 +337,13 @@ async def test_fault_controls_restore_consume_and_isolate_modes(mcp):
 
 
 @pytest.mark.anyio
-async def test_fault_endpoint_disabled_without_admin(mcp):
-    async with simulation(mcp, ui_mode="voice", admin_token="") as (client, metadata, _, __):
-        assert not metadata["admin_enabled"]
+async def test_fault_endpoint_disabled_without_admin():
+    app = build_app(Settings(demo_admin_token="", llm_provider="none"))
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app), base_url="http://localhost"
+    ) as client:
         response = await client.post(
-            f"/session/{metadata['session_id']}/faults",
+            "/session/disabled/faults",
             json={"kind": "drop_response_after_write", "uses": 1},
         )
         assert response.status_code == 404

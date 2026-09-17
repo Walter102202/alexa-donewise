@@ -1,20 +1,17 @@
 """Wire acceptance with the official SDK, real TCP and persisted fake oracles."""
 
 import json
-import socket
-import threading
 import time
-from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import anyio
 import httpx2
 import pytest
-import uvicorn
 from donewise_harness.contracts import TOOL_SPECS, CalendarCreateResult
 from donewise_server.app import build_app
 from donewise_server.config import Settings
+from donewise_server.local import serving
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
 
@@ -35,27 +32,6 @@ def test_connected_configuration_fails_closed(key, google):
             google_service_account_json="sandbox.json" if google else "",
             google_calendar_id="sandbox" if google else "",
         )
-
-
-@contextmanager
-def serving(app):
-    sock = socket.socket()
-    sock.bind(("127.0.0.1", 0))
-    port = sock.getsockname()[1]
-    server = uvicorn.Server(uvicorn.Config(app, log_level="error", lifespan="on"))
-    thread = threading.Thread(target=server.run, kwargs={"sockets": [sock]}, daemon=True)
-    thread.start()
-    deadline = time.monotonic() + 10
-    while not server.started and thread.is_alive() and time.monotonic() < deadline:
-        time.sleep(0.01)
-    assert server.started
-    try:
-        yield f"http://127.0.0.1:{port}"
-    finally:
-        server.should_exit = True
-        thread.join(20)
-        sock.close()
-        assert not thread.is_alive()
 
 
 @pytest.fixture

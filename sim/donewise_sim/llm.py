@@ -46,8 +46,9 @@ class NoLLM:
 
 
 class BedrockLLM:
-    def __init__(self, settings):
+    def __init__(self, settings, prompt_factory=system_prompt):
         self.settings = settings
+        self.prompt_factory = prompt_factory
 
     async def reply(self, messages, tools):
         import boto3
@@ -87,7 +88,7 @@ class BedrockLLM:
             try:
                 return client.converse(
                     modelId=self.settings.bedrock_model_id,
-                    system=[{"text": system_prompt()}],
+                    system=[{"text": self.prompt_factory()}],
                     messages=converted,
                     inferenceConfig={"maxTokens": 1200},
                     toolConfig={
@@ -119,8 +120,9 @@ class BedrockLLM:
 
 
 class AnthropicLLM:
-    def __init__(self, settings):
+    def __init__(self, settings, prompt_factory=system_prompt):
         self.settings = settings
+        self.prompt_factory = prompt_factory
 
     async def reply(self, messages, tools):
         from anthropic import AsyncAnthropic
@@ -131,7 +133,7 @@ class AnthropicLLM:
             response = await client.messages.create(
                 model=self.settings.anthropic_model,
                 max_tokens=1200,
-                system=system_prompt(),
+                system=self.prompt_factory(),
                 messages=messages,
                 tools=tools,
             )
@@ -141,10 +143,10 @@ class AnthropicLLM:
         )
 
 
-def make_llm(settings) -> LLM:
+def make_llm(settings, prompt_factory=system_prompt) -> LLM:
     providers = {"bedrock": BedrockLLM, "anthropic": AnthropicLLM}
     if settings.llm_provider == "none":
         return NoLLM()
     if settings.llm_provider not in providers:
         raise ValueError("LLM_PROVIDER must be bedrock, anthropic or none")
-    return providers[settings.llm_provider](settings)
+    return providers[settings.llm_provider](settings, prompt_factory)

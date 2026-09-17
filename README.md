@@ -4,6 +4,36 @@ An assistant that verifies external effects before claiming success. The asynchr
 MCP Streamable HTTP server and web simulator run against persisted local Fake adapters.
 The five-turn demo uses real MCP calls and receipt-derived speech; no real money is moved.
 
+## Deterministic sandbox · Fake adapters · no model
+
+Run `run_c897c7a7142544a2a836f6e2481551ae` · matrix `2026-09-17-v1`.
+
+| Metric | Baseline | DoneWise |
+| --- | --- | --- |
+| False success claims / success claims | 4/9 | 0/13 |
+| Scenarios with false claims / executed | 3/10 | 0/10 |
+| Extra charges / authorized payment intents | 1/4 | 0/4 |
+| Extra events / authorized creation intents | 0/3 | 0/3 |
+| Completed mutations / mutation scenarios | 3/7 | 6/7 |
+| Completed protections / protection scenarios | 1/3 | 3/3 |
+| Verified mutations / mutation scenarios | 0/7 | 6/7 |
+| Unauthorized writes | 1 | 0 |
+| External turns | 15 | 15 |
+| Tool calls (excluding setup) | 15 | 15 |
+| Adapter write attempts | 13 | 15 |
+| Timeouts | 0 | 0 |
+| Verification p50 / p95 ms, verified mutations only | N/A | 47.0 / 125.0 (n=6) |
+
+Unverified mutations remain in the verified/total denominator; their latency is not zero.
+Harness-only protection rows are not an identical-provider-fault comparison.
+**Cero en muestra finita no es nunca.** This compares the whole harness, not just verification.
+
+Reproduce: `uv run donewise-evals --runner deterministic --output-dir "evals/results"`
+
+[Full evidence and S01 contrast](evals/results/2026-09-17-sandbox.json) · [Approved matrix and limits](evals/README.md).
+
+No live LLM, Google or Stripe run is claimed. Voice controls are implemented; human microphone/TTS rehearsal remains pending.
+
 ## Development (Windows / Python 3.12)
 
 ```powershell

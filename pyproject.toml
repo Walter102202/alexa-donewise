@@ -17,14 +17,15 @@ dependencies = [
 [project.scripts]
 donewise-server = "donewise_server.app:main"
 donewise-sim = "donewise_sim.app:main"
+donewise-evals = "donewise_evals.runner:main"
 
 [build-system]
 requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["donewise_adapters", "donewise_server", "donewise_sim"]
-package-dir = {donewise_adapters = "adapters/donewise_adapters", donewise_server = "server/donewise_server", donewise_sim = "sim/donewise_sim"}
+packages = ["donewise_adapters", "donewise_server", "donewise_sim", "donewise_evals"]
+package-dir = {donewise_adapters = "adapters/donewise_adapters", donewise_server = "server/donewise_server", donewise_sim = "sim/donewise_sim", donewise_evals = "evals/donewise_evals"}
 
 [tool.uv.workspace]
 members = ["core"]
