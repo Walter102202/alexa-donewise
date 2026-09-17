@@ -237,3 +237,52 @@ async def test_http_security_and_run_reset(live, tmp_path):
     with serving(no_admin) as other:
         async with httpx2.AsyncClient() as client:
             assert (await client.post(other + "/admin/reset", json={})).status_code == 404
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("budget,expected", [("off", "VERIFIED"), ("0.45", "PENDING")])
+async def test_pending_budget_over_mcp(tmp_path, monkeypatch, budget, expected):
+    monkeypatch.setenv("DONEWISE_PENDING_AFTER", budget)
+    app = build_app(
+        Settings(data_dir=tmp_path, demo_admin_token="admin", fake_payment_delay_seconds=0.8)
+    )
+    h = app.state.harness
+    with serving(app) as url:
+        async with streamable_http_client(url + "/mcp") as streams:
+            async with ClientSession(*streams) as session:
+                await session.initialize()
+                pay = {
+                    "submission_id": "sync",
+                    "amount_minor": 100,
+                    "currency": "USD",
+                    "payee": "Ridge Plumbing",
+                    "concept": "deposit",
+                }
+                needs = (await session.call_tool("payment_charge_verified", pay)).structured_content
+                grant = await session.call_tool(
+                    "approval_grant",
+                    {
+                        "approval_request_id": needs["approval_request"]["approval_request_id"],
+                        "consent_token": h.consent_token_for(needs["run_id"]),
+                    },
+                )
+                result = await session.call_tool(
+                    "payment_charge_verified",
+                    pay | {"approval_id": grant.structured_content["approval_id"]},
+                )
+                assert result.structured_content["outcome"] == expected
+                await anyio.to_thread.run_sync(h.wait_for_workers)
+                op_id = result.structured_content["operation_id"]
+                polled = await session.call_tool("operation_get", {"operation_id": op_id})
+                assert polled.structured_content["outcome"] == "VERIFIED"
+                pending = h.registry._one(
+                    "SELECT * FROM receipts WHERE operation_id = ? AND outcome = 'PENDING'", op_id
+                )
+                assert (pending is None) == (budget == "off")
+
+
+@pytest.mark.parametrize("budget", ["-1", "nan", "inf", "invalid"])
+def test_invalid_pending_budget(monkeypatch, budget):
+    monkeypatch.setenv("DONEWISE_PENDING_AFTER", budget)
+    with pytest.raises(ValueError):
+        Settings()

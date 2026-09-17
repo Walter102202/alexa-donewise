@@ -2,9 +2,15 @@
 
 import hashlib
 import hmac
+import math
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+
+
+def pending_after_from_env() -> float | None:
+    value = os.getenv("DONEWISE_PENDING_AFTER", "0.45").strip().lower()
+    return None if value == "off" else float(value)
 
 
 @dataclass
@@ -29,13 +35,17 @@ class Settings:
     )
     google_calendar_id: str = field(default_factory=lambda: os.getenv("GOOGLE_CALENDAR_ID", ""))
     stripe_secret_key: str = field(default_factory=lambda: os.getenv("STRIPE_SECRET_KEY", ""))
-    pending_after: float = 0.45
+    pending_after: float | None = field(default_factory=pending_after_from_env)
     fake_payment_delay_seconds: float = field(
         default_factory=lambda: float(os.getenv("FAKE_PAYMENT_DELAY_SECONDS", "0.65"))
     )
 
     def __post_init__(self):
         self.data_dir = Path(self.data_dir)
+        if self.pending_after is not None and (
+            not math.isfinite(self.pending_after) or self.pending_after < 0
+        ):
+            raise ValueError("DONEWISE_PENDING_AFTER must be nonnegative seconds or off")
         if self.mode not in ("sandbox", "connected"):
             raise ValueError("DONEWISE_MODE must be sandbox or connected")
         if self.stripe_secret_key and not self.stripe_secret_key.startswith("sk_test_"):
