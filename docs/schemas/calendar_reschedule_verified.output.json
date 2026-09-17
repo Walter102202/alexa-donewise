@@ -1,0 +1,356 @@
+{
+  "$defs": {
+    "CalendarTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "calendar_id": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Calendar Id",
+          "type": "string"
+        },
+        "event_id": {
+          "pattern": "^evt_[A-Za-z0-9_-]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Title",
+          "type": "string"
+        },
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        },
+        "timezone": {
+          "title": "Timezone",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "confirmed",
+            "cancelled"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "calendar_id",
+        "event_id",
+        "title",
+        "start",
+        "end",
+        "timezone",
+        "status"
+      ],
+      "title": "CalendarTarget",
+      "type": "object"
+    },
+    "Claim": {
+      "enum": [
+        "EFFECT_VERIFIED",
+        "LATEST_READ_MATCHES_TARGET",
+        "LATEST_READ_DIFFERS_FROM_TARGET",
+        "EFFECT_UNVERIFIED",
+        "CHARGED_ONCE",
+        "NOTHING_CHARGED",
+        "OPERATION_IN_PROGRESS",
+        "APPROVAL_REQUIRED"
+      ],
+      "title": "Claim",
+      "type": "string"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_id": {
+          "pattern": "^ev_[A-Za-z0-9_-]+$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/EvidenceSource"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Version"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "source",
+        "observed_at",
+        "version"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceSource": {
+      "enum": [
+        "google_calendar",
+        "stripe_test",
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "title": "EvidenceSource",
+      "type": "string"
+    },
+    "FaultKind": {
+      "enum": [
+        "drop_response_after_write",
+        "ack_without_write",
+        "read_unavailable",
+        "concurrent_edit",
+        "registry_down"
+      ],
+      "title": "FaultKind",
+      "type": "string"
+    },
+    "NextAction": {
+      "enum": [
+        "NONE",
+        "CHECK_EXISTING_OPERATION",
+        "ASK_USER",
+        "GRANT_APPROVAL"
+      ],
+      "title": "NextAction",
+      "type": "string"
+    },
+    "Outcome": {
+      "enum": [
+        "VERIFIED",
+        "PENDING",
+        "NEEDS_APPROVAL",
+        "NEEDS_INPUT",
+        "NOT_OBSERVED",
+        "UNKNOWN",
+        "REJECTED"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "ReasonCode": {
+      "enum": [
+        "POSTCONDITION_MISMATCH",
+        "READ_TIMEOUT",
+        "WRITE_RESPONSE_LOST_RECOVERED",
+        "REPLAY_BUDGET_EXHAUSTED",
+        "REPLAY_WINDOW_EXPIRED",
+        "RECONCILIATION_EXPIRED",
+        "VERSION_CONFLICT",
+        "NO_APPROVAL",
+        "APPROVAL_MISMATCH",
+        "APPROVAL_USED",
+        "APPROVAL_EXPIRED",
+        "IDEMPOTENCY_PAYLOAD_MISMATCH",
+        "AMBIGUOUS_TARGET",
+        "UNAUTHORIZED",
+        "REGISTRY_UNAVAILABLE"
+      ],
+      "title": "ReasonCode",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "spoken": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Spoken",
+      "type": "string"
+    },
+    "structured_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Structured Version",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "operation_id": {
+      "pattern": "^op_[A-Za-z0-9_-]+$",
+      "title": "Operation Id",
+      "type": "string"
+    },
+    "intent_id": {
+      "pattern": "^int_[A-Za-z0-9_-]+$",
+      "title": "Intent Id",
+      "type": "string"
+    },
+    "attempt_id": {
+      "pattern": "^att_[A-Za-z0-9_-]+$",
+      "title": "Attempt Id",
+      "type": "string"
+    },
+    "action": {
+      "const": "CALENDAR_RESCHEDULE",
+      "default": "CALENDAR_RESCHEDULE",
+      "title": "Action",
+      "type": "string"
+    },
+    "outcome": {
+      "$ref": "#/$defs/Outcome"
+    },
+    "expected": {
+      "$ref": "#/$defs/CalendarTarget"
+    },
+    "observed": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CalendarTarget"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "evidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Evidence"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "reason_code": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ReasonCode"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "allowed_claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Allowed Claims",
+      "type": "array"
+    },
+    "may_claim_success": {
+      "title": "May Claim Success",
+      "type": "boolean"
+    },
+    "next_action": {
+      "$ref": "#/$defs/NextAction"
+    },
+    "writes_applied": {
+      "minimum": 0,
+      "title": "Writes Applied",
+      "type": "integer"
+    },
+    "automatic_retries": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Automatic Retries",
+      "type": "integer"
+    },
+    "spoken_subject": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Spoken Subject"
+    },
+    "receipt_id": {
+      "anyOf": [
+        {
+          "pattern": "^rcpt_[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Receipt Id"
+    },
+    "run_id": {
+      "pattern": "^run_[A-Za-z0-9_-]+$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "fault_injected": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FaultKind"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "event_id": {
+      "pattern": "^evt_[A-Za-z0-9_-]+$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "previous": {
+      "$ref": "#/$defs/CalendarTarget"
+    }
+  },
+  "required": [
+    "spoken",
+    "operation_id",
+    "intent_id",
+    "attempt_id",
+    "outcome",
+    "expected",
+    "observed",
+    "evidence",
+    "reason_code",
+    "allowed_claims",
+    "may_claim_success",
+    "next_action",
+    "writes_applied",
+    "automatic_retries",
+    "receipt_id",
+    "run_id",
+    "fault_injected",
+    "observed_at",
+    "event_id",
+    "previous"
+  ],
+  "title": "CalendarRescheduleResult",
+  "type": "object"
+}

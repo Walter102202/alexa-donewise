@@ -1,0 +1,112 @@
+{
+  "$defs": {
+    "Action": {
+      "enum": [
+        "CALENDAR_CREATE",
+        "CALENDAR_RESCHEDULE",
+        "PAYMENT_CHARGE"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "Outcome": {
+      "enum": [
+        "VERIFIED",
+        "PENDING",
+        "NEEDS_APPROVAL",
+        "NEEDS_INPUT",
+        "NOT_OBSERVED",
+        "UNKNOWN",
+        "REJECTED"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "RecapItem": {
+      "additionalProperties": false,
+      "properties": {
+        "operation_id": {
+          "pattern": "^op_[A-Za-z0-9_-]+$",
+          "title": "Operation Id",
+          "type": "string"
+        },
+        "action": {
+          "$ref": "#/$defs/Action"
+        },
+        "outcome": {
+          "$ref": "#/$defs/Outcome"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "operation_id",
+        "action",
+        "outcome",
+        "observed_at",
+        "summary"
+      ],
+      "title": "RecapItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "spoken": {
+      "title": "Spoken",
+      "type": "string"
+    },
+    "structured_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Structured Version",
+      "type": "string"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "pattern": "^run_[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Run Id"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/RecapItem"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "timezone": {
+      "default": "America/Los_Angeles",
+      "title": "Timezone",
+      "type": "string"
+    }
+  },
+  "required": [
+    "spoken",
+    "run_id",
+    "items",
+    "generated_at"
+  ],
+  "title": "RecapResult",
+  "type": "object"
+}

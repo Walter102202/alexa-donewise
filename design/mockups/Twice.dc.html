@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; color: #2a2521; -webkit-font-smoothing: antialiased; }
+    a { color: #1f6f78; text-decoration: none; } a:hover { color: #164f56; text-decoration: underline; }
+    .serif { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  </style>
+</helmet>
+<div style="width: 1440px; height: 900px; background: #f4efe6; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; border-bottom: 1px solid #e2d9cb; background: #f4efe6;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div class="serif" style="font-size: 27px; letter-spacing: -0.01em; color: #2a2521;">Alexa-DoneWise</div>
+      <div style="width: 1px; height: 22px; background: #d6ccbb;"></div>
+      <div class="mono" style="font-size: 12px; color: #5c554d; border: 1px solid #d6ccbb; border-radius: 999px; padding: 5px 12px; background: #fffcf7;">Same request · Same dropped response · Stripe test mode, no real money</div>
+    </div>
+    <div class="mono" style="font-size: 12px; color: #8a8177;">Case T08 · response lost after the charge · reproduced in CI</div>
+  </div>
+
+  <div style="flex: 1; padding: 26px 40px 28px 40px; display: flex; flex-direction: column; gap: 18px; min-height: 0;">
+
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div class="serif" style="font-size: 40px; letter-spacing: -0.01em; line-height: 1.1;">Same request. Same fault. Two assistants.</div>
+      <div style="font-size: 15px; color: #5c554d;">The charge goes through. The response never arrives. What each one says next, and what the test account shows.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; flex: 1; min-height: 0;">
+
+      <div style="background: #faf6ee; border: 1px solid #e2d9cb; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div style="font-size: 15px; font-weight: 600; color: #5c554d;">Assistant without DoneWise</div>
+          <div class="mono" style="font-size: 12px; color: #8a8177;">same model · same tools · verifier optional</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="align-self: flex-end; max-width: 400px; background: #ebe4d6; border-radius: 18px 18px 4px 18px; padding: 10px 14px; font-size: 15px;">Yes, pay it.</div>
+          <div style="align-self: flex-start; max-width: 460px; background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 18px 18px 18px 4px; padding: 11px 16px; font-size: 16px; line-height: 1.4; color: #5c554d;">Hmm, that didn't go through. Let me try again.</div>
+          <div style="align-self: flex-start; max-width: 460px; background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 18px 18px 18px 4px; padding: 11px 16px; font-size: 16px; line-height: 1.4;">Done! Your $60 deposit is paid.</div>
+        </div>
+        <div class="mono" style="margin-top: auto; background: #fffdf9; border: 1px solid #e2d9cb; border-radius: 12px; padding: 14px 16px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; color: #8a8177;"><span>Payments · Ridge Plumbing (test)</span><span>Idempotency-Key: none</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid #ede5d8;"><span>7:40:58 PM · pi_demo_7f2a</span><span>succeeded</span><span>$60.00</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid #ede5d8;"><span>7:41:00 PM · pi_demo_7f2b</span><span>succeeded</span><span>$60.00</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; border-top: 1px solid #ede5d8;">
+            <span style="color: #8a8177;">charged</span>
+            <span style="font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; font-size: 34px; font-weight: 500; color: #b0452b;">$120.00</span>
+          </div>
+        </div>
+        <div style="font-size: 14px; color: #b0452b; font-weight: 600;">Said "done" once. Charged twice.</div>
+      </div>
+
+      <div style="background: #fffcf7; border: 1px solid #1f6f78; border-radius: 16px; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div class="serif" style="font-size: 22px;">Alexa-DoneWise</div>
+          <div class="mono" style="font-size: 12px; color: #8a8177;">same model · same tools · verifier mandatory</div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="align-self: flex-end; max-width: 400px; background: #ebe4d6; border-radius: 18px 18px 4px 18px; padding: 10px 14px; font-size: 15px;">Yes, pay it.</div>
+          <div style="align-self: flex-start; max-width: 460px; background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 18px 18px 18px 4px; padding: 11px 16px; font-size: 16px; line-height: 1.4; color: #5c554d;">Paying now. I'll confirm in a moment.</div>
+          <div style="align-self: flex-start; max-width: 480px; display: flex; flex-direction: column; gap: 6px;">
+            <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 18px 18px 18px 4px; padding: 11px 16px; font-size: 16px; line-height: 1.4;">Paid. $60 to Ridge Plumbing, charged once. Confirmation pi_demo_7f2a.</div>
+            <div style="display: flex; align-items: center; gap: 8px; padding-left: 6px; font-size: 13px; color: #2c7a5a;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12.5 2.5 2.5 4.5-5"></path></svg>
+              <span style="font-weight: 600;">Verified</span>
+              <span style="color: #8a8177;">read back at 7:41:04 PM · no second charge</span>
+            </div>
+          </div>
+        </div>
+        <div class="mono" style="margin-top: auto; background: #fffdf9; border: 1px solid #e2d9cb; border-radius: 12px; padding: 14px 16px; font-size: 12px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; justify-content: space-between; color: #8a8177;"><span>Payments · Ridge Plumbing (test)</span><span>Idempotency-Key: ik_9c41</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid #ede5d8;"><span>7:40:58 PM · pi_demo_7f2a</span><span>succeeded</span><span>$60.00</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid #ede5d8; color: #8a8177;"><span>7:41:02 PM · read-back</span><span>found pi_demo_7f2a</span><span>no retry</span></div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; border-top: 1px solid #ede5d8;">
+            <span style="color: #8a8177;">charged</span>
+            <span style="font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; font-size: 34px; font-weight: 500; color: #2c7a5a;">$60.00</span>
+          </div>
+        </div>
+        <div style="font-size: 14px; color: #2c7a5a; font-weight: 600;">Read the payment back. Found it. Did not retry.</div>
+      </div>
+
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #e2d9cb; padding-top: 16px;">
+      <div style="font-size: 15px; line-height: 1.45; max-width: 980px;">The difference is not a smarter model. It is an idempotency key sent with the charge and a read-back before the answer, enforced inside the tool. The model cannot skip it.</div>
+      <div class="mono" style="font-size: 12px; color: #8a8177; white-space: nowrap;">payment_charge_verified · outcome VERIFIED · charges_applied 1</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; color: #2a2521; -webkit-font-smoothing: antialiased; }
+    a { color: #1f6f78; text-decoration: none; } a:hover { color: #164f56; text-decoration: underline; }
+    .serif { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  </style>
+</helmet>
+<div style="width: 1440px; height: 900px; background: #f4efe6; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; border-bottom: 1px solid #e2d9cb; background: #f4efe6;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div class="serif" style="font-size: 27px; letter-spacing: -0.01em; color: #2a2521;">Alexa-DoneWise</div>
+      <div style="width: 1px; height: 22px; background: #d6ccbb;"></div>
+      <div class="mono" style="font-size: 12px; color: #5c554d; border: 1px solid #d6ccbb; border-radius: 999px; padding: 5px 12px; background: #fffcf7;">Simulated Alexa+ experience · Real MCP server · Stripe test mode</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 28px;">
+      <div class="mono" style="font-size: 12px; color: #8a8177;">Run r-0914 · read from the server log, not from the chat</div>
+      <div style="display: flex; align-items: center; gap: 22px; font-size: 14px; font-weight: 500;">
+        <div style="color: #8a8177; padding: 4px 0;">Conversation</div>
+        <div style="color: #2a2521; border-bottom: 2px solid #1f6f78; padding: 4px 0;">Audit</div>
+        <div style="color: #8a8177; padding: 4px 0;">Proof</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 1; display: flex; min-height: 0;">
+
+    <div style="width: 300px; border-right: 1px solid #e2d9cb; padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; background: #faf6ee;">
+      <div class="mono" style="font-size: 12px; color: #8a8177; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px;">Operations · this run</div>
+      <sc-for list="{{ops}}" as="o" hint-placeholder-count="4">
+        <div onClick="{{o.pick}}" style="cursor: pointer; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; background: {{o.bg}}; border: 1px solid {{o.border}};">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="mono" style="font-size: 12px; color: #5c554d;">{{o.id}}</div>
+            <div class="mono" style="font-size: 11px; color: #8a8177;">{{o.time}}</div>
+          </div>
+          <div style="font-size: 14px; font-weight: 600;">{{o.title}}</div>
+          <div class="mono" style="font-size: 12px; font-weight: 500; color: {{o.color}};">{{o.outcome}}</div>
+        </div>
+      </sc-for>
+      <div style="margin-top: auto; font-size: 12px; color: #8a8177; line-height: 1.5;">Each line is a persisted record: request, intent, authorization, approval, attempt, observation, verdict, response.</div>
+    </div>
+
+    <div style="flex: 1; padding: 22px 36px; display: flex; flex-direction: column; gap: 14px; min-width: 0; overflow: hidden;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <div class="serif" style="font-size: 26px;">{{headTitle}}</div>
+        <div class="mono" style="font-size: 12px; color: #8a8177;">{{headMeta}}</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0; flex: 1; min-height: 0;">
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="10">
+          <div style="display: flex; gap: 14px; align-items: stretch;">
+            <div class="mono" style="width: 104px; flex-shrink: 0; font-size: 12px; color: #8a8177; padding-top: 6px;">{{r.time}}</div>
+            <div style="width: 16px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center;">
+              <div style="width: 10px; height: 10px; border-radius: 999px; margin-top: 8px; background: {{r.dot}}; flex-shrink: 0;"></div>
+              <div style="width: 1px; flex: 1; background: #ddd3c4; margin-top: 4px;"></div>
+            </div>
+            <div style="flex: 1; padding: 4px 0 13px 0; display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+              <div style="font-size: 14px; font-weight: 600; color: {{r.titleColor}};">{{r.title}}</div>
+              <div class="mono" style="font-size: 12px; color: #5c554d; line-height: 1.45;">{{r.detail}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="width: 360px; border-left: 1px solid #e2d9cb; padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; background: #faf6ee;">
+
+      <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 14px; font-weight: 600;">Fault injection · test panel</div>
+          <div style="font-size: 12px; color: #8a8177;">Dev only. Not an MCP tool. One shot, next operation of this run.</div>
+        </div>
+        <sc-for list="{{faults}}" as="f" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; border-top: 1px solid #ede5d8;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <div style="font-size: 13px; font-weight: 500;">{{f.name}}</div>
+              <div style="font-size: 12px; color: #8a8177;">{{f.desc}}</div>
+            </div>
+            <div class="mono" style="font-size: 11px; font-weight: 500; border-radius: 999px; padding: 4px 10px; min-width: 34px; text-align: center; color: {{f.fg}}; background: {{f.bg}};">{{f.state}}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div class="mono" style="background: #fffdf9; border: 1px solid #e2d9cb; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #2a2521;">
+        <div style="font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 600;">MCP session</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 10px;">
+          <div style="color: #8a8177;">endpoint</div><div>https://…/mcp</div>
+          <div style="color: #8a8177;">transport</div><div>Streamable HTTP</div>
+          <div style="color: #8a8177;">protocol</div><div>2025-11-25 (negotiated)</div>
+          <div style="color: #8a8177;">client</div><div>DoneWise web · official SDK</div>
+          <div style="color: #8a8177;">tools</div><div>6 listed · 3 verified writes</div>
+          <div style="color: #8a8177;">auth</div><div>bearer · origin checked</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <div style="flex: 1; border: 1px solid #d6ccbb; border-radius: 999px; padding: 10px 14px; font-size: 13px; font-weight: 500; text-align: center; background: #fffcf7; min-height: 40px; display: flex; align-items: center; justify-content: center;">Export sanitized trace</div>
+        <div style="flex: 1; border: 1px solid #d6ccbb; border-radius: 999px; padding: 10px 14px; font-size: 13px; font-weight: 500; text-align: center; background: #fffcf7; min-height: 40px; display: flex; align-items: center; justify-content: center;">{{openLabel}}</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 1 };
+  }
+  renderVals() {
+    const sel = this.state.sel;
+    const V = '#2c7a5a', P = '#9a6b12', B = '#b0452b', T = '#1f6f78', N = '#8a8177', INK = '#2a2521';
+    const row = (time, title, detail, dot, titleColor) => ({ time: time, title: title, detail: detail, dot: dot || N, titleColor: titleColor || INK });
+
+    const OPS = [
+      {
+        id: 'op_demo_001', time: '7:39 PM', title: 'calendar.create', outcome: 'VERIFIED', color: V, openLabel: 'Open in Google Calendar',
+        headTitle: 'op_demo_001 · calendar.create',
+        headMeta: 'intent int_5a2c · idempotency ik_2b71 · policy v1 · event evt_plumber_0915 · no fault',
+        rows: [
+          row('19:39:11.020', 'Request received', '"Book the plumber tomorrow at nine and pay the sixty-dollar deposit." · web-voice · submission sub_88 · split into two intents: booking, deposit'),
+          row('19:39:11.130', 'Intent resolved', 'new event "Plumber · Ridge Plumbing" · Sep 15 · 9:00–10:00 AM · America/Los_Angeles · private, no attendees'),
+          row('19:39:11.150', 'Authorized', 'actor test-user · calendar "DoneWise Test" · scope events.write · no approval required for a private block'),
+          row('19:39:11.180', 'Idempotency', 'key ik_2b71 from intent · event id evt_plumber_0915 generated and persisted BEFORE the write', T),
+          row('19:39:11.290', 'Attempt 1', 'INSERT events (id evt_plumber_0915) → 200 OK · etag "etag-77"', T),
+          row('19:39:12.010', 'Observation 1', 'GET event · 9:00–10:00 AM · etag "etag-77" · ev_demo_009 · new read, not the in-memory object'),
+          row('19:39:12.060', 'Verdict', 'VERIFIED · POSTCONDITION_MATCH · may_claim_success = true', V, V),
+          row('19:39:12.090', 'Response', 'claim EVENT_ON_CALENDAR → "It\'s on your calendar: Ridge Plumbing, tomorrow 9 to 10 AM." · deposit intent handed to op_demo_002', V)
+        ],
+        faults: [0, 0, 0]
+      },
+      {
+        id: 'op_demo_002 · attempt 1', time: '7:41 PM', title: 'payment.charge', outcome: 'VERIFIED · recovered', color: V, openLabel: 'Open in Stripe (test)',
+        headTitle: 'op_demo_002 · payment.charge · attempt 1',
+        headMeta: 'intent int_8d02 · idempotency ik_9c41 · approval ap_demo_31 · Stripe test mode · fault: response dropped after the charge',
+        rows: [
+          row('19:39:12.300', 'Intent resolved', '$60.00 USD · payee Ridge Plumbing (test account) · purpose: deposit for evt_plumber_0915 · money → approval required by policy'),
+          row('19:39:12.320', 'Approval requested', '"The $60 deposit for Ridge Plumbing. Should I charge it (test mode)?" · phase NEEDS_APPROVAL · nothing sent', T, T),
+          row('19:40:58.100', 'Approval granted', '"Yes, pay it." · ap_demo_31 bound to intent, amount and payee · a different amount would invalidate it', T, T),
+          row('19:40:58.180', 'Idempotency', 'key ik_9c41 from intent · sent to Stripe as Idempotency-Key · metadata.intent_id = int_8d02', T),
+          row('19:40:58.240', 'Attempt 1', 'POST /v1/payment_intents (confirm) · Idempotency-Key ik_9c41 → no response (FAULT: charge applied, response dropped) · timeout 4 s', T),
+          row('19:41:02.900', 'Observation 1', 'GET /v1/payment_intents?metadata[intent_id]=int_8d02 · found pi_demo_7f2a · status succeeded · amount 6000 · ev_demo_014'),
+          row('19:41:04.100', 'Observation 2', 'unchanged · one payment intent for this key · ev_demo_015'),
+          row('19:41:04.150', 'Verdict', 'VERIFIED · RECOVERED_BY_READBACK · timeout was not a failure · replay not needed · charges applied: 1', V, V),
+          row('19:41:04.200', 'Response', 'claim PAID_ONCE → "Done: a $60 test charge is recorded for Ridge Plumbing\'s deposit, charged once. Confirmation pi_demo_7f2a."', V)
+        ],
+        faults: [0, 1, 0]
+      },
+      {
+        id: 'op_demo_003 · attempt 1', time: '7:43 PM', title: 'calendar.reschedule', outcome: 'NOT_OBSERVED', color: B, openLabel: 'Open in Google Calendar',
+        headTitle: 'op_demo_003 · calendar.reschedule · attempt 1',
+        headMeta: 'intent int_7c1e · idempotency ik_4f9a · policy v1 · event evt_plumber_0915 · fault: ack without write',
+        rows: [
+          row('19:43:10.120', 'Request received', '"I\'m running late. Move the plumber to ten." · web-voice · submission sub_91'),
+          row('19:43:10.240', 'Intent resolved', 'event evt_plumber_0915 from active context · target 10:00–11:00 AM · absolute, not "+1 hour"'),
+          row('19:43:10.260', 'Authorized', 'actor test-user · calendar "DoneWise Test" · scope events.write'),
+          row('19:43:10.300', 'Idempotency', 'key ik_4f9a from intent · no prior attempt', T),
+          row('19:43:10.410', 'Attempt 1', 'PATCH events/evt_plumber_0915 · If-Match "etag-77" → 200 OK · FAULT: acknowledged, not applied', T),
+          row('19:43:10.900', 'Observation 1', 'GET event · 9:00–10:00 AM · etag "etag-77" · ev_demo_018'),
+          row('19:43:12.910', 'Observation 2', 'unchanged · ev_demo_019'),
+          row('19:43:15.080', 'Observation 3', 'unchanged · ev_demo_020 · 5 s window exhausted'),
+          row('19:43:15.150', 'Verdict', 'NOT_OBSERVED · POSTCONDITION_MISMATCH · may_claim_success = false · no automatic replay: etag unchanged, a write may still be in flight', B, B),
+          row('19:43:15.200', 'Response', 'claim LATEST_READ_DIFFERS_FROM_TARGET → "I couldn\'t confirm the change. The latest calendar check still shows 9 AM."', B)
+        ],
+        faults: [1, 0, 0]
+      },
+      {
+        id: 'op_demo_003 · attempt 2', time: '7:44 PM', title: 'calendar.reschedule (retry)', outcome: 'VERIFIED', color: V, openLabel: 'Open in Google Calendar',
+        headTitle: 'op_demo_003 · calendar.reschedule · attempt 2',
+        headMeta: 'retry_of op_demo_003 · same intent int_7c1e · same key ik_4f9a · no fault',
+        rows: [
+          row('19:44:02.400', 'Request received', '"Try that again." · web-voice · submission sub_95'),
+          row('19:44:02.480', 'Intent resolved', 'retry_of op_demo_003 · same target 10:00–11:00 AM · not reinterpreted as another +1 hour'),
+          row('19:44:02.520', 'Idempotency', 'key ik_4f9a reused · attempt 2 of the same operation, no new intent', T),
+          row('19:44:02.640', 'Attempt 2', 'PATCH events/evt_plumber_0915 · If-Match "etag-77" → 200 OK · etag "etag-78"', T),
+          row('19:44:03.300', 'Observation 1', 'GET event · 10:00–11:00 AM · etag "etag-78" · ev_demo_023'),
+          row('19:44:03.350', 'Verdict', 'VERIFIED · POSTCONDITION_MATCH · writes applied: 1', V, V),
+          row('19:44:03.390', 'Response', 'claim EVENT_AT_TARGET → "The plumber is now at 10 to 11 AM."', V)
+        ],
+        faults: [0, 0, 0]
+      }
+    ];
+
+    const cur = OPS[sel];
+    const ops = OPS.map((o, i) => ({
+      id: o.id, time: o.time, title: o.title, outcome: o.outcome, color: o.color,
+      bg: i === sel ? '#fffcf7' : 'transparent',
+      border: i === sel ? '#d6ccbb' : 'transparent',
+      pick: () => this.setState({ sel: i })
+    }));
+    const faultNames = [
+      ['Ack without write', 'Connector returns 200, applies nothing'],
+      ['Drop response after write', 'Charge or write lands, response never arrives'],
+      ['Read timeout', 'Verification read fails']
+    ];
+    const faults = faultNames.map((f, i) => ({
+      name: f[0], desc: f[1],
+      state: cur.faults[i] ? 'ON' : 'off',
+      fg: cur.faults[i] ? '#fffcf7' : '#8a8177',
+      bg: cur.faults[i] ? '#b0452b' : '#ebe4d6'
+    }));
+
+    return { ops: ops, rows: cur.rows, headTitle: cur.headTitle, headMeta: cur.headMeta, faults: faults, openLabel: cur.openLabel };
+  }
+}
+</script>
+</body>
+</html>

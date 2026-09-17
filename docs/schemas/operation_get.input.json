@@ -1,0 +1,15 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "operation_id": {
+      "pattern": "^op_[A-Za-z0-9_-]+$",
+      "title": "Operation Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "operation_id"
+  ],
+  "title": "OperationGetInput",
+  "type": "object"
+}

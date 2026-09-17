@@ -1,0 +1,46 @@
+[project]
+name = "donewise"
+version = "0.1.0"
+description = "DoneWise application contracts and skeleton"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "boto3>=1.42",
+    "anthropic>=0.75",
+    "donewise-harness",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "mcp>=2.2,<3",
+    "pydantic>=2,<3",
+    "uvicorn>=0.53.0",
+]
+
+[project.scripts]
+donewise-server = "donewise_server.app:main"
+donewise-sim = "donewise_sim.app:main"
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["donewise_adapters", "donewise_server", "donewise_sim"]
+package-dir = {donewise_adapters = "adapters/donewise_adapters", donewise_server = "server/donewise_server", donewise_sim = "sim/donewise_sim"}
+
+[tool.uv.workspace]
+members = ["core"]
+
+[tool.uv.sources]
+donewise-harness = { workspace = true }
+
+[dependency-groups]
+dev = ["pytest>=8", "ruff>=0.11"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]

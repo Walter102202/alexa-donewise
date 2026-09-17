@@ -1,0 +1,21 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.sqlite
+*.db
+docs/traces/*.raw
+.pytest_cache/
+.ruff_cache/
+
+# Documentos internos (no se publican)
+docs/archive/
+docs/analisis-y-plan.md
+docs/revision-critica-ganar.md
+docs/plan-desarrollo.md
+docs/briefs/
+
+# Build and local data
+*.egg-info/
+data/
+node_modules/

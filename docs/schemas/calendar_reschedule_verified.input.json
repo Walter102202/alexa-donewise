@@ -1,0 +1,73 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "submission_id": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Submission Id",
+      "type": "string"
+    },
+    "event_id": {
+      "anyOf": [
+        {
+          "pattern": "^evt_[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Event Id"
+    },
+    "event_query": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "pattern": "\\S",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Event Query"
+    },
+    "new_start": {
+      "format": "date-time",
+      "title": "New Start",
+      "type": "string"
+    },
+    "new_end": {
+      "format": "date-time",
+      "title": "New End",
+      "type": "string"
+    },
+    "timezone": {
+      "title": "Timezone",
+      "type": "string"
+    },
+    "retry_of_operation_id": {
+      "anyOf": [
+        {
+          "pattern": "^op_[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retry Of Operation Id"
+    }
+  },
+  "required": [
+    "submission_id",
+    "new_start",
+    "new_end",
+    "timezone"
+  ],
+  "title": "CalendarRescheduleInput",
+  "type": "object"
+}

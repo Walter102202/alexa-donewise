@@ -1,0 +1,399 @@
+{
+  "run_id": "run_story_3min",
+  "timezone": "America/Los_Angeles",
+  "states": [
+    {
+      "state": "1",
+      "receipts": [
+        {
+          "tool": "calendar_create_verified",
+          "result": {
+            "spoken": "It's on your calendar: Ridge Plumbing, tomorrow 9 to 10 AM.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_create",
+            "intent_id": "int_create",
+            "attempt_id": "att_create_1",
+            "action": "CALENDAR_CREATE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_create_1",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:03Z",
+              "version": "etag_create_1"
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_create_1",
+            "run_id": "run_story_3min",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:03Z",
+            "event_id": "evt_plumber"
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "result": {
+            "spoken": "For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_payment",
+            "intent_id": "int_payment",
+            "attempt_id": "att_payment_0",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "NEEDS_APPROVAL",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "NO_APPROVAL",
+            "allowed_claims": [
+              "APPROVAL_REQUIRED",
+              "NOTHING_CHARGED"
+            ],
+            "may_claim_success": false,
+            "next_action": "GRANT_APPROVAL",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_payment_0",
+            "run_id": "run_story_3min",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:04Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": null,
+            "approval_request": {
+              "intent_id": "int_payment",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "approval_request_id": "apr_request_deposit",
+              "concept": "deposit",
+              "expires_at": "2026-09-17T02:44:04Z"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "state": "2",
+      "receipts": [
+        {
+          "tool": "payment_charge_verified",
+          "result": {
+            "spoken": "I'm on it. I'll confirm in a moment.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_payment",
+            "intent_id": "int_payment",
+            "attempt_id": "att_payment_1",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "PENDING",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": null,
+            "allowed_claims": [
+              "OPERATION_IN_PROGRESS"
+            ],
+            "may_claim_success": false,
+            "next_action": "CHECK_EXISTING_OPERATION",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_payment_1",
+            "run_id": "run_story_3min",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:40:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": "apr_deposit",
+            "approval_request": null
+          }
+        }
+      ]
+    },
+    {
+      "state": "2b",
+      "receipts": [
+        {
+          "tool": "operation_get",
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_story_deposit. You don't need to try again.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_payment",
+            "intent_id": "int_payment",
+            "attempt_id": "att_payment_2",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_payment_2",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:40:04Z",
+              "version": null
+            },
+            "reason_code": "WRITE_RESPONSE_LOST_RECOVERED",
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_payment_2",
+            "run_id": "run_story_3min",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:40:04Z",
+            "history": [
+              {
+                "attempt_id": "att_payment_1",
+                "kind": "write",
+                "at": "2026-09-17T02:40:00Z",
+                "summary": "Response lost after the test charge."
+              },
+              {
+                "attempt_id": "att_payment_2",
+                "kind": "replay",
+                "at": "2026-09-17T02:40:02Z",
+                "summary": "Same provider key returns the original PaymentIntent."
+              },
+              {
+                "attempt_id": "att_payment_2",
+                "kind": "read",
+                "at": "2026-09-17T02:40:04Z",
+                "summary": "Read back succeeded; exactly one charge."
+              },
+              {
+                "attempt_id": "att_payment_2",
+                "kind": "verdict",
+                "at": "2026-09-17T02:40:04Z",
+                "summary": "Verified from the persisted observation."
+              }
+            ],
+            "payment_intent_id": "pi_story_deposit",
+            "charges_applied": 1
+          }
+        }
+      ]
+    },
+    {
+      "state": "3",
+      "receipts": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "result": {
+            "spoken": "I couldn't confirm the change. I tried twice; the latest calendar check still shows 9 AM.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_move",
+            "intent_id": "int_move",
+            "attempt_id": "att_move_2",
+            "action": "CALENDAR_RESCHEDULE",
+            "outcome": "NOT_OBSERVED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_move_2",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:43:10Z",
+              "version": "etag_move_2"
+            },
+            "reason_code": "REPLAY_BUDGET_EXHAUSTED",
+            "allowed_claims": [
+              "EFFECT_UNVERIFIED",
+              "LATEST_READ_DIFFERS_FROM_TARGET"
+            ],
+            "may_claim_success": false,
+            "next_action": "ASK_USER",
+            "writes_applied": 0,
+            "automatic_retries": 1,
+            "spoken_subject": "The plumber",
+            "receipt_id": "rcpt_move_2",
+            "run_id": "run_story_3min",
+            "fault_injected": "ack_without_write",
+            "observed_at": "2026-09-17T02:43:10Z",
+            "event_id": "evt_plumber",
+            "previous": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "state": "4",
+      "receipts": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "result": {
+            "spoken": "The plumber is now at 10 to 11 AM. I read it back from your calendar.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_move",
+            "intent_id": "int_move",
+            "attempt_id": "att_move_3",
+            "action": "CALENDAR_RESCHEDULE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_move_3",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:44:03Z",
+              "version": "etag_move_3"
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": "The plumber",
+            "receipt_id": "rcpt_move_3",
+            "run_id": "run_story_3min",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:44:03Z",
+            "event_id": "evt_plumber",
+            "previous": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_plumber",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "state": "5",
+      "receipts": [
+        {
+          "tool": "receipts_recap",
+          "result": {
+            "spoken": "From the receipts in this conversation: the plumber is at 10 to 11 AM, read back at 7:44 PM. One $60 test charge for the deposit, read back at 7:40 PM. Nothing new was written.",
+            "structured_version": "1.0",
+            "run_id": "run_story_3min",
+            "items": [
+              {
+                "operation_id": "op_move",
+                "action": "CALENDAR_RESCHEDULE",
+                "outcome": "VERIFIED",
+                "observed_at": "2026-09-17T02:44:03Z",
+                "summary": "the plumber is at 10 to 11 AM"
+              },
+              {
+                "operation_id": "op_payment",
+                "action": "PAYMENT_CHARGE",
+                "outcome": "VERIFIED",
+                "observed_at": "2026-09-17T02:40:04Z",
+                "summary": "One $60 test charge for the deposit"
+              }
+            ],
+            "generated_at": "2026-09-17T02:45:00Z",
+            "timezone": "America/Los_Angeles"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; color: #2a2521; -webkit-font-smoothing: antialiased; }
+    a { color: #1f6f78; text-decoration: none; } a:hover { color: #164f56; text-decoration: underline; }
+    .serif { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  </style>
+</helmet>
+<div style="width: 1440px; height: 900px; background: #f4efe6; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+  <div style="width: 700px; display: flex; flex-direction: column; gap: 24px;">
+
+    <div style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+      <div class="serif" style="font-size: 56px; letter-spacing: -0.015em; line-height: 1;">Alexa-DoneWise</div>
+      <div class="serif" style="font-size: 26px; font-style: italic; color: #5c554d; line-height: 1.25;">Never says done unless it can prove it. Never charges twice.</div>
+      <div class="mono" style="font-size: 12px; color: #5c554d; border: 1px solid #d6ccbb; border-radius: 999px; padding: 5px 12px; background: #fffcf7;">Simulated Alexa+ experience · Real MCP server · No wake word, no always-on listening</div>
+    </div>
+
+    <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 16px; padding: 4px 22px; display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #ede5d8;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12.5 2.5 2.5 4.5-5"></path></svg>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 15px; font-weight: 600;">Microphone</div>
+          <div style="font-size: 13px; color: #8a8177;">Granted · Chrome speech recognition · text input always available</div>
+        </div>
+        <div class="mono" style="font-size: 12px; color: #2c7a5a;">ready</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #ede5d8;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12.5 2.5 2.5 4.5-5"></path></svg>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 15px; font-weight: 600;">Audio output</div>
+          <div style="font-size: 13px; color: #8a8177;">Test tone played · spoken replies on</div>
+        </div>
+        <div class="mono" style="font-size: 12px; color: #2c7a5a;">ready</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #ede5d8;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12.5 2.5 2.5 4.5-5"></path></svg>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 15px; font-weight: 600;">MCP server</div>
+          <div style="font-size: 13px; color: #8a8177;">Streamable HTTP · protocol 2025-11-25 negotiated · 6 tools, 3 verified writes</div>
+        </div>
+        <div class="mono" style="font-size: 12px; color: #2c7a5a;">connected</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid #ede5d8;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12.5 2.5 2.5 4.5-5"></path></svg>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 15px; font-weight: 600;">Test calendar</div>
+          <div style="font-size: 13px; color: #8a8177;">"DoneWise Test" · fictional household · nothing personal</div>
+        </div>
+        <div class="mono" style="font-size: 12px; color: #2c7a5a;">linked</div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2c7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="9"></circle><path d="m8.5 12.5 2.5 2.5 4.5-5"></path></svg>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px;">
+          <div style="font-size: 15px; font-weight: 600;">Payments</div>
+          <div style="font-size: 13px; color: #8a8177;">Stripe test mode · card ••4242 · no real money moves · every charge needs your OK</div>
+        </div>
+        <div class="mono" style="font-size: 12px; color: #2c7a5a;">test mode</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div class="mono" style="font-size: 12px; color: #8a8177; width: 110px;">Environment</div>
+      <div style="font-size: 14px;">Seattle · America/Los_Angeles · today Sep 14, plumber tomorrow Sep 15</div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <div class="mono" style="font-size: 12px; color: #8a8177; width: 110px;">Mode</div>
+      <div style="display: flex; gap: 8px;">
+        <div style="border: 1px solid #d6ccbb; border-radius: 999px; padding: 8px 14px; font-size: 13px; color: #5c554d; background: #fffcf7; min-height: 36px; display: flex; align-items: center;">Sandbox · fake calendar and fake payments, no keys</div>
+        <div style="border: 1px solid #1f6f78; border-radius: 999px; padding: 8px 14px; font-size: 13px; color: #fffcf7; background: #1f6f78; min-height: 36px; display: flex; align-items: center;">Connected · Google test calendar + Stripe test mode</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 18px; padding-top: 4px;">
+      <div style="background: #2a2521; color: #fffcf7; border-radius: 999px; padding: 14px 26px; font-size: 15px; font-weight: 600; min-height: 48px; display: flex; align-items: center;">Start the demo</div>
+      <div style="font-size: 13px; color: #8a8177; line-height: 1.45; max-width: 400px;">Every action goes through the MCP server, which reads the result back before anything is called done.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

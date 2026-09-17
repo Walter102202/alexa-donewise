@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif; color: #2a2521; -webkit-font-smoothing: antialiased; }
+    a { color: #1f6f78; text-decoration: none; } a:hover { color: #164f56; text-decoration: underline; }
+    .serif { font-family: "Instrument Serif", Georgia, "Times New Roman", serif; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace; }
+  </style>
+</helmet>
+<div style="width: 1440px; height: 900px; background: #f4efe6; display: flex; flex-direction: column; overflow: hidden;">
+
+  <div style="height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; border-bottom: 1px solid #e2d9cb; background: #f4efe6;">
+    <div style="display: flex; align-items: center; gap: 18px;">
+      <div class="serif" style="font-size: 27px; letter-spacing: -0.01em; color: #2a2521;">Alexa-DoneWise</div>
+      <div style="width: 1px; height: 22px; background: #d6ccbb;"></div>
+      <div class="mono" style="font-size: 12px; color: #5c554d; border: 1px solid #d6ccbb; border-radius: 999px; padding: 5px 12px; background: #fffcf7;">Simulated Alexa+ experience · Real MCP server · Stripe test mode</div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 22px; font-size: 14px; font-weight: 500;">
+      <div style="color: #8a8177; padding: 4px 0;">Conversation</div>
+      <div style="color: #8a8177; padding: 4px 0;">Audit</div>
+      <div style="color: #2a2521; border-bottom: 2px solid #1f6f78; padding: 4px 0;">Proof</div>
+    </div>
+  </div>
+
+  <div style="flex: 1; padding: 26px 40px; display: flex; flex-direction: column; gap: 20px; min-height: 0;">
+
+    <div style="display: flex; align-items: baseline; gap: 16px;">
+      <div class="serif" style="font-size: 34px;">What actually ran</div>
+      <div style="font-size: 14px; color: #8a8177;">Bracketed values are filled from the real runs before the video is recorded. Nothing here is invented.</div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; flex: 1; min-height: 0;">
+
+      <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 15px; font-weight: 600;">Critical cases</div>
+        <div style="font-size: 12px; color: #8a8177; margin-bottom: 4px;">Run in CI against the fakes and against Google and Stripe test mode. Same harness, same MCP client.</div>
+        <div class="mono" style="display: flex; flex-direction: column; gap: 0; font-size: 12px;">
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T06 create + read-back</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T07 ack without write</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T08 charge applied, response lost → one charge</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T09 write uncertain, read down → UNKNOWN</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T11 double submit → one effect</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T12 concurrent edit → 412 handled</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T17 no approval → no charge</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid #ede5d8;"><span>T18 approval for $60 reused for $90 → refused</span><span style="color: #8a8177;">[runs] · [result]</span></div>
+        </div>
+      </div>
+
+      <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;">
+        <div style="font-size: 15px; font-weight: 600;">Same model, same tools, with and without the harness</div>
+        <div style="font-size: 12px; color: #8a8177; margin-bottom: 4px;">10 scenarios, faults injected. The baseline may call the verifier; DoneWise must.</div>
+        <div class="mono" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; font-size: 12px;">
+          <div style="padding: 8px 0; color: #8a8177;">metric</div><div style="padding: 8px 0; color: #8a8177;">baseline</div><div style="padding: 8px 0; color: #8a8177;">DoneWise</div>
+          <div style="padding: 8px 0; border-top: 1px solid #ede5d8;">false confirmations</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8;">[n] / 30</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8; font-weight: 500;">[n] / 30</div>
+          <div style="padding: 8px 0; border-top: 1px solid #ede5d8;">duplicate charges</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8;">[n] / 30</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8; font-weight: 500;">[n] / 30</div>
+          <div style="padding: 8px 0; border-top: 1px solid #ede5d8;">duplicate events</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8;">[n] / 30</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8; font-weight: 500;">[n] / 30</div>
+          <div style="padding: 8px 0; border-top: 1px solid #ede5d8;">tasks completed</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8;">[n] / 30</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8; font-weight: 500;">[n] / 30</div>
+          <div style="padding: 8px 0; border-top: 1px solid #ede5d8;">time to verified result</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8;">[p50 / p95]</div><div style="padding: 8px 0; border-top: 1px solid #ede5d8; font-weight: 500;">[p50 / p95]</div>
+        </div>
+        <div style="font-size: 12px; color: #8a8177; margin-top: auto;">Denominators and scope are published with every number. Zero on a finite sample is not "never".</div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px; min-height: 0;">
+        <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px;">
+          <div style="font-size: 15px; font-weight: 600;">MCP, for real</div>
+          <div class="mono" style="background: #2a2521; color: #e8e4dc; border-radius: 10px; padding: 14px 16px; font-size: 12px; line-height: 1.7; display: flex; flex-direction: column;">
+            <div><span style="color: #8a8177;">POST /mcp</span> initialize → 200 · MCP-Protocol-Version: <span style="color: #7fd1c7;">2025-11-25</span></div>
+            <div><span style="color: #8a8177;">POST /mcp</span> tools/list → 6 tools · 3 verified writes · operation_get</div>
+            <div><span style="color: #8a8177;">POST /mcp</span> tools/call payment_charge_verified</div>
+            <div style="padding-left: 16px;">→ structuredContent.outcome = <span style="color: #7fd1c7;">VERIFIED</span> · charges_applied = 1 · isError = false</div>
+            <div><span style="color: #8a8177;">POST /mcp</span> tools/call calendar_reschedule_verified</div>
+            <div style="padding-left: 16px;">→ structuredContent.outcome = <span style="color: #e0876f;">NOT_OBSERVED</span> · may_claim_success = false</div>
+            <div><span style="color: #8a8177;">clients</span> MCP Inspector · Claude Desktop · [ASK simulator via bridge]</div>
+          </div>
+        </div>
+
+        <div style="background: #fffcf7; border: 1px solid #e2d9cb; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+          <div style="font-size: 15px; font-weight: 600;">Take it home</div>
+          <div style="display: flex; justify-content: space-between;"><span style="color: #8a8177;">Repository</span><span class="mono" style="font-size: 12px;">[github.com/…/alexa-donewise]</span></div>
+          <div style="display: flex; justify-content: space-between;"><span style="color: #8a8177;">License</span><span class="mono" style="font-size: 12px;">[MIT]</span></div>
+          <div style="display: flex; justify-content: space-between;"><span style="color: #8a8177;">Runs without keys</span><span class="mono" style="font-size: 12px;">docker compose up · sandbox mode</span></div>
+          <div style="display: flex; justify-content: space-between;"><span style="color: #8a8177;">Friction log</span><span class="mono" style="font-size: 12px;">[n] entries · product feedback included</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

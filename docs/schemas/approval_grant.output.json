@@ -1,0 +1,84 @@
+{
+  "$defs": {
+    "ApprovalBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "intent_id": {
+          "pattern": "^int_[A-Za-z0-9_-]+$",
+          "title": "Intent Id",
+          "type": "string"
+        },
+        "amount_minor": {
+          "exclusiveMinimum": 0,
+          "title": "Amount Minor",
+          "type": "integer"
+        },
+        "currency": {
+          "pattern": "^[A-Z]{3}$",
+          "title": "Currency",
+          "type": "string"
+        },
+        "payee": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Payee",
+          "type": "string"
+        }
+      },
+      "required": [
+        "intent_id",
+        "amount_minor",
+        "currency",
+        "payee"
+      ],
+      "title": "ApprovalBinding",
+      "type": "object"
+    },
+    "GrantedBy": {
+      "enum": [
+        "session_ui",
+        "mcp_client"
+      ],
+      "title": "GrantedBy",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "spoken": {
+      "default": "",
+      "title": "Spoken",
+      "type": "string"
+    },
+    "structured_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Structured Version",
+      "type": "string"
+    },
+    "approval_id": {
+      "pattern": "^apr_[A-Za-z0-9_-]+$",
+      "title": "Approval Id",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "bound_to": {
+      "$ref": "#/$defs/ApprovalBinding"
+    },
+    "granted_by": {
+      "$ref": "#/$defs/GrantedBy"
+    }
+  },
+  "required": [
+    "approval_id",
+    "expires_at",
+    "bound_to",
+    "granted_by"
+  ],
+  "title": "ApprovalGrantResult",
+  "type": "object"
+}

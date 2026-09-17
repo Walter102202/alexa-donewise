@@ -1,0 +1,22 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "approval_request_id": {
+      "pattern": "^apr_[A-Za-z0-9_-]+$",
+      "title": "Approval Request Id",
+      "type": "string"
+    },
+    "consent_token": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Consent Token",
+      "type": "string"
+    }
+  },
+  "required": [
+    "approval_request_id",
+    "consent_token"
+  ],
+  "title": "ApprovalGrantInput",
+  "type": "object"
+}

@@ -1,0 +1,68 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "submission_id": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Submission Id",
+      "type": "string"
+    },
+    "amount_minor": {
+      "exclusiveMinimum": 0,
+      "title": "Amount Minor",
+      "type": "integer"
+    },
+    "currency": {
+      "pattern": "^[A-Z]{3}$",
+      "title": "Currency",
+      "type": "string"
+    },
+    "payee": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Payee",
+      "type": "string"
+    },
+    "concept": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Concept",
+      "type": "string"
+    },
+    "approval_id": {
+      "anyOf": [
+        {
+          "pattern": "^apr_[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approval Id"
+    },
+    "retry_of_operation_id": {
+      "anyOf": [
+        {
+          "pattern": "^op_[A-Za-z0-9_-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retry Of Operation Id"
+    }
+  },
+  "required": [
+    "submission_id",
+    "amount_minor",
+    "currency",
+    "payee",
+    "concept"
+  ],
+  "title": "PaymentChargeInput",
+  "type": "object"
+}
