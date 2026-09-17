@@ -5,7 +5,7 @@ from datetime import UTC, datetime, timedelta
 
 NOW = datetime(2026, 9, 17, 2, 39, tzinfo=UTC)
 START = datetime(2026, 9, 17, 16, tzinfo=UTC)
-VERSION = "2026-09-17-v1"
+VERSION = "2026-09-17-v2"
 PAYMENT = dict(amount_minor=6000, currency="USD", payee="Ridge Plumbing", concept="deposit")
 CREATE = dict(
     title="Ridge Plumbing",
@@ -39,7 +39,9 @@ class Scenario:
 
 
 SCENARIOS = (
-    Scenario("S01", "lost payment response", "payment", (("drop_response_after_write", 1),)),
+    Scenario(
+        "S01", "lost payment response", "payment", (("drop_response_after_write", 1),), "retry"
+    ),
     Scenario("S02", "acknowledgement without write once", "create", (("ack_without_write", 1),)),
     Scenario("S03", "acknowledgement without write twice", "move", (("ack_without_write", 2),)),
     Scenario("S04", "concurrent edit", "move", (("concurrent_edit", 1),), protection=True),
@@ -84,7 +86,7 @@ async def deterministic(world):
                 "operation_get", {"operation_id": result.get("operation_id", "op_none")}
             )
         else:
-            if scenario.followup == "retry":
+            if scenario.followup == "retry" and scenario.action != "payment":
                 args["retry_of_operation_id"] = result.get("operation_id", "op_none")
             if scenario.followup == "reuse":
                 args["submission_id"] = "submission-other"

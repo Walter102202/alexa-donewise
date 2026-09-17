@@ -33,8 +33,21 @@ async def test_approved_matrix_over_mcp_and_independent_oracle(tmp_path):
     assert summary["baseline"]["creation_intents"] == 3
     for sid in ("S02", "S03", "S08"):
         assert row[sid, "baseline"]["metrics"]["false_claims"] > 0
-    assert row["S01", "baseline"]["metrics"]["success_claims"] == 0
-    assert len(row["S01", "baseline"]["final"]["payments"]["intents"]) == 1
+    assert row["S01", "baseline"]["metrics"]["success_claims"] == 1
+    assert len(row["S01", "baseline"]["final"]["payments"]["intents"]) == 2
+    assert len(row["S01", "donewise"]["final"]["payments"]["intents"]) == 1
+    for variant in ("baseline", "donewise"):
+        s01 = row["S01", variant]
+        calls = [t for t in s01["trace"] if not t["setup"]]
+        assert s01["metrics"]["turns"] == 2
+        assert len(calls) == 2 and calls[0]["arguments"] == calls[1]["arguments"]
+    for sid in ("S01", "S07"):
+        payment = row[sid, "donewise"]
+        calls = [t for t in payment["trace"] if not t["setup"]]
+        assert calls[0]["result"]["receipt_id"] == calls[1]["result"]["receipt_id"]
+        assert {c["kind"] for c in payment["claims"]} == {"effect", "charged_once"}
+        assert len(payment["claims"]) == 2
+        assert {c["trace_index"] for c in payment["claims"]} == {payment["trace"].index(calls[0])}
     assert row["S03", "baseline"]["faults_remaining"] == {"ack_without_write": 1}
     assert not row["S03", "donewise"]["metrics"]["completed"]
     assert all(row["S04", v]["metrics"]["completed"] for v in ("baseline", "donewise"))

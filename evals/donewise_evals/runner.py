@@ -103,6 +103,8 @@ def main():
         "matrix_version": VERSION,
         "runner": args.runner,
         "logical_clock": NOW.isoformat(),
+        "timing_note": "Diagnostic only: logical clock; read window not simulated. "
+        "Real verification latency requires RF-13 with real adapters.",
         "git": git_state(),
         "configuration": {
             "horizon_seconds": 30,

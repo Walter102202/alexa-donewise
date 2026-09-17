@@ -84,16 +84,10 @@ def markdown(report):
         ("Timeouts", "timeouts"),
     ):
         lines.append(f"| {title} | {groups['baseline'][key]} | {groups['donewise'][key]} |")
-    values = [
-        "N/A"
-        if s["p50_ms"] is None
-        else f"{s['p50_ms']:.1f} / {s['p95_ms']:.1f} (n={s['verified_mutations']})"
-        for s in groups.values()
-    ]
     lines += [
-        f"| Verification p50 / p95 ms, verified mutations only | {' | '.join(values)} |",
         "",
-        "Unverified mutations remain in the verified/total denominator; their latency is not zero.",
+        "Timing is diagnostic only: logical clock; read window not simulated. "
+        "Real verification latency requires RF-13 with real adapters.",
         "Harness-only protection rows are not an identical-provider-fault comparison.",
         "**Cero en muestra finita no es nunca.** "
         "This compares the whole harness, not just verification.",

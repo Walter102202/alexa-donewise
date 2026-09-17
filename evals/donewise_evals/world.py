@@ -31,6 +31,7 @@ class World:
         self.run_id = "run_" + uuid4().hex
         self.clock = FakeClock(NOW)
         self.trace, self.claims = [], []
+        self.counted_receipts = set()
         self.turns = 0
         self.started = None
         self.verification_ms = None
@@ -237,6 +238,11 @@ class World:
             if goal_matches(self.scenario, snapshot):
                 self.verification_ms = self.verification_ms or elapsed
         if claims and (verified or result.get("status") == "acked"):
+            receipt_id = result.get("receipt_id")
+            if receipt_id:
+                if receipt_id in self.counted_receipts:
+                    return
+                self.counted_receipts.add(receipt_id)
             self.claims.append(
                 {
                     "kind": "effect",

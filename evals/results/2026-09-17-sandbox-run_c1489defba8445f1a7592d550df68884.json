@@ -1,0 +1,4425 @@
+{
+  "run_id": "run_c1489defba8445f1a7592d550df68884",
+  "matrix_version": "2026-09-17-v2",
+  "runner": "deterministic",
+  "logical_clock": "2026-09-17T02:39:00+00:00",
+  "timing_note": "Diagnostic only: logical clock; read window not simulated. Real verification latency requires RF-13 with real adapters.",
+  "git": {
+    "revision": "7c658b872b9ec69d9eaec49e41a516ed9155c699",
+    "dirty": true,
+    "diff_stat": "evals/README.md                     | 23 ++++++++++++++---------\n evals/donewise_evals/llm_runner.py  |  7 ++++++-\n evals/donewise_evals/report.py      | 10 ++--------\n evals/donewise_evals/runner.py      |  2 ++\n evals/donewise_evals/scenarios.py   |  8 +++++---\n evals/donewise_evals/world.py       |  6 ++++++\n evals/results/2026-09-17-sandbox.md |  5 +++--\n tests/test_evals.py                 | 17 +++++++++++++++--\n 8 files changed, 53 insertions(+), 25 deletions(-)",
+    "source_sha256": {
+      "adapters/donewise_adapters/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "adapters/donewise_adapters/fake_calendar.py": "f877ff3d56ff7b39640933dc0f48bfd54e6b439eebbcccf21cf79b52f6e37196",
+      "adapters/donewise_adapters/fake_payments.py": "bb5405f6d02848a4e355ceac40934c46b10925d97c45f52fcbe0fdf9db953c21",
+      "adapters/donewise_adapters/state_lock.py": "4209f2adf8eb120a7985dd24b5e43c65927902441d11189aa3103ddd9d0aa1b7",
+      "core/donewise_harness/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "core/donewise_harness/clock.py": "c32fe13aca9a5b9b02656b688a347d9124dcbf323f7d647075420bec79741abd",
+      "core/donewise_harness/contracts.py": "dcd50a4588def8a7aa9e8f8a834a089b989fb8e3c3a0d8c5134f235cb7584c2e",
+      "core/donewise_harness/errors.py": "149feebff04023be1c26a61a928997d1d609d72cf62c94c97c794e16ff6ba463",
+      "core/donewise_harness/faults.py": "86e502f552bd8bdfc6b9c917ab4b1ea5d5ebb06809b518419418de3db0800f64",
+      "core/donewise_harness/harness.py": "356006174d640919280454aa83465f123b0b5fcb7bc69880461d840b8c0f68c1",
+      "core/donewise_harness/ports.py": "29a6a6cd72b6cbbbf8c9337bd7100ef1bc6cb880b46c4a08fb0901b47d8f2eff",
+      "core/donewise_harness/reconcile.py": "a8b8b41f627fa4ca28ff9c8e7cf5654d9463b6eea0396c9bbf07df14689525e4",
+      "core/donewise_harness/registry.py": "8b437280810cf2cf1eb398b19426641166f851f70f56d26b557983b8520ee2a7",
+      "core/donewise_harness/replay.py": "09c57135f80955ed2677137b014020fed429c65f86c3e481c6d32e71bb161bd1",
+      "core/donewise_harness/spoken.py": "750793dcd1ad164545594858b502d14986c58f5936aeff5057768f966037573a",
+      "core/donewise_harness/verdict.py": "c39f73ceb9d87a7ee411e714711953bf72d12ae6e1b4bdf8897d2e10fb0223d2",
+      "evals/donewise_evals/__init__.py": "4b9930d24c950e8b04924fb098cb1256fc02231f254094e1b19a5ae6454d513f",
+      "evals/donewise_evals/llm_runner.py": "c67566c94f1c69f77ad990df85f397f13871425687e2d45dcccbd09c62de84f1",
+      "evals/donewise_evals/report.py": "ec5beb80665a930fd436420a972658bba29c86fe4f93359d0b5437708b81f368",
+      "evals/donewise_evals/runner.py": "dd4f1f7e9fc15f31359e0cabb6bb5fd4f900c6825d997e932427384069fd443f",
+      "evals/donewise_evals/scenarios.py": "ed588365230730dcbcdfbabdc7a3af09efee55d0506ddcce2b0a1e86374fd404",
+      "evals/donewise_evals/world.py": "ffb22bb0bfcaae98c54b54172c37d54b546705168fcda41ea69f9fc998c9621e",
+      "pyproject.toml": "b0e3eca2e870f10899739a0edf8a340f38380fdb3be2737327992a68ea43580b",
+      "server/donewise_server/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "server/donewise_server/admin.py": "a1f7621873c49c1841537eb3faea688ccc100ee8fa1eeac4c322d0f7b35ca984",
+      "server/donewise_server/app.py": "0bc6bcd82607302d4d6ba0d295cccd34f5b3652e1b32489083f5c58ae7566b13",
+      "server/donewise_server/config.py": "97329969bdb987721695afc04915686bcc08d9a6a1fb68fc861a9e28a5ee732c",
+      "server/donewise_server/local.py": "1abf68101084e6aba72549a7d7c7e83bf6aa19ff196ec55f3f3f3cb58103bea6",
+      "server/donewise_server/resources.py": "ec6b20227355a3627e321ad31a3cbdfbf0eef639a148aa95b1216ac13299af5c",
+      "server/donewise_server/tools.py": "a37531570dae502b01b168d6dc792e72ae0801980e9547b1d345468a7d54a693",
+      "sim/donewise_sim/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sim/donewise_sim/agent.py": "37a6997c3c2a699ba5c340f9f1dc64bda1b454985d33cc985c3aa186ae6c6ecc",
+      "sim/donewise_sim/app.py": "4ff3211d150e04774e0ec718fb480498eb3bbc0e51af01f3d98d6e74ac166566",
+      "sim/donewise_sim/config.py": "63cca350e7da63a482744eb46b4069bb45391669bc1fc3f0c5cfa403b159b073",
+      "sim/donewise_sim/llm.py": "c28e7f09ac8d3e0f5d331ede3d5bf0c2a75738911bad3765c3621c0cf4bde624",
+      "sim/donewise_sim/mcp_client.py": "28a0b3d63bc2c718caf0e44f6bd046cf8a658ea635496365a8e1fe67aa0b5e38",
+      "sim/donewise_sim/scripted.py": "990ed776c3326a192662868c0fb3cc13d9c44173b76da4f9124d18d916dfaa23",
+      "sim/donewise_sim/session.py": "cdc412b36dade552a8dac6a93db0a25f8a38b551d0b56854170e6813441bd9f8",
+      "uv.lock": "452f687446fadf7a52a53cd58857bcb85398fc3de52a67a00412e606378c532a"
+    }
+  },
+  "configuration": {
+    "horizon_seconds": 30,
+    "poll_seconds": 0.1,
+    "cleanup_seconds": 5,
+    "provider": "none",
+    "model": null
+  },
+  "command": "uv run donewise-evals --runner deterministic --output-dir \"evals/results\"",
+  "rows": [
+    {
+      "scenario": "S01",
+      "name": "lost payment response",
+      "variant": "baseline",
+      "run_id": "run_ea3df2b3189941f88c844911544034ee",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_17d1f311ff1d4360bf596b9140a5eb68": {
+              "run_id": "run_ea3df2b3189941f88c844911544034ee",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_b5180b7aedfe45349a21921703398cbf",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            },
+            "pi_ec05c1f90091477d95ebd7e52e148624": {
+              "run_id": "run_ea3df2b3189941f88c844911544034ee",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_375fe9f690b44a6487fa91fef7bd8fff",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_b5180b7aedfe45349a21921703398cbf": {
+              "payment_intent_id": "pi_17d1f311ff1d4360bf596b9140a5eb68",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            },
+            "idem_375fe9f690b44a6487fa91fef7bd8fff": {
+              "payment_intent_id": "pi_ec05c1f90091477d95ebd7e52e148624",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "response_lost",
+            "provider_ref": null,
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_b5180b7aedfe45349a21921703398cbf",
+            "spoken": "Result not confirmed."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_17d1f311ff1d4360bf596b9140a5eb68": {
+                  "run_id": "run_ea3df2b3189941f88c844911544034ee",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_b5180b7aedfe45349a21921703398cbf",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_b5180b7aedfe45349a21921703398cbf": {
+                  "payment_intent_id": "pi_17d1f311ff1d4360bf596b9140a5eb68",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "pi_ec05c1f90091477d95ebd7e52e148624",
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_375fe9f690b44a6487fa91fef7bd8fff",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_17d1f311ff1d4360bf596b9140a5eb68": {
+                  "run_id": "run_ea3df2b3189941f88c844911544034ee",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_b5180b7aedfe45349a21921703398cbf",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                },
+                "pi_ec05c1f90091477d95ebd7e52e148624": {
+                  "run_id": "run_ea3df2b3189941f88c844911544034ee",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_375fe9f690b44a6487fa91fef7bd8fff",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_b5180b7aedfe45349a21921703398cbf": {
+                  "payment_intent_id": "pi_17d1f311ff1d4360bf596b9140a5eb68",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                },
+                "idem_375fe9f690b44a6487fa91fef7bd8fff": {
+                  "payment_intent_id": "pi_ec05c1f90091477d95ebd7e52e148624",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 1,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [
+        [
+          "drop_response_after_write",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "drop_response_after_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 1,
+        "extra_charges": 1,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 2,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        null,
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S01",
+      "name": "lost payment response",
+      "variant": "donewise",
+      "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_7331b1d094ba40a0922e7f57fc11fb81": {
+              "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_64e54d30313c43b6860459d08770fa73",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_64e54d30313c43b6860459d08770fa73": {
+              "payment_intent_id": "pi_7331b1d094ba40a0922e7f57fc11fb81",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "spoken": "For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_54ec26f33db341a886da8b3fac8cc8e3",
+            "intent_id": "int_64e54d30313c43b6860459d08770fa73",
+            "attempt_id": "att_b8ca8dfb3b37432fac8247ddf6c78dff",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "NEEDS_APPROVAL",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "NO_APPROVAL",
+            "allowed_claims": [
+              "APPROVAL_REQUIRED",
+              "NOTHING_CHARGED"
+            ],
+            "may_claim_success": false,
+            "next_action": "GRANT_APPROVAL",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_e1976dac88a74247b27666917fc26bcd",
+            "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": null,
+            "approval_request": {
+              "intent_id": "int_64e54d30313c43b6860459d08770fa73",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "approval_request_id": "apr_2fbec691adca4a4fafbb768bd05fefeb",
+              "concept": "deposit",
+              "expires_at": "2026-09-17T02:44:00Z"
+            }
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "approval_grant",
+          "arguments": {
+            "approval_request_id": "apr_2fbec691adca4a4fafbb768bd05fefeb"
+          },
+          "result": {
+            "spoken": "Your approval is recorded. Nothing has been charged by this approval.",
+            "structured_version": "1.0",
+            "approval_id": "apr_cef8be8096c445a4952dd77d8e5f89f1",
+            "expires_at": "2026-09-17T02:44:00Z",
+            "bound_to": {
+              "intent_id": "int_64e54d30313c43b6860459d08770fa73",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing"
+            },
+            "granted_by": "session_ui"
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_cef8be8096c445a4952dd77d8e5f89f1"
+          },
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_7331b1d094ba40a0922e7f57fc11fb81. You don't need to try again.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_54ec26f33db341a886da8b3fac8cc8e3",
+            "intent_id": "int_64e54d30313c43b6860459d08770fa73",
+            "attempt_id": "att_eb53c56a62164139821bbeaeb03dac1c",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_6c147a676d2245aba247cb00d05b04b1",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": null
+            },
+            "reason_code": "WRITE_RESPONSE_LOST_RECOVERED",
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_1ef08d77e4794a82a52357f5123407e9",
+            "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": "pi_7331b1d094ba40a0922e7f57fc11fb81",
+            "charges_applied": 1,
+            "approval_id": "apr_cef8be8096c445a4952dd77d8e5f89f1",
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 30.999999995401595,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_7331b1d094ba40a0922e7f57fc11fb81": {
+                  "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_64e54d30313c43b6860459d08770fa73",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_64e54d30313c43b6860459d08770fa73": {
+                  "payment_intent_id": "pi_7331b1d094ba40a0922e7f57fc11fb81",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_cef8be8096c445a4952dd77d8e5f89f1"
+          },
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_7331b1d094ba40a0922e7f57fc11fb81. You don't need to try again.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_54ec26f33db341a886da8b3fac8cc8e3",
+            "intent_id": "int_64e54d30313c43b6860459d08770fa73",
+            "attempt_id": "att_eb53c56a62164139821bbeaeb03dac1c",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_6c147a676d2245aba247cb00d05b04b1",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": null
+            },
+            "reason_code": "WRITE_RESPONSE_LOST_RECOVERED",
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_1ef08d77e4794a82a52357f5123407e9",
+            "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": "pi_7331b1d094ba40a0922e7f57fc11fb81",
+            "charges_applied": 1,
+            "approval_id": "apr_cef8be8096c445a4952dd77d8e5f89f1",
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 30.999999995401595,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_7331b1d094ba40a0922e7f57fc11fb81": {
+                  "run_id": "run_e133331a06344d8f96b4b9a95c64da75",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_64e54d30313c43b6860459d08770fa73",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_64e54d30313c43b6860459d08770fa73": {
+                  "payment_intent_id": "pi_7331b1d094ba40a0922e7f57fc11fb81",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 2,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_7331b1d094ba40a0922e7f57fc11fb81. You don't need to try again."
+        },
+        {
+          "kind": "charged_once",
+          "true": true,
+          "trace_index": 2,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_7331b1d094ba40a0922e7f57fc11fb81. You don't need to try again."
+        }
+      ],
+      "faults_requested": [
+        [
+          "drop_response_after_write",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "drop_response_after_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 2,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": 30.999999995401595,
+        "turns": 2,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        "VERIFIED",
+        "VERIFIED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S02",
+      "name": "acknowledgement without write once",
+      "variant": "baseline",
+      "run_id": "run_b4decab3a4dc4fa59cc6cb53102436ae",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_create_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "title": "Ridge Plumbing",
+            "start": "2026-09-17T16:00:00+00:00",
+            "end": "2026-09-17T17:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "evt_8f4ab249fa6d428fbc6b1a8f17e5526a",
+            "version": "1",
+            "error": null,
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_8f4ab249fa6d428fbc6b1a8f17e5526a",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_CREATE",
+            "provider_key": "evt_8f4ab249fa6d428fbc6b1a8f17e5526a",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 14.999999999417923,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": false,
+          "trace_index": 0,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [
+        [
+          "ack_without_write",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "ack_without_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 1,
+        "success_claims": 1,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 1,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S02",
+      "name": "acknowledgement without write once",
+      "variant": "donewise",
+      "run_id": "run_2a3b05da809a466e96ed5c3eebac410c",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_13d3498324764d9eae849625b2856d3d": {
+              "run_id": "run_2a3b05da809a466e96ed5c3eebac410c",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_create_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "title": "Ridge Plumbing",
+            "start": "2026-09-17T16:00:00+00:00",
+            "end": "2026-09-17T17:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "spoken": "It's on your calendar: Ridge Plumbing, tomorrow 9 to 10 AM.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_c6de8ea02a974556bf5c11858aa93ca6",
+            "intent_id": "int_13d3498324764d9eae849625b2856d3d",
+            "attempt_id": "att_c267315b7fa54706b147388f66ae1cf5",
+            "action": "CALENDAR_CREATE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_13d3498324764d9eae849625b2856d3d",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_13d3498324764d9eae849625b2856d3d",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_e1b2ff44c1024424a408542c48d2fc38",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:03.333334Z",
+              "version": "1"
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_dc83de00ce504396a427394190db7705",
+            "run_id": "run_2a3b05da809a466e96ed5c3eebac410c",
+            "fault_injected": "ack_without_write",
+            "observed_at": "2026-09-17T02:39:03.333334Z",
+            "event_id": "evt_13d3498324764d9eae849625b2856d3d"
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 63.00000000192085,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_13d3498324764d9eae849625b2856d3d": {
+                  "run_id": "run_2a3b05da809a466e96ed5c3eebac410c",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 0,
+          "text": "It's on your calendar: Ridge Plumbing, tomorrow 9 to 10 AM."
+        }
+      ],
+      "faults_requested": [
+        [
+          "ack_without_write",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "ack_without_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 1,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 1,
+        "completed": true,
+        "verification_ms": 63.00000000192085,
+        "turns": 1,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        "VERIFIED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S03",
+      "name": "acknowledgement without write twice",
+      "variant": "baseline",
+      "run_id": "run_a164141bddcf49c7a67185b231b29e06",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_a164141bddcf49c7a67185b231b29e06",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_a164141bddcf49c7a67185b231b29e06",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "evt_seed",
+            "version": "2",
+            "error": null,
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_RESCHEDULE",
+            "provider_key": "evt_seed",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 16.00000000325963,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_a164141bddcf49c7a67185b231b29e06",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": false,
+          "trace_index": 0,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [
+        [
+          "ack_without_write",
+          2
+        ]
+      ],
+      "faults_remaining": {
+        "ack_without_write": 1
+      },
+      "faults_consumed": [
+        "ack_without_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 1,
+        "success_claims": 1,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 0,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S03",
+      "name": "acknowledgement without write twice",
+      "variant": "donewise",
+      "run_id": "run_2b4599cf94c24c909c8200e670a651b7",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_2b4599cf94c24c909c8200e670a651b7",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_2b4599cf94c24c909c8200e670a651b7",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "spoken": "I couldn't confirm the change. I tried twice; the latest calendar check still shows 9 AM.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_bfe96f1b41734f72b5c466970f1c2442",
+            "intent_id": "int_99df71f4968c4f9eb8baf843a6c2b9f4",
+            "attempt_id": "att_2811820855b5476e9ff9b5545806ee60",
+            "action": "CALENDAR_RESCHEDULE",
+            "outcome": "NOT_OBSERVED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_80c3fa83801e4b3cb8856e6c59e9e526",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:06.666668Z",
+              "version": "1"
+            },
+            "reason_code": "REPLAY_BUDGET_EXHAUSTED",
+            "allowed_claims": [
+              "EFFECT_UNVERIFIED",
+              "LATEST_READ_DIFFERS_FROM_TARGET"
+            ],
+            "may_claim_success": false,
+            "next_action": "ASK_USER",
+            "writes_applied": 0,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_4c50fd2600744394b9a6c08960cdfbff",
+            "run_id": "run_2b4599cf94c24c909c8200e670a651b7",
+            "fault_injected": "ack_without_write",
+            "observed_at": "2026-09-17T02:39:06.666668Z",
+            "event_id": "evt_seed",
+            "previous": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            }
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 61.99999999807915,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_2b4599cf94c24c909c8200e670a651b7",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [],
+      "faults_requested": [
+        [
+          "ack_without_write",
+          2
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "ack_without_write",
+        "ack_without_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 0,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 0,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        "NOT_OBSERVED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S04",
+      "name": "concurrent edit",
+      "variant": "baseline",
+      "run_id": "run_f7a76e95199d435d877d680c1ac45644",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": true,
+      "initial": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_f7a76e95199d435d877d680c1ac45644",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_f7a76e95199d435d877d680c1ac45644",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:30:00+00:00",
+              "end": "2026-09-17T17:30:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 2
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "status": "precondition_failed",
+            "provider_ref": "evt_seed",
+            "version": "2",
+            "error": "If-Match failed",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_RESCHEDULE",
+            "provider_key": "evt_seed",
+            "spoken": "Result not confirmed."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_f7a76e95199d435d877d680c1ac45644",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:30:00+00:00",
+                  "end": "2026-09-17T17:30:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 2
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [],
+      "faults_requested": [
+        [
+          "concurrent_edit",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "concurrent_edit"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 0,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S04",
+      "name": "concurrent edit",
+      "variant": "donewise",
+      "run_id": "run_daf3ea4e4d494f6eaae608170c47f87f",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": true,
+      "initial": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_daf3ea4e4d494f6eaae608170c47f87f",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_daf3ea4e4d494f6eaae608170c47f87f",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:30:00+00:00",
+              "end": "2026-09-17T17:30:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 2
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "spoken": "Your calendar changed since I last looked. It now shows 9:30 to 10:30 AM. Still move it to 10 to 11 AM?",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_75ff4af7f2c842dba81977114acf0508",
+            "intent_id": "int_9342406b3a4c4bb08029ec651a60127e",
+            "attempt_id": "att_c7f7a888c4b34d8a8c71d0cfc262c103",
+            "action": "CALENDAR_RESCHEDULE",
+            "outcome": "NOT_OBSERVED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:30:00Z",
+              "end": "2026-09-17T17:30:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_f34d926f34cb444fa28fe7a61bb041da",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": "2"
+            },
+            "reason_code": "VERSION_CONFLICT",
+            "allowed_claims": [
+              "EFFECT_UNVERIFIED",
+              "LATEST_READ_DIFFERS_FROM_TARGET"
+            ],
+            "may_claim_success": false,
+            "next_action": "ASK_USER",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_da1aa079605d4015b25409987f982fe1",
+            "run_id": "run_daf3ea4e4d494f6eaae608170c47f87f",
+            "fault_injected": "concurrent_edit",
+            "observed_at": "2026-09-17T02:39:00Z",
+            "event_id": "evt_seed",
+            "previous": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            }
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 63.00000000192085,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_daf3ea4e4d494f6eaae608170c47f87f",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:30:00+00:00",
+                  "end": "2026-09-17T17:30:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 2
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [],
+      "faults_requested": [
+        [
+          "concurrent_edit",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "concurrent_edit"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 0,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        "NOT_OBSERVED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S05",
+      "name": "read unavailable",
+      "variant": "baseline",
+      "run_id": "run_e34aab241790479e98a60a301cca3822",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_4789e42aa8a642dc8b92ef6b13a888fc": {
+              "run_id": "run_e34aab241790479e98a60a301cca3822",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_create_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "title": "Ridge Plumbing",
+            "start": "2026-09-17T16:00:00+00:00",
+            "end": "2026-09-17T17:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "status": "response_lost",
+            "provider_ref": null,
+            "version": null,
+            "error": null,
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_4789e42aa8a642dc8b92ef6b13a888fc",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_CREATE",
+            "provider_key": "evt_4789e42aa8a642dc8b92ef6b13a888fc",
+            "spoken": "Result not confirmed."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_4789e42aa8a642dc8b92ef6b13a888fc": {
+                  "run_id": "run_e34aab241790479e98a60a301cca3822",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "operation_get",
+          "arguments": {
+            "operation_id": "op_none"
+          },
+          "result": {
+            "spoken": "No verification is available from this direct-write client."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_4789e42aa8a642dc8b92ef6b13a888fc": {
+                  "run_id": "run_e34aab241790479e98a60a301cca3822",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [],
+      "faults_requested": [
+        [
+          "drop_response_after_write",
+          1
+        ],
+        [
+          "read_unavailable",
+          3
+        ]
+      ],
+      "faults_remaining": {
+        "read_unavailable": 3
+      },
+      "faults_consumed": [
+        "drop_response_after_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 0,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 1,
+        "completed": true,
+        "verification_ms": null,
+        "turns": 2,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        null,
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S05",
+      "name": "read unavailable",
+      "variant": "donewise",
+      "run_id": "run_dd7ac09016414943bb4fe62139aa4ed3",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_923eb153ebca488680bfc041bb4ce97a": {
+              "run_id": "run_dd7ac09016414943bb4fe62139aa4ed3",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_create_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "title": "Ridge Plumbing",
+            "start": "2026-09-17T16:00:00+00:00",
+            "end": "2026-09-17T17:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "spoken": "I couldn't check the result yet. Nothing is confirmed. I'll keep checking.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_30e4aed5de304a509d315a4dab625c61",
+            "intent_id": "int_923eb153ebca488680bfc041bb4ce97a",
+            "attempt_id": "att_df1887d0b31c4c878143ac81d21db423",
+            "action": "CALENDAR_CREATE",
+            "outcome": "UNKNOWN",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_923eb153ebca488680bfc041bb4ce97a",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "READ_TIMEOUT",
+            "allowed_claims": [
+              "EFFECT_UNVERIFIED"
+            ],
+            "may_claim_success": false,
+            "next_action": "CHECK_EXISTING_OPERATION",
+            "writes_applied": 0,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_63e021ab8dc5449191962414a37bf841",
+            "run_id": "run_dd7ac09016414943bb4fe62139aa4ed3",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:39:03.333334Z",
+            "event_id": "evt_923eb153ebca488680bfc041bb4ce97a"
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 61.99999999807915,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_923eb153ebca488680bfc041bb4ce97a": {
+                  "run_id": "run_dd7ac09016414943bb4fe62139aa4ed3",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "operation_get",
+          "arguments": {
+            "operation_id": "op_30e4aed5de304a509d315a4dab625c61"
+          },
+          "result": {
+            "spoken": "It's on your calendar: Ridge Plumbing, tomorrow 9 to 10 AM.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_30e4aed5de304a509d315a4dab625c61",
+            "intent_id": "int_923eb153ebca488680bfc041bb4ce97a",
+            "attempt_id": "att_5f81f30bcbbe408197cbe6d2f3789a75",
+            "action": "CALENDAR_CREATE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_923eb153ebca488680bfc041bb4ce97a",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_923eb153ebca488680bfc041bb4ce97a",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_60a0fa362bf1423aa1826441bc3e3da9",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:03.333334Z",
+              "version": "1"
+            },
+            "reason_code": "WRITE_RESPONSE_LOST_RECOVERED",
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_af0c2cda8983436c9e038a3702e0d95c",
+            "run_id": "run_dd7ac09016414943bb4fe62139aa4ed3",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:39:03.333334Z",
+            "history": [
+              {
+                "attempt_id": "att_506afd6d0b354501972b89bc10c5aa29",
+                "kind": "write",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "write: response_lost"
+              },
+              {
+                "attempt_id": "att_df1887d0b31c4c878143ac81d21db423",
+                "kind": "replay",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "replay: already_exists"
+              },
+              {
+                "attempt_id": "att_5f81f30bcbbe408197cbe6d2f3789a75",
+                "kind": "read",
+                "at": "2026-09-17T02:39:03.333334Z",
+                "summary": "read: started"
+              },
+              {
+                "attempt_id": "att_5f81f30bcbbe408197cbe6d2f3789a75",
+                "kind": "read",
+                "at": "2026-09-17T02:39:03.333334Z",
+                "summary": "read back: found"
+              },
+              {
+                "attempt_id": "att_df1887d0b31c4c878143ac81d21db423",
+                "kind": "verdict",
+                "at": "2026-09-17T02:39:03.333334Z",
+                "summary": "UNKNOWN (READ_TIMEOUT)"
+              },
+              {
+                "attempt_id": "att_5f81f30bcbbe408197cbe6d2f3789a75",
+                "kind": "verdict",
+                "at": "2026-09-17T02:39:03.333334Z",
+                "summary": "VERIFIED (WRITE_RESPONSE_LOST_RECOVERED)"
+              }
+            ],
+            "payment_intent_id": null,
+            "charges_applied": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 93.0000000007567,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_923eb153ebca488680bfc041bb4ce97a": {
+                  "run_id": "run_dd7ac09016414943bb4fe62139aa4ed3",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 1,
+          "text": "It's on your calendar: Ridge Plumbing, tomorrow 9 to 10 AM."
+        }
+      ],
+      "faults_requested": [
+        [
+          "drop_response_after_write",
+          1
+        ],
+        [
+          "read_unavailable",
+          3
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "drop_response_after_write",
+        "read_unavailable",
+        "read_unavailable",
+        "read_unavailable"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 1,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 1,
+        "completed": true,
+        "verification_ms": 93.0000000007567,
+        "turns": 2,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        "UNKNOWN",
+        "VERIFIED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S06",
+      "name": "registry down before intent",
+      "variant": "baseline",
+      "run_id": "run_db5a3ec4a2444a1fa749b14ea3a31f66",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": true,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_159ce030d94a455db4cb6e50043cb954": {
+              "run_id": "run_db5a3ec4a2444a1fa749b14ea3a31f66",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_create_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "title": "Ridge Plumbing",
+            "start": "2026-09-17T16:00:00+00:00",
+            "end": "2026-09-17T17:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "evt_159ce030d94a455db4cb6e50043cb954",
+            "version": "1",
+            "error": null,
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_159ce030d94a455db4cb6e50043cb954",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_CREATE",
+            "provider_key": "evt_159ce030d94a455db4cb6e50043cb954",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_159ce030d94a455db4cb6e50043cb954": {
+                  "run_id": "run_db5a3ec4a2444a1fa749b14ea3a31f66",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 0,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [
+        [
+          "registry_down",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [],
+      "protection_absent": true,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 1,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 1,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S06",
+      "name": "registry down before intent",
+      "variant": "donewise",
+      "run_id": "run_eadaabceaaa54457b17be2dd0a857a8a",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": true,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_create_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "title": "Ridge Plumbing",
+            "start": "2026-09-17T16:00:00+00:00",
+            "end": "2026-09-17T17:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "error": "Error executing tool calendar_create_verified: REGISTRY_UNAVAILABLE: operation state unavailable"
+          },
+          "is_error": true,
+          "setup": false,
+          "elapsed_ms": 16.00000000325963,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [],
+      "faults_requested": [
+        [
+          "registry_down",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "registry_down"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 0,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 1,
+        "completed": true,
+        "verification_ms": null,
+        "turns": 1,
+        "write_attempts": 0
+      },
+      "outcomes": [
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S07",
+      "name": "repeated submission",
+      "variant": "baseline",
+      "run_id": "run_7dae962522fc485ca6c965ba8d28f7be",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_5718adceb4f54683b9ceaea4da759b55": {
+              "run_id": "run_7dae962522fc485ca6c965ba8d28f7be",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_792c3757acf448d38f6f934a3d5de4a9",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            },
+            "pi_ca45dda454cc40ee997b46e651822cab": {
+              "run_id": "run_7dae962522fc485ca6c965ba8d28f7be",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_8ee6a4b4726547bf9d07459a9cec4e66",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_792c3757acf448d38f6f934a3d5de4a9": {
+              "payment_intent_id": "pi_5718adceb4f54683b9ceaea4da759b55",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            },
+            "idem_8ee6a4b4726547bf9d07459a9cec4e66": {
+              "payment_intent_id": "pi_ca45dda454cc40ee997b46e651822cab",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "pi_5718adceb4f54683b9ceaea4da759b55",
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_792c3757acf448d38f6f934a3d5de4a9",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_5718adceb4f54683b9ceaea4da759b55": {
+                  "run_id": "run_7dae962522fc485ca6c965ba8d28f7be",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_792c3757acf448d38f6f934a3d5de4a9",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_792c3757acf448d38f6f934a3d5de4a9": {
+                  "payment_intent_id": "pi_5718adceb4f54683b9ceaea4da759b55",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "pi_ca45dda454cc40ee997b46e651822cab",
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_8ee6a4b4726547bf9d07459a9cec4e66",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_5718adceb4f54683b9ceaea4da759b55": {
+                  "run_id": "run_7dae962522fc485ca6c965ba8d28f7be",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_792c3757acf448d38f6f934a3d5de4a9",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                },
+                "pi_ca45dda454cc40ee997b46e651822cab": {
+                  "run_id": "run_7dae962522fc485ca6c965ba8d28f7be",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_8ee6a4b4726547bf9d07459a9cec4e66",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_792c3757acf448d38f6f934a3d5de4a9": {
+                  "payment_intent_id": "pi_5718adceb4f54683b9ceaea4da759b55",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                },
+                "idem_8ee6a4b4726547bf9d07459a9cec4e66": {
+                  "payment_intent_id": "pi_ca45dda454cc40ee997b46e651822cab",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 0,
+          "text": "Done."
+        },
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 1,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [],
+      "faults_remaining": {},
+      "faults_consumed": [],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 2,
+        "extra_charges": 1,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 2,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        null,
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S07",
+      "name": "repeated submission",
+      "variant": "donewise",
+      "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_8c39242e83bf4a718ae1e30c0cb64cc1": {
+              "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_d626339c69c54cfb8d42e98bb11b79e5",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_d626339c69c54cfb8d42e98bb11b79e5": {
+              "payment_intent_id": "pi_8c39242e83bf4a718ae1e30c0cb64cc1",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "spoken": "For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_d4a89f4e9c6346c9bb6cf277cb2bee53",
+            "intent_id": "int_d626339c69c54cfb8d42e98bb11b79e5",
+            "attempt_id": "att_90d59d05ead9491a9e4bf2a83bc21f79",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "NEEDS_APPROVAL",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "NO_APPROVAL",
+            "allowed_claims": [
+              "APPROVAL_REQUIRED",
+              "NOTHING_CHARGED"
+            ],
+            "may_claim_success": false,
+            "next_action": "GRANT_APPROVAL",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_698c984ad26947b283e41e698f6e5711",
+            "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": null,
+            "approval_request": {
+              "intent_id": "int_d626339c69c54cfb8d42e98bb11b79e5",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "approval_request_id": "apr_2d65653f94cc477a947b06d089c1de5b",
+              "concept": "deposit",
+              "expires_at": "2026-09-17T02:44:00Z"
+            }
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "approval_grant",
+          "arguments": {
+            "approval_request_id": "apr_2d65653f94cc477a947b06d089c1de5b"
+          },
+          "result": {
+            "spoken": "Your approval is recorded. Nothing has been charged by this approval.",
+            "structured_version": "1.0",
+            "approval_id": "apr_360466efca8b4d5db7484d17a67debdc",
+            "expires_at": "2026-09-17T02:44:00Z",
+            "bound_to": {
+              "intent_id": "int_d626339c69c54cfb8d42e98bb11b79e5",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing"
+            },
+            "granted_by": "session_ui"
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_360466efca8b4d5db7484d17a67debdc"
+          },
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_8c39242e83bf4a718ae1e30c0cb64cc1.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_d4a89f4e9c6346c9bb6cf277cb2bee53",
+            "intent_id": "int_d626339c69c54cfb8d42e98bb11b79e5",
+            "attempt_id": "att_091193835fe54c628fb59ed832aa2ea7",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_35919582ef8c488d99781db6b4246d0e",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": null
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_49bb47964b1d431e89acfdac9b7096d5",
+            "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": "pi_8c39242e83bf4a718ae1e30c0cb64cc1",
+            "charges_applied": 1,
+            "approval_id": "apr_360466efca8b4d5db7484d17a67debdc",
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 30.999999995401595,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_8c39242e83bf4a718ae1e30c0cb64cc1": {
+                  "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_d626339c69c54cfb8d42e98bb11b79e5",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_d626339c69c54cfb8d42e98bb11b79e5": {
+                  "payment_intent_id": "pi_8c39242e83bf4a718ae1e30c0cb64cc1",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_360466efca8b4d5db7484d17a67debdc"
+          },
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_8c39242e83bf4a718ae1e30c0cb64cc1.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_d4a89f4e9c6346c9bb6cf277cb2bee53",
+            "intent_id": "int_d626339c69c54cfb8d42e98bb11b79e5",
+            "attempt_id": "att_091193835fe54c628fb59ed832aa2ea7",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_35919582ef8c488d99781db6b4246d0e",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": null
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_49bb47964b1d431e89acfdac9b7096d5",
+            "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": "pi_8c39242e83bf4a718ae1e30c0cb64cc1",
+            "charges_applied": 1,
+            "approval_id": "apr_360466efca8b4d5db7484d17a67debdc",
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 30.999999995401595,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_8c39242e83bf4a718ae1e30c0cb64cc1": {
+                  "run_id": "run_90329e6eecb749e0aeb3b79778550c2e",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_d626339c69c54cfb8d42e98bb11b79e5",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_d626339c69c54cfb8d42e98bb11b79e5": {
+                  "payment_intent_id": "pi_8c39242e83bf4a718ae1e30c0cb64cc1",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 2,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_8c39242e83bf4a718ae1e30c0cb64cc1."
+        },
+        {
+          "kind": "charged_once",
+          "true": true,
+          "trace_index": 2,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_8c39242e83bf4a718ae1e30c0cb64cc1."
+        }
+      ],
+      "faults_requested": [],
+      "faults_remaining": {},
+      "faults_consumed": [],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 2,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": 30.999999995401595,
+        "turns": 2,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        "VERIFIED",
+        "VERIFIED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S08",
+      "name": "explicit retry of operation",
+      "variant": "baseline",
+      "run_id": "run_cea3c4ad80704621b94d6496d34e93d8",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_cea3c4ad80704621b94d6496d34e93d8",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_cea3c4ad80704621b94d6496d34e93d8",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "evt_seed",
+            "version": "2",
+            "error": null,
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_RESCHEDULE",
+            "provider_key": "evt_seed",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_cea3c4ad80704621b94d6496d34e93d8",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles",
+            "retry_of_operation_id": "op_none"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "evt_seed",
+            "version": "2",
+            "error": null,
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "action": "CALENDAR_RESCHEDULE",
+            "provider_key": "evt_seed",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 14.999999999417923,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_cea3c4ad80704621b94d6496d34e93d8",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": false,
+          "trace_index": 0,
+          "text": "Done."
+        },
+        {
+          "kind": "effect",
+          "true": false,
+          "trace_index": 1,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [
+        [
+          "ack_without_write",
+          2
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "ack_without_write",
+        "ack_without_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 2,
+        "success_claims": 2,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 0,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 2,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        null,
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S08",
+      "name": "explicit retry of operation",
+      "variant": "donewise",
+      "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00+00:00",
+              "end": "2026-09-17T17:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 1
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {
+            "evt_seed": {
+              "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+              "calendar_id": "sandbox_calendar",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00+00:00",
+              "end": "2026-09-17T18:00:00+00:00",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed",
+              "version": 2
+            }
+          }
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "trace": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles"
+          },
+          "result": {
+            "spoken": "I couldn't confirm the change. I tried twice; the latest calendar check still shows 9 AM.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_2beac206c1a14a979d92dfa46ee77161",
+            "intent_id": "int_797c0a5eacb6440c8f80a012763b58ea",
+            "attempt_id": "att_563ad7569d694d7fba7a4e3bc5574f5e",
+            "action": "CALENDAR_RESCHEDULE",
+            "outcome": "NOT_OBSERVED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_dbed33485969485a84c0b935aee14d90",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:06.666668Z",
+              "version": "1"
+            },
+            "reason_code": "REPLAY_BUDGET_EXHAUSTED",
+            "allowed_claims": [
+              "EFFECT_UNVERIFIED",
+              "LATEST_READ_DIFFERS_FROM_TARGET"
+            ],
+            "may_claim_success": false,
+            "next_action": "ASK_USER",
+            "writes_applied": 0,
+            "automatic_retries": 1,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_acfa8f0a8db740a4aebfd32f5d4e159f",
+            "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+            "fault_injected": "ack_without_write",
+            "observed_at": "2026-09-17T02:39:06.666668Z",
+            "event_id": "evt_seed",
+            "previous": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            }
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 93.99999999732245,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T16:00:00+00:00",
+                  "end": "2026-09-17T17:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 1
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "calendar_reschedule_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "event_id": "evt_seed",
+            "new_start": "2026-09-17T17:00:00+00:00",
+            "new_end": "2026-09-17T18:00:00+00:00",
+            "timezone": "America/Los_Angeles",
+            "retry_of_operation_id": "op_2beac206c1a14a979d92dfa46ee77161"
+          },
+          "result": {
+            "spoken": "Ridge Plumbing is now at 10 to 11 AM. I read it back from your calendar.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_2beac206c1a14a979d92dfa46ee77161",
+            "intent_id": "int_797c0a5eacb6440c8f80a012763b58ea",
+            "attempt_id": "att_ce9bb6b0666041fc84745f1659922cb1",
+            "action": "CALENDAR_RESCHEDULE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "observed": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T17:00:00Z",
+              "end": "2026-09-17T18:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            },
+            "evidence": {
+              "evidence_id": "ev_16594fa4fc074e76bc75463b53cbab43",
+              "source": "fake_calendar",
+              "observed_at": "2026-09-17T02:39:06.666668Z",
+              "version": "2"
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_fc1afcb7a42b4516a94def1d487d58e2",
+            "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:06.666668Z",
+            "event_id": "evt_seed",
+            "previous": {
+              "calendar_id": "sandbox_calendar",
+              "event_id": "evt_seed",
+              "title": "Ridge Plumbing",
+              "start": "2026-09-17T16:00:00Z",
+              "end": "2026-09-17T17:00:00Z",
+              "timezone": "America/Los_Angeles",
+              "status": "confirmed"
+            }
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 110.00000000058208,
+          "oracle": {
+            "calendar": {
+              "events": {
+                "evt_seed": {
+                  "run_id": "run_e651364d91474fed893e51c8ab36c4b4",
+                  "calendar_id": "sandbox_calendar",
+                  "title": "Ridge Plumbing",
+                  "start": "2026-09-17T17:00:00+00:00",
+                  "end": "2026-09-17T18:00:00+00:00",
+                  "timezone": "America/Los_Angeles",
+                  "status": "confirmed",
+                  "version": 2
+                }
+              }
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 1,
+          "text": "Ridge Plumbing is now at 10 to 11 AM. I read it back from your calendar."
+        }
+      ],
+      "faults_requested": [
+        [
+          "ack_without_write",
+          2
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "ack_without_write",
+        "ack_without_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 1,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 0,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": 110.00000000058208,
+        "turns": 2,
+        "write_attempts": 3
+      },
+      "outcomes": [
+        "NOT_OBSERVED",
+        "VERIFIED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S09",
+      "name": "reused approval",
+      "variant": "baseline",
+      "run_id": "run_7766a437414645c28eefdea79b3bad1b",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": true,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_4d4afc331a9843658de9b4328b1c12ae": {
+              "run_id": "run_7766a437414645c28eefdea79b3bad1b",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_079fd819a8944d97a3b6a79eade1db26",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            },
+            "pi_058f6f8c3e57489486644fca74832795": {
+              "run_id": "run_7766a437414645c28eefdea79b3bad1b",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_e3f96c823e4845009e9db59c38b40ad3",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_079fd819a8944d97a3b6a79eade1db26": {
+              "payment_intent_id": "pi_4d4afc331a9843658de9b4328b1c12ae",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            },
+            "idem_e3f96c823e4845009e9db59c38b40ad3": {
+              "payment_intent_id": "pi_058f6f8c3e57489486644fca74832795",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "pi_4d4afc331a9843658de9b4328b1c12ae",
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_079fd819a8944d97a3b6a79eade1db26",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_4d4afc331a9843658de9b4328b1c12ae": {
+                  "run_id": "run_7766a437414645c28eefdea79b3bad1b",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_079fd819a8944d97a3b6a79eade1db26",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_079fd819a8944d97a3b6a79eade1db26": {
+                  "payment_intent_id": "pi_4d4afc331a9843658de9b4328b1c12ae",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-other",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "acked",
+            "provider_ref": "pi_058f6f8c3e57489486644fca74832795",
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_e3f96c823e4845009e9db59c38b40ad3",
+            "spoken": "Done."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_4d4afc331a9843658de9b4328b1c12ae": {
+                  "run_id": "run_7766a437414645c28eefdea79b3bad1b",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_079fd819a8944d97a3b6a79eade1db26",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                },
+                "pi_058f6f8c3e57489486644fca74832795": {
+                  "run_id": "run_7766a437414645c28eefdea79b3bad1b",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_e3f96c823e4845009e9db59c38b40ad3",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_079fd819a8944d97a3b6a79eade1db26": {
+                  "payment_intent_id": "pi_4d4afc331a9843658de9b4328b1c12ae",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                },
+                "idem_e3f96c823e4845009e9db59c38b40ad3": {
+                  "payment_intent_id": "pi_058f6f8c3e57489486644fca74832795",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 0,
+          "text": "Done."
+        },
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 1,
+          "text": "Done."
+        }
+      ],
+      "faults_requested": [],
+      "faults_remaining": {},
+      "faults_consumed": [],
+      "protection_absent": true,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 2,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 1,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": false,
+        "verification_ms": null,
+        "turns": 2,
+        "write_attempts": 2
+      },
+      "outcomes": [
+        null,
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S09",
+      "name": "reused approval",
+      "variant": "donewise",
+      "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": true,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_155e92387a91405fb7190a12e770354c": {
+              "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_9c4e6491b5e944499dcdb5c961bee088",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_9c4e6491b5e944499dcdb5c961bee088": {
+              "payment_intent_id": "pi_155e92387a91405fb7190a12e770354c",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "spoken": "For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_707352ba0c1744deb1e7b10511e09ad3",
+            "intent_id": "int_9c4e6491b5e944499dcdb5c961bee088",
+            "attempt_id": "att_1b7ae4818ed741d2b7e50da7a7d69713",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "NEEDS_APPROVAL",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "NO_APPROVAL",
+            "allowed_claims": [
+              "APPROVAL_REQUIRED",
+              "NOTHING_CHARGED"
+            ],
+            "may_claim_success": false,
+            "next_action": "GRANT_APPROVAL",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_e2828129d3f2413c8384109843d0a636",
+            "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": null,
+            "approval_request": {
+              "intent_id": "int_9c4e6491b5e944499dcdb5c961bee088",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "approval_request_id": "apr_4e5e7a1365184521915fc23ddd6d2f53",
+              "concept": "deposit",
+              "expires_at": "2026-09-17T02:44:00Z"
+            }
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "approval_grant",
+          "arguments": {
+            "approval_request_id": "apr_4e5e7a1365184521915fc23ddd6d2f53"
+          },
+          "result": {
+            "spoken": "Your approval is recorded. Nothing has been charged by this approval.",
+            "structured_version": "1.0",
+            "approval_id": "apr_d4d570df99b64111bfcda51c43582f78",
+            "expires_at": "2026-09-17T02:44:00Z",
+            "bound_to": {
+              "intent_id": "int_9c4e6491b5e944499dcdb5c961bee088",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing"
+            },
+            "granted_by": "session_ui"
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_d4d570df99b64111bfcda51c43582f78"
+          },
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_155e92387a91405fb7190a12e770354c.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_707352ba0c1744deb1e7b10511e09ad3",
+            "intent_id": "int_9c4e6491b5e944499dcdb5c961bee088",
+            "attempt_id": "att_f2dd589286354cc5a16a2d7e31fcf394",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_b167693bdecf476784bdd1e775f9211f",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": null
+            },
+            "reason_code": null,
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_155ec84827f24f939a239a3fc2458555",
+            "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": "pi_155e92387a91405fb7190a12e770354c",
+            "charges_applied": 1,
+            "approval_id": "apr_d4d570df99b64111bfcda51c43582f78",
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 14.999999999417923,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_155e92387a91405fb7190a12e770354c": {
+                  "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_9c4e6491b5e944499dcdb5c961bee088",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_9c4e6491b5e944499dcdb5c961bee088": {
+                  "payment_intent_id": "pi_155e92387a91405fb7190a12e770354c",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-other",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_d4d570df99b64111bfcda51c43582f78"
+          },
+          "result": {
+            "spoken": "I couldn't carry out this request.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_3ca061f2a712472e8c3d9d14a32a81d5",
+            "intent_id": "int_40cd029c514042239183fbaab99d1743",
+            "attempt_id": "att_7a776ece53a948f3bcf43d9f08f982f3",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "REJECTED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "APPROVAL_USED",
+            "allowed_claims": [
+              "NOTHING_CHARGED"
+            ],
+            "may_claim_success": false,
+            "next_action": "GRANT_APPROVAL",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_899fc208e9fc40bf8f42572aadbc6ff5",
+            "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": null,
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 30.999999995401595,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_155e92387a91405fb7190a12e770354c": {
+                  "run_id": "run_00ce7aae3246446cb97aa20cde7f0d1c",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_9c4e6491b5e944499dcdb5c961bee088",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_9c4e6491b5e944499dcdb5c961bee088": {
+                  "payment_intent_id": "pi_155e92387a91405fb7190a12e770354c",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 2,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_155e92387a91405fb7190a12e770354c."
+        },
+        {
+          "kind": "charged_once",
+          "true": true,
+          "trace_index": 2,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_155e92387a91405fb7190a12e770354c."
+        }
+      ],
+      "faults_requested": [],
+      "faults_remaining": {},
+      "faults_consumed": [],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 2,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": 14.999999999417923,
+        "turns": 2,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        "VERIFIED",
+        "REJECTED"
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S10",
+      "name": "replay window expired",
+      "variant": "baseline",
+      "run_id": "run_b945443828794683be92481e69b8eff9",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_3ce71e57a05f4617a43f6960b346e6b8": {
+              "run_id": "run_b945443828794683be92481e69b8eff9",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_1770f6845a11448282525bc5bb2c5030",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_1770f6845a11448282525bc5bb2c5030": {
+              "payment_intent_id": "pi_3ce71e57a05f4617a43f6960b346e6b8",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "status": "response_lost",
+            "provider_ref": null,
+            "version": null,
+            "error": null,
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "action": "PAYMENT_CHARGE",
+            "provider_key": "idem_1770f6845a11448282525bc5bb2c5030",
+            "spoken": "Result not confirmed."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_3ce71e57a05f4617a43f6960b346e6b8": {
+                  "run_id": "run_b945443828794683be92481e69b8eff9",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_1770f6845a11448282525bc5bb2c5030",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_1770f6845a11448282525bc5bb2c5030": {
+                  "payment_intent_id": "pi_3ce71e57a05f4617a43f6960b346e6b8",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "operation_get",
+          "arguments": {
+            "operation_id": "op_none"
+          },
+          "result": {
+            "spoken": "No verification is available from this direct-write client."
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 0.0,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_3ce71e57a05f4617a43f6960b346e6b8": {
+                  "run_id": "run_b945443828794683be92481e69b8eff9",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_1770f6845a11448282525bc5bb2c5030",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_1770f6845a11448282525bc5bb2c5030": {
+                  "payment_intent_id": "pi_3ce71e57a05f4617a43f6960b346e6b8",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [],
+      "faults_requested": [
+        [
+          "drop_response_after_write",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "drop_response_after_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 0,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": null,
+        "turns": 2,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        null,
+        null
+      ],
+      "timed_out": false
+    },
+    {
+      "scenario": "S10",
+      "name": "replay window expired",
+      "variant": "donewise",
+      "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+      "runner": "deterministic",
+      "evidence_sources": [
+        "fake_calendar",
+        "fake_payments"
+      ],
+      "protection": false,
+      "initial": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {},
+          "keys": {}
+        }
+      },
+      "final": {
+        "calendar": {
+          "events": {}
+        },
+        "payments": {
+          "intents": {
+            "pi_409114a1d8704943b7ff952c992418bf": {
+              "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded",
+              "idempotency_key": "idem_6dadbffb3abb4f74aa25a17830723b9f",
+              "created_at": "2026-09-17T02:39:00+00:00"
+            }
+          },
+          "keys": {
+            "idem_6dadbffb3abb4f74aa25a17830723b9f": {
+              "payment_intent_id": "pi_409114a1d8704943b7ff952c992418bf",
+              "first_sent_at": "2026-09-17T02:39:00+00:00"
+            }
+          }
+        }
+      },
+      "trace": [
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit"
+          },
+          "result": {
+            "spoken": "For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_cbb9d072c1ac420d9760f100c2434a79",
+            "intent_id": "int_6dadbffb3abb4f74aa25a17830723b9f",
+            "attempt_id": "att_e6da92e5d2cb47aa8e3201bc5bca5607",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "NEEDS_APPROVAL",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "NO_APPROVAL",
+            "allowed_claims": [
+              "APPROVAL_REQUIRED",
+              "NOTHING_CHARGED"
+            ],
+            "may_claim_success": false,
+            "next_action": "GRANT_APPROVAL",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_367d21645e264e88bc5ec66552c2aa47",
+            "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+            "fault_injected": null,
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": null,
+            "approval_request": {
+              "intent_id": "int_6dadbffb3abb4f74aa25a17830723b9f",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "approval_request_id": "apr_33fcbbfe78714d1b957191c2adc474a0",
+              "concept": "deposit",
+              "expires_at": "2026-09-17T02:44:00Z"
+            }
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "approval_grant",
+          "arguments": {
+            "approval_request_id": "apr_33fcbbfe78714d1b957191c2adc474a0"
+          },
+          "result": {
+            "spoken": "Your approval is recorded. Nothing has been charged by this approval.",
+            "structured_version": "1.0",
+            "approval_id": "apr_0b5c7da10fa34c8bb3a3d8c8bd3602d9",
+            "expires_at": "2026-09-17T02:44:00Z",
+            "bound_to": {
+              "intent_id": "int_6dadbffb3abb4f74aa25a17830723b9f",
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing"
+            },
+            "granted_by": "session_ui"
+          },
+          "is_error": false,
+          "setup": true,
+          "elapsed_ms": null,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {},
+              "keys": {}
+            }
+          }
+        },
+        {
+          "tool": "payment_charge_verified",
+          "arguments": {
+            "submission_id": "submission-first",
+            "amount_minor": 6000,
+            "currency": "USD",
+            "payee": "Ridge Plumbing",
+            "concept": "deposit",
+            "approval_id": "apr_0b5c7da10fa34c8bb3a3d8c8bd3602d9"
+          },
+          "result": {
+            "spoken": "I couldn't check the result yet. Nothing is confirmed. I'll keep checking.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_cbb9d072c1ac420d9760f100c2434a79",
+            "intent_id": "int_6dadbffb3abb4f74aa25a17830723b9f",
+            "attempt_id": "att_bcede7336fdf41aeb5eab18ead0e8cf1",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "UNKNOWN",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": null,
+            "evidence": null,
+            "reason_code": "REPLAY_WINDOW_EXPIRED",
+            "allowed_claims": [
+              "EFFECT_UNVERIFIED"
+            ],
+            "may_claim_success": false,
+            "next_action": "CHECK_EXISTING_OPERATION",
+            "writes_applied": 0,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_df4dd782598e4995a2883bf275b362a9",
+            "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:39:00Z",
+            "payment_intent_id": null,
+            "charges_applied": 0,
+            "approval_id": "apr_0b5c7da10fa34c8bb3a3d8c8bd3602d9",
+            "approval_request": null
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 14.999999999417923,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_409114a1d8704943b7ff952c992418bf": {
+                  "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_6dadbffb3abb4f74aa25a17830723b9f",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_6dadbffb3abb4f74aa25a17830723b9f": {
+                  "payment_intent_id": "pi_409114a1d8704943b7ff952c992418bf",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        },
+        {
+          "tool": "operation_get",
+          "arguments": {
+            "operation_id": "op_cbb9d072c1ac420d9760f100c2434a79"
+          },
+          "result": {
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_409114a1d8704943b7ff952c992418bf. You don't need to try again.",
+            "structured_version": "1.0",
+            "schema_version": "1.0",
+            "operation_id": "op_cbb9d072c1ac420d9760f100c2434a79",
+            "intent_id": "int_6dadbffb3abb4f74aa25a17830723b9f",
+            "attempt_id": "att_90bd056ce38f406fbfecc6a180f077b7",
+            "action": "PAYMENT_CHARGE",
+            "outcome": "VERIFIED",
+            "expected": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "observed": {
+              "amount_minor": 6000,
+              "currency": "USD",
+              "payee": "Ridge Plumbing",
+              "concept": "deposit",
+              "status": "succeeded"
+            },
+            "evidence": {
+              "evidence_id": "ev_4463ad47ac014d5c9e4150f5dc2c9f50",
+              "source": "fake_payments",
+              "observed_at": "2026-09-17T02:39:00Z",
+              "version": null
+            },
+            "reason_code": "WRITE_RESPONSE_LOST_RECOVERED",
+            "allowed_claims": [
+              "EFFECT_VERIFIED",
+              "LATEST_READ_MATCHES_TARGET",
+              "CHARGED_ONCE"
+            ],
+            "may_claim_success": true,
+            "next_action": "NONE",
+            "writes_applied": 1,
+            "automatic_retries": 0,
+            "spoken_subject": null,
+            "receipt_id": "rcpt_6e095939301b48e38e368784f688e87e",
+            "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+            "fault_injected": "drop_response_after_write",
+            "observed_at": "2026-09-17T02:39:00Z",
+            "history": [
+              {
+                "attempt_id": "att_bcede7336fdf41aeb5eab18ead0e8cf1",
+                "kind": "write",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "write: response_lost"
+              },
+              {
+                "attempt_id": "att_90bd056ce38f406fbfecc6a180f077b7",
+                "kind": "read",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "read: started"
+              },
+              {
+                "attempt_id": "att_90bd056ce38f406fbfecc6a180f077b7",
+                "kind": "read",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "read back: found"
+              },
+              {
+                "attempt_id": "att_bcede7336fdf41aeb5eab18ead0e8cf1",
+                "kind": "verdict",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "UNKNOWN (REPLAY_WINDOW_EXPIRED)"
+              },
+              {
+                "attempt_id": "att_90bd056ce38f406fbfecc6a180f077b7",
+                "kind": "verdict",
+                "at": "2026-09-17T02:39:00Z",
+                "summary": "VERIFIED (WRITE_RESPONSE_LOST_RECOVERED)"
+              }
+            ],
+            "payment_intent_id": "pi_409114a1d8704943b7ff952c992418bf",
+            "charges_applied": 1
+          },
+          "is_error": false,
+          "setup": false,
+          "elapsed_ms": 46.999999998661224,
+          "oracle": {
+            "calendar": {
+              "events": {}
+            },
+            "payments": {
+              "intents": {
+                "pi_409114a1d8704943b7ff952c992418bf": {
+                  "run_id": "run_234fbd3bebe543ce99c45436c038d8c0",
+                  "amount_minor": 6000,
+                  "currency": "USD",
+                  "payee": "Ridge Plumbing",
+                  "concept": "deposit",
+                  "status": "succeeded",
+                  "idempotency_key": "idem_6dadbffb3abb4f74aa25a17830723b9f",
+                  "created_at": "2026-09-17T02:39:00+00:00"
+                }
+              },
+              "keys": {
+                "idem_6dadbffb3abb4f74aa25a17830723b9f": {
+                  "payment_intent_id": "pi_409114a1d8704943b7ff952c992418bf",
+                  "first_sent_at": "2026-09-17T02:39:00+00:00"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "claims": [
+        {
+          "kind": "effect",
+          "true": true,
+          "trace_index": 3,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_409114a1d8704943b7ff952c992418bf. You don't need to try again."
+        },
+        {
+          "kind": "charged_once",
+          "true": true,
+          "trace_index": 3,
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_409114a1d8704943b7ff952c992418bf. You don't need to try again."
+        }
+      ],
+      "faults_requested": [
+        [
+          "drop_response_after_write",
+          1
+        ]
+      ],
+      "faults_remaining": {},
+      "faults_consumed": [
+        "drop_response_after_write"
+      ],
+      "protection_absent": false,
+      "claims_reviewed": true,
+      "metrics": {
+        "false_claims": 0,
+        "success_claims": 2,
+        "extra_charges": 0,
+        "extra_events": 0,
+        "unauthorized_writes": 0,
+        "payment_intents": 1,
+        "creation_intents": 0,
+        "completed": true,
+        "verification_ms": 46.999999998661224,
+        "turns": 2,
+        "write_attempts": 1
+      },
+      "outcomes": [
+        "UNKNOWN",
+        "VERIFIED"
+      ],
+      "timed_out": false
+    }
+  ],
+  "summary": {
+    "baseline": {
+      "scenarios": 10,
+      "false_claims": 4,
+      "success_claims": 10,
+      "false_claim_scenarios": 3,
+      "extra_charges": 2,
+      "payment_intents": 4,
+      "extra_events": 0,
+      "creation_intents": 3,
+      "unauthorized_writes": 1,
+      "completed_mutations": 2,
+      "mutations": 7,
+      "completed_protections": 1,
+      "protections": 3,
+      "turns": 16,
+      "write_attempts": 14,
+      "tool_calls": 16,
+      "timeouts": 0,
+      "verified_mutations": 0,
+      "unverified_mutations": 7,
+      "p50_ms": null,
+      "p95_ms": null
+    },
+    "donewise": {
+      "scenarios": 10,
+      "false_claims": 0,
+      "success_claims": 11,
+      "false_claim_scenarios": 0,
+      "extra_charges": 0,
+      "payment_intents": 4,
+      "extra_events": 0,
+      "creation_intents": 3,
+      "unauthorized_writes": 0,
+      "completed_mutations": 6,
+      "mutations": 7,
+      "completed_protections": 3,
+      "protections": 3,
+      "turns": 16,
+      "write_attempts": 15,
+      "tool_calls": 16,
+      "timeouts": 0,
+      "verified_mutations": 6,
+      "unverified_mutations": 1,
+      "p50_ms": 46.999999998661224,
+      "p95_ms": 110.00000000058208
+    }
+  }
+}

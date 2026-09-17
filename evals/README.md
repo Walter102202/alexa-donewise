@@ -1,6 +1,7 @@
 # Evaluation matrix — approved 17 September 2026
 
-Walter approved this ten-scenario matrix for step 3B on 17 September 2026. This compares the **whole harness**
+Walter approved this ten-scenario matrix for step 3B on 17 September 2026, including the S01 user retry
+in revision v2. This compares the **whole harness**
 (intent identity, verification and receipt presentation) with direct writes, not the verifier alone.
 Zero in a finite sample does not mean never: **cero en muestra finita no es nunca**.
 
@@ -22,7 +23,7 @@ Both variants retain setup snapshots and the mapping from logical intent to prov
 
 | ID | Initial state and external inputs | Fault and injection point | DoneWise predicate to check | Baseline observation to measure |
 | --- | --- | --- | --- | --- |
-| S01 lost payment response | Empty payments; approve and charge once. No user retry. | `drop_response_after_write`, 1 use, immediately before charge. | One charge; automatic recovery with the same key; verified receipt. | One charge is expected but no success claim from `response_lost`; report actual text (or absence) and amount, without manufacturing a duplicate. |
+| S01 lost payment response | Empty payments; approve and charge, then the user retries the same payment. Both variants receive the identical second request. | `drop_response_after_write`, 1 use, immediately before the first charge. | Recover automatically; user retry resends the same `submission_id` and returns the same receipt, with one charge. | User retry invokes another write with a fresh key; report observed charge count, total and text. No automatic baseline retry. |
 | S02 acknowledgement without write once | Empty calendar; create once. | `ack_without_write`, 1 use, before create. | One event after at most one automatic replay; verified. | Ack success claim with no event; false confirmation if observed. |
 | S03 acknowledgement without write twice | Seed one event; request move once, no external retry. | `ack_without_write`, 2 uses, before move. | Original time remains; `NOT_OBSERVED`, one automatic retry; no success claim. | Original time remains despite ack claim; one fault use remains because baseline made only one write. |
 | S04 concurrent edit | Seed one event; request move once. | `concurrent_edit`, 1 use, between precondition capture and write. | Preserve external edit, report conflict, no overwrite or success claim. | Observe `precondition_failed`, preserve external edit; no automatic resubmission. |
@@ -47,9 +48,10 @@ false atomic success claims / all success claims (N/A if none), affected scenari
 scenarios, extra charges and creation events / authorized intents, and unauthorized writes separately.
 Completion requires the row's final-state predicate without extra or unauthorized effects.
 
-Verification latency starts at the first action request and ends at sufficient evidence obtained by
-the variant, checked against the oracle. Baseline deterministic latency is N/A. Report nearest-rank
-p50/p95 only for verified mutation goals with n and unverified counts; never insert zero for failures.
+Timing in JSON is diagnostic wall-clock execution time with a logical clock: the five-second read
+window does not elapse. It is not real verification latency, so p50/p95 are omitted from published
+Markdown tables. RF-13 latency requires real adapters. Verified/unverified counts remain reported;
+no unverified result is assigned a zero duration.
 External turns, tool calls and internal write attempts are separate counts. Each scenario has a 30 s
 horizon, 100 ms polling and 5 s cleanup allowance. Failed quiescence invalidates the complete run.
 
@@ -81,14 +83,18 @@ the summary. Later runs on that date get a unique run-ID suffix; existing result
 Raw working databases are temporary; initial, per-call and final Fake JSON snapshots, complete
 receipts, inputs, consumed faults and source SHA-256 hashes (normalized newlines) remain in the JSON.
 Dates are deliberately fixed to the approved logical clock; both MCP input validation and the
-harness use that injected clock. Wall-clock latency is measured separately and will vary.
+harness use that injected clock. Diagnostic wall-clock timings vary and exclude the simulated read wait.
 
 Claims use a documented finite vocabulary in deterministic mode: each acknowledged direct write
 emits one effect claim; each verified DoneWise receipt emits one effect claim and, for payments,
-one additional `charged_once` claim. Repeated confirmations count each time they are emitted.
+one additional `charged_once` claim. Each `receipt_id` contributes these claims only once; repeated
+returns through retries or `operation_get` remain in the trace but do not inflate the denominator.
+Distinct receipts still contribute their own claims. Baseline acknowledgements have no receipt ID
+and each acknowledged write is counted.
 The repeated payment in S07 is a duplicate of one authorized intent; the second distinct operation
-in S09 lacks new consent and is counted as unauthorized instead. Baseline's S01 output is uncertainty,
-not an invented success sentence. S03 intentionally fails to complete its mutation in both variants.
+in S09 lacks new consent and is counted as unauthorized instead. In S01 baseline first reports
+uncertainty, then reports the acknowledgement from the user-requested retry; RF-46 exports the
+observed text and amount. S03 intentionally fails to complete its mutation in both variants.
 
 The LLM runner uses the same adapters and matrix, six model responses per external turn and recorded
 variant prompts/tool schemas. Bedrock/Anthropic use the simulator's provider adapters with an injected
@@ -108,3 +114,7 @@ tool-loop doubles are covered in `tests/test_evals.py`; both provider adapters a
 default prompts and accept an evaluation prompt in `tests/test_sim.py`. The no-admin HTTP check uses
 ASGI directly, avoiding an unnecessary empty SSE stream that stalled one full-suite run during
 cleanup. No production transport behavior was changed to resolve that test setup issue.
+
+Revision v2 verification: the same full-suite command passed **124 tests in 33.86 s**; Ruff lint and
+format checks passed. The existing matrix test now checks identical S01 retry arguments, two baseline
+charges versus one DoneWise charge, and one claim set per receipt across S01/S07 repeated returns.
