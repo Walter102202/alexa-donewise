@@ -2,6 +2,7 @@
 
 import base64
 import json
+from calendar import monthrange
 from datetime import datetime
 from pathlib import Path
 from threading import Lock
@@ -159,8 +160,13 @@ class GoogleCalendar(ProviderHTTP):
         if self.run_id:
             params["privateExtendedProperty"] = f"run_id={self.run_id}"
         hits = {}
+        now = self.clock.now()
+        limit = now.replace(
+            year=now.year + 1, day=min(now.day, monthrange(now.year + 1, now.month)[1])
+        )
+        window = {"timeMin": now.isoformat(), "timeMax": limit.isoformat(), "singleEvents": "true"}
         # Google's q does not guarantee stemming. A scoped second pass preserves Fake semantics.
-        for search_params in (params | {"q": query}, params.copy()):
+        for search_params in (params | {"q": query}, params | window):
             while True:
                 page = self.read_json(self.events_path, params=search_params)
                 for row in page.get("items", []):

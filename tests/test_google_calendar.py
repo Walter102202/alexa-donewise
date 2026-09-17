@@ -4,6 +4,7 @@ from datetime import UTC, datetime, timedelta
 import httpx
 import pytest
 from donewise_adapters.google_calendar import GoogleCalendar, google_event_id
+from donewise_harness.clock import FakeClock
 from donewise_harness.contracts import Action, CalendarTarget
 from donewise_harness.errors import ReadUnavailable
 from donewise_harness.ports import ReadRequest, WriteRequest
@@ -105,10 +106,15 @@ def test_read_missing_or_unavailable(calendar, calendar_req, respx_mock, status)
 
 
 def test_search_stems_scope_pagination(calendar, calendar_req, respx_mock):
+    calendar.clock = FakeClock(datetime(2028, 2, 29, tzinfo=UTC))
+
     def respond(request):
         assert request.url.params["privateExtendedProperty"] == "run_id=run_a"
         if "q" in request.url.params:
             return httpx.Response(200, json={"items": []})
+        assert request.url.params["timeMin"] == "2028-02-29T00:00:00+00:00"
+        assert request.url.params["timeMax"] == "2029-02-28T00:00:00+00:00"
+        assert request.url.params["singleEvents"] == "true"
         if "pageToken" not in request.url.params:
             return httpx.Response(
                 200,
@@ -126,4 +132,3 @@ def test_search_stems_scope_pagination(calendar, calendar_req, respx_mock):
 
     respx_mock.get(path__regex="/events").mock(side_effect=respond)
     assert calendar.search("the plumber") == [calendar_req.target]
-
