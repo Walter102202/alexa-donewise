@@ -29,3 +29,11 @@ upgrading Inspector is not represented as validated by this trace.
 Two ACK-without-write faults require two read windows in the real harness. Step 3 therefore
 can emit PENDING before NOT_OBSERVED, unlike the instant fixture. Consumers must accept every real
 structured receipt and deduplicate unchanged polling responses, rather than require seven events.
+
+## Datetime inputs from an unfamiliar client
+
+Claude Code's first `calendar_create_verified` call sent `start`/`end` without a timezone offset and
+was rejected (`Invalid tool input: end, start`). The model recovered on its own because the error
+names the fields, but the published schema only says `format: date-time`. A field description
+stating "ISO 8601 with offset or Z" would remove the extra round trip. Full run:
+`docs/traces/claude-code-client.md`.
