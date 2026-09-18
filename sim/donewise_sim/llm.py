@@ -25,10 +25,24 @@ Never claim a mutation without a receipt.
 
 def system_prompt(timezone="America/Los_Angeles"):
     now = datetime.now(ZoneInfo(timezone))
-    return (
-        f"You assist Clara. Today is {now:%Y-%m-%d %H:%M:%S %z} {timezone}. "
-        f"The user schedules in {timezone}; express start and end with that offset.\n" + SYSTEM
-    )
+    static = "You assist Clara.\n" + SYSTEM
+    return [
+        # Stable prefix (tools come before it and are stable too): cached across requests.
+        {"type": "text", "text": static, "cache_control": {"type": "ephemeral"}},
+        # Volatile suffix: never part of the cached prefix. The timezone is fixed per session.
+        {
+            "type": "text",
+            "text": f"Today is {now:%Y-%m-%d %H:%M:%S %z} {timezone}. The user schedules in "
+            f"{timezone}; express start and end with that offset.",
+        },
+    ]
+
+
+def system_blocks(prompt):
+    """Accept the legacy str form (evals, tests) and the block list form."""
+    if isinstance(prompt, str):
+        return [{"type": "text", "text": prompt}]
+    return prompt
 
 
 @dataclass
@@ -96,7 +110,7 @@ class BedrockLLM:
             try:
                 return client.converse(
                     modelId=self.settings.bedrock_model_id,
-                    system=[{"text": self.prompt_factory()}],
+                    system=[{"text": b["text"]} for b in system_blocks(self.prompt_factory())],
                     messages=converted,
                     inferenceConfig={"maxTokens": 1200},
                     toolConfig={
@@ -141,7 +155,7 @@ class AnthropicLLM:
             response = await client.messages.create(
                 model=self.settings.anthropic_model,
                 max_tokens=1200,
-                system=self.prompt_factory(),
+                system=system_blocks(self.prompt_factory()),
                 messages=messages,
                 tools=tools,
             )

@@ -381,7 +381,7 @@ async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provi
         import boto3
 
         def converse(**kwargs):
-            prompts.append(kwargs["system"][0]["text"])
+            prompts.append(kwargs["system"])
             return {"output": {"message": {"content": []}}}
 
         monkeypatch.setattr(
@@ -403,11 +403,23 @@ async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provi
         model = llm.AnthropicLLM(settings)
     await model.reply([], [])
     await model.reply([], [])
-    assert "2026-10-01 23:59:00 -0700 America/Los_Angeles" in prompts[0]
-    assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in prompts[1]
+    texts = [" ".join(block["text"] for block in system) for system in prompts]
+    assert "2026-10-01 23:59:00 -0700 America/Los_Angeles" in texts[0]
+    assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in texts[1]
+    # Static block first and identical across requests; the clock lives in the last block.
+    assert prompts[0][0]["text"] == prompts[1][0]["text"]
+    assert "Today is" in prompts[0][-1]["text"] and "Today is" not in prompts[0][0]["text"]
+    if provider == "anthropic":
+        assert prompts[0][0]["cache_control"] == {"type": "ephemeral"}
+        assert "cache_control" not in prompts[0][-1]
+    else:
+        assert all(set(block) == {"text"} for block in prompts[0])
     model.prompt_factory = lambda: "Evaluation baseline: direct writes and optional reads."
     await model.reply([], [])
-    assert prompts[2] == "Evaluation baseline: direct writes and optional reads."
+    assert [b["text"] for b in prompts[2]] == [
+        "Evaluation baseline: direct writes and optional reads."
+    ]
+    assert "cache_control" not in prompts[2][0]
 
 
 @pytest.mark.anyio
@@ -506,10 +518,11 @@ def test_system_prompt_follows_the_user_timezone(monkeypatch):
 
     fixed = datetime(2026, 10, 2, 7, 1, tzinfo=UTC)
     monkeypatch.setattr(llm, "datetime", SimpleNamespace(now=lambda tz: fixed.astimezone(tz)))
-    santiago = llm.system_prompt("America/Santiago")
+    santiago = " ".join(b["text"] for b in llm.system_prompt("America/Santiago"))
     assert "2026-10-02 04:01:00 -0300 America/Santiago" in santiago
     assert "America/Los_Angeles" not in santiago
-    assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in llm.system_prompt()
+    default = " ".join(b["text"] for b in llm.system_prompt())
+    assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in default
 
 
 @pytest.mark.anyio
