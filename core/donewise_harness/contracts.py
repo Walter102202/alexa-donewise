@@ -386,6 +386,15 @@ class RecapResult(ToolResult):
     timezone: Timezone = "America/Los_Angeles"
 
 
+START_DESCRIPTION = (
+    "RFC 3339 date-time with an explicit UTC offset in the user's timezone, for example "
+    "2026-09-19T10:00:00-07:00. Must be later than the current time and within the next "
+    "twelve months; never a bare date or a naive time."
+)
+END_DESCRIPTION = "RFC 3339 date-time with an explicit UTC offset; must be later than the start."
+TIMEZONE_DESCRIPTION = "IANA timezone the user is scheduling in, for example America/Los_Angeles."
+
+
 def check_window(start: datetime, end: datetime, info: ValidationInfo) -> None:
     if end <= start:
         raise ValueError("end must be after start")
@@ -398,9 +407,9 @@ def check_window(start: datetime, end: datetime, info: ValidationInfo) -> None:
 class CalendarCreateInput(Contract):
     submission_id: Text
     title: Text
-    start: UtcDatetime
-    end: UtcDatetime
-    timezone: Timezone
+    start: Annotated[UtcDatetime, Field(description=START_DESCRIPTION)]
+    end: Annotated[UtcDatetime, Field(description=END_DESCRIPTION)]
+    timezone: Annotated[Timezone, Field(description=TIMEZONE_DESCRIPTION)]
     notes: str | None = None
 
     @model_validator(mode="after")
@@ -413,9 +422,9 @@ class CalendarRescheduleInput(Contract):
     submission_id: Text
     event_id: EventId | None = None
     event_query: Text | None = None
-    new_start: UtcDatetime
-    new_end: UtcDatetime
-    timezone: Timezone
+    new_start: Annotated[UtcDatetime, Field(description=START_DESCRIPTION)]
+    new_end: Annotated[UtcDatetime, Field(description=END_DESCRIPTION)]
+    timezone: Annotated[Timezone, Field(description=TIMEZONE_DESCRIPTION)]
     retry_of_operation_id: OperationId | None = None
 
     @model_validator(mode="after")

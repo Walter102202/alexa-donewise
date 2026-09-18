@@ -14,16 +14,19 @@
       "type": "string"
     },
     "start": {
+      "description": "RFC 3339 date-time with an explicit UTC offset in the user's timezone, for example 2026-09-19T10:00:00-07:00. Must be later than the current time and within the next twelve months; never a bare date or a naive time.",
       "format": "date-time",
       "title": "Start",
       "type": "string"
     },
     "end": {
+      "description": "RFC 3339 date-time with an explicit UTC offset; must be later than the start.",
       "format": "date-time",
       "title": "End",
       "type": "string"
     },
     "timezone": {
+      "description": "IANA timezone the user is scheduling in, for example America/Los_Angeles.",
       "title": "Timezone",
       "type": "string"
     },
