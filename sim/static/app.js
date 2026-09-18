@@ -506,40 +506,80 @@ function note(msg) { const n = get('input-note'); n.hidden = !msg; n.textContent
 
 if (!Recognition) { get('mic').disabled = true; get('mic').title = 'Speech recognition is not supported in this browser'; }
 
+// Listening works like a speaker, not a walkie-talkie: recognition stays open across pauses and
+// closes on its own after SILENCE_MS without speech, or earlier when the mic is tapped again.
+// Chrome may end a continuous session by itself; while still armed we restart it and keep the text.
+const SILENCE_MS = 2000, MAX_RESTARTS = 5;
+
 get('mic').addEventListener('click', () => {
 
   if (!Recognition) { note('Speech recognition is not supported in this browser. Type instead.'); return; }
 
-  if (!LIVE || LIVE_BUSY || controlBusy || recognizing || ttsActive()) return;
-  const rec = new Recognition(); rec.lang = 'en-US'; rec.interimResults = true;
-  let finalText = '', failed = false;
-  recognizing = rec; updateControls();
+  if (recognizing) { recognizing.finish(); return; }
 
-  get('mic').setAttribute('aria-pressed', 'true'); note('Listening…');
+  if (!LIVE || LIVE_BUSY || controlBusy || ttsActive()) return;
 
-  rec.onresult = e => {
-    const results = Array.from(e.results);
-    get('text').value = results.map(r => r[0].transcript).join(' ');
-    finalText = results.filter(r => r.isFinal).map(r => r[0].transcript).join(' ').trim();
-  };
+  const committed = []; // final transcripts from earlier sessions of this same listen
+  let rec = null, sessionFinal = '', interim = '', silence = null, restarts = 0;
+  let armed = true, failed = false, sent = false;
 
-  rec.onerror = e => {
-    failed = true;
-    note(e.error === 'not-allowed' ? 'Microphone permission denied. Allow it for this origin or type instead.' :
-      e.error === 'no-speech' ? 'No speech detected. Try the microphone again or type instead.' :
-      `Microphone stopped (${e.error}). Nothing sent; type instead.`);
-  };
+  const transcript = () => [...committed, sessionFinal, interim].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 
-  rec.onend = () => {
-    recognizing = null; get('mic').setAttribute('aria-pressed', 'false'); updateControls();
-    if (!failed && finalText) { get('text').value = finalText; sendText(finalText); }
-    else if (!failed) note('No final speech detected. Nothing sent; type instead.');
-  };
+  const resetSilence = () => { clearTimeout(silence); silence = setTimeout(finish, SILENCE_MS); };
 
-  try { rec.start(); } catch (_) {
-    failed = true; recognizing = null; get('mic').setAttribute('aria-pressed', 'false');
-    updateControls(); note('Could not start the microphone. Type instead.');
+  function finish() {
+    if (!armed) return;
+    armed = false; clearTimeout(silence);
+    try { rec && rec.stop(); } catch (_) { done(); }
   }
+
+  function done() {
+    if (sent) return;
+    sent = true; clearTimeout(silence); recognizing = null;
+    get('mic').setAttribute('aria-pressed', 'false'); updateControls();
+    const text = transcript();
+    if (!failed && text) { get('text').value = text; sendText(text); }
+    else if (!failed) note('No speech detected. Nothing sent; type instead.');
+  }
+
+  function startSession() {
+    rec = new Recognition(); rec.lang = 'en-US'; rec.interimResults = true; rec.continuous = true;
+    sessionFinal = ''; interim = '';
+
+    rec.onresult = e => {
+      const results = Array.from(e.results);
+      sessionFinal = results.filter(r => r.isFinal).map(r => r[0].transcript).join(' ').trim();
+      interim = results.filter(r => !r.isFinal).map(r => r[0].transcript).join(' ').trim();
+      get('text').value = transcript();
+      if (armed) resetSilence();
+    };
+
+    rec.onerror = e => {
+      if (e.error === 'no-speech' && transcript()) return; // a long pause, we already have words
+      if (e.error === 'aborted' && !armed) return;
+      failed = true; armed = false;
+      note(e.error === 'not-allowed' ? 'Microphone permission denied. Allow it for this origin or type instead.' :
+        e.error === 'no-speech' ? 'No speech detected. Try the microphone again or type instead.' :
+        `Microphone stopped (${e.error}). Nothing sent; type instead.`);
+    };
+
+    rec.onend = () => {
+      if (sessionFinal) committed.push(sessionFinal);
+      sessionFinal = ''; interim = '';
+      if (armed && !failed && restarts < MAX_RESTARTS) { restarts++; startSession(); return; }
+      done();
+    };
+
+    try { rec.start(); } catch (_) {
+      failed = true; armed = false;
+      note('Could not start the microphone. Type instead.'); done();
+    }
+  }
+
+  recognizing = { finish }; updateControls();
+  get('mic').setAttribute('aria-pressed', 'true');
+  note('Listening… sends after a short pause, or tap the mic when you are done.');
+  startSession();
 
 });
 
@@ -622,7 +662,7 @@ function updateControls() {
   get('approve').disabled = busy;
   get('input').querySelector('[type="submit"]').disabled = busy;
   get('text').disabled = busy;
-  get('mic').disabled = busy || !Recognition || ttsActive();
+  get('mic').disabled = recognizing ? false : (busy || !Recognition || ttsActive());
   get('session-mode').disabled = busy;
   get('session-timezone').disabled = busy;
   const armed = !LIVE.fault_state || Object.keys(LIVE.fault_state.armed).length > 0;
