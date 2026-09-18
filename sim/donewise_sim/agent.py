@@ -75,7 +75,11 @@ async def turn(session, text):
                     if identity in attempted:
                         raise RuntimeError("Automatic write retry denied")
                     attempted.add(identity)
-                    args.setdefault("submission_id", str(uuid4()))
+                    # Backend-owned ids: a fresh submission per call (session.approve resends
+                    # these same arguments, so the id survives the consent round trip), and
+                    # never a model-supplied approval.
+                    args.pop("approval_id", None)
+                    args["submission_id"] = str(uuid4())
                 result = await session.execute(call.name, args)
                 payload, error = {"structuredContent": result}, False
             except Exception as exc:

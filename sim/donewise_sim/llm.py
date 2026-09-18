@@ -16,8 +16,8 @@ user's timezone (for example 2026-09-19T10:00:00-07:00); never send naive times 
 If a tool rejects the input, fix it only when the fix keeps what the user asked for (for example
 add the UTC offset). If the fix would change the date, time, amount or target, tell the user why
 and ask; do not call the tool again until they answer.
-Use a new UUID submission_id per intent; an explicitly requested retry uses the
-existing retry_of_operation_id. Approval is performed only by the session backend, never by you.
+An explicitly requested retry uses the existing retry_of_operation_id.
+Approval is performed only by the session backend, never by you.
 After receiving the requested receipts, stop calling tools.
 Never claim a mutation without a receipt.
 """

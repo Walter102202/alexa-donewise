@@ -12,6 +12,22 @@ class ToolCallError(RuntimeError):
     """A deliberate MCP tool error, already sanitized by the server."""
 
 
+# Identifiers the backend owns: the agent generates submission_id per call and only the
+# deterministic approval path adds approval_id. Models repeat "random" UUIDs across sessions.
+BACKEND_OWNED_FIELDS = ("submission_id", "approval_id")
+
+
+def model_schema(tool):
+    """The tool's input schema as the model sees it: a copy without backend-owned fields."""
+    schema = json.loads(json.dumps(tool.input_schema))
+    for name in BACKEND_OWNED_FIELDS:
+        schema.get("properties", {}).pop(name, None)
+    required = [name for name in schema.get("required", []) if name not in BACKEND_OWNED_FIELDS]
+    if "required" in schema:
+        schema["required"] = required
+    return schema
+
+
 class Session:
     def __init__(self, settings, llm, ui_mode=None, timezone=None):
         self.id = uuid4().hex
@@ -41,7 +57,7 @@ class Session:
         try:
             await self.client.start()
             self.tools = [
-                dict(name=t.name, description=t.description, input_schema=t.input_schema)
+                dict(name=t.name, description=t.description, input_schema=model_schema(t))
                 for t in await self.client.tools()
             ]
             if self.settings.demo_admin_token:

@@ -24,6 +24,14 @@ def anyio_backend():
     return "asyncio"
 
 
+def test_data_dir_defaults_to_one_directory_per_mode(monkeypatch):
+    monkeypatch.delenv("DONEWISE_DATA_DIR", raising=False)
+    assert Settings(mode="sandbox").data_dir == Path("data/sandbox")
+    monkeypatch.setenv("DONEWISE_DATA_DIR", "./elsewhere")
+    assert Settings(mode="sandbox").data_dir == Path("./elsewhere")
+    assert Settings(mode="sandbox", data_dir="explicit").data_dir == Path("explicit")
+
+
 @pytest.mark.parametrize(
     "key,google",
     [

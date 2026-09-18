@@ -26,7 +26,8 @@ class Settings:
     mode: str = field(default_factory=lambda: os.getenv("DONEWISE_MODE", "sandbox"))
     mcp_bearer_token: str = field(default_factory=lambda: os.getenv("MCP_BEARER_TOKEN", ""))
     demo_admin_token: str = field(default_factory=lambda: os.getenv("DEMO_ADMIN_TOKEN", ""))
-    data_dir: Path = field(default_factory=lambda: Path(os.getenv("DONEWISE_DATA_DIR", "./data")))
+    # Empty means one directory per mode (data/sandbox, data/connected) so registries never mix.
+    data_dir: Path | str = field(default_factory=lambda: os.getenv("DONEWISE_DATA_DIR", ""))
     allowed_origins: list[str] = field(
         default_factory=lambda: [
             v.strip()
@@ -50,13 +51,13 @@ class Settings:
     )
 
     def __post_init__(self):
-        self.data_dir = Path(self.data_dir)
+        if self.mode not in ("sandbox", "connected"):
+            raise ValueError("DONEWISE_MODE must be sandbox or connected")
+        self.data_dir = Path(self.data_dir) if self.data_dir else Path("data") / self.mode
         if self.pending_after is not None and (
             not math.isfinite(self.pending_after) or self.pending_after < 0
         ):
             raise ValueError("DONEWISE_PENDING_AFTER must be nonnegative seconds or off")
-        if self.mode not in ("sandbox", "connected"):
-            raise ValueError("DONEWISE_MODE must be sandbox or connected")
         if self.user_timezone not in USER_TIMEZONES:
             raise ValueError("USER_TIMEZONE must be one of: " + ", ".join(USER_TIMEZONES))
         if self.stripe_secret_key and not self.stripe_secret_key.startswith(

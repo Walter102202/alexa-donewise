@@ -289,6 +289,80 @@ async def test_rejected_write_shows_the_question_and_writes_only_after_the_answe
         assert "Done, I booked it." not in json.dumps(speech)
 
 
+class OneCallLLM:
+    """Calls one tool with fixed arguments (ids included), then answers in prose."""
+
+    def __init__(self, tool, arguments):
+        self.tool, self.arguments = tool, arguments
+        self.seen_tools = None
+        self.calls = 0
+
+    async def reply(self, messages, tools):
+        self.seen_tools = tools
+        self.calls += 1
+        if self.calls == 1:
+            return Reply("", [ToolCall("one", self.tool, dict(self.arguments))])
+        return Reply("Anything else?")
+
+
+INVENTED = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"  # the kind of "UUID" a model repeats
+
+
+@pytest.mark.anyio
+async def test_model_tools_hide_backend_owned_ids(mcp):
+    llm = OneCallLLM("calendar_create_verified", calendar_args("ignored") | {"title": "Plumber"})
+    async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, app):
+        await act(client, metadata["session_id"], "/turn", {"text": "Book the plumber"})
+        assert llm.seen_tools
+        for tool in llm.seen_tools:
+            schema = tool["input_schema"]
+            assert "submission_id" not in schema["properties"], tool["name"]
+            assert "approval_id" not in schema["properties"], tool["name"]
+            assert "submission_id" not in schema.get("required", []), tool["name"]
+        # The server contract itself is untouched.
+        server_tools = {
+            t.name: t for t in await app.state.sessions[metadata["session_id"]].client.tools()
+        }
+        assert "submission_id" in server_tools["calendar_create_verified"].input_schema["required"]
+
+
+@pytest.mark.anyio
+async def test_same_invented_submission_id_in_two_sessions_creates_two_events(mcp):
+    for title in ("Plumber", "Dentist"):
+        args = calendar_args("x") | {"submission_id": INVENTED, "title": title}
+        llm = OneCallLLM("calendar_create_verified", args)
+        async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, app):
+            await act(client, metadata["session_id"], "/turn", {"text": "Book " + title})
+            receipts = [e["data"]["result"] for e in events if e["event"] == "receipt"]
+            assert [r["outcome"] for r in receipts] == ["VERIFIED"], receipts
+            assert receipts[0]["expected"]["title"] == title
+    titles = sorted(row["title"] for row in mcp[0].state.harness.calendar.events().values())
+    assert titles == ["Dentist", "Plumber"]
+
+
+@pytest.mark.anyio
+async def test_invented_approval_id_does_not_skip_consent(mcp):
+    args = {
+        "submission_id": INVENTED,
+        "amount_minor": 6000,
+        "currency": "USD",
+        "payee": "Ridge Plumbing",
+        "concept": "deposit",
+        "approval_id": "apr_made_up_by_the_model",
+    }
+    llm = OneCallLLM("payment_charge_verified", args)
+    async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, app):
+        sid = metadata["session_id"]
+        state = await act(client, sid, "/turn", {"text": "Pay the deposit"})
+        receipts = [e["data"]["result"] for e in events if e["event"] == "receipt"]
+        assert [r["outcome"] for r in receipts] == ["NEEDS_APPROVAL"], receipts
+        assert state["pending_approval"]
+        await act(client, sid, "/turn", {"text": "yes"})
+        receipts = [e["data"]["result"] for e in events if e["event"] == "receipt"]
+        assert receipts[-1]["outcome"] == "VERIFIED"
+        assert len(mcp[0].state.harness.payments.intents()) == 1
+
+
 @pytest.mark.anyio
 @pytest.mark.parametrize("provider", ["bedrock", "anthropic"])
 async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provider):
