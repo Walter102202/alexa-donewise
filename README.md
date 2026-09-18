@@ -42,7 +42,7 @@ This table is not a live LLM, Google or Stripe run. A separate Claude Code/Sonne
 | Faults | Injected lost responses and acknowledgements without writes | Controlled experiments, not provider failure rates |
 | Offline preview | Same UI loading `sim/fixtures/story-3min.json` | Invented fixture; labelled disconnected; not acceptance evidence |
 | Claude Code | Sonnet completed five turns in the [recorded sandbox run](docs/traces/claude-code-client.md) | Not the simulator's live LLM path or an Alexa integration |
-| Google Calendar / Stripe test | REST adapters and mocked HTTP tests exist | Connected acceptance and latency measurements pending |
+| Google Calendar / Stripe test | [Connected provider smoke passed](docs/stripe-sandbox.md): calendar create/move/read and one $1 Stripe test payment, replayed with the same identity | Full connected fault acceptance and latency measurements pending |
 | Voice / Alexa+ | Browser speech controls and a simulated Alexa+ experience | No official Alexa+ integration, account linking or certification; human audio rehearsal pending |
 
 ## Quickstart: no keys, no real money
@@ -146,7 +146,7 @@ Without form elicitation, a trusted operator must supply consent via the token f
 “yes” is not capability. The historical provenance issue in the trace predates the current
 `mcp_client`/`session_ui` distinction in the [server guide](server/README.md).
 
-## Run connected with your own keys (opt-in; unvalidated live)
+## Run connected with your own keys (opt-in)
 
 Use Python 3.12 and uv. Stop Compose if you need its ports. Copy `.env.example` to ignored `.env`:
 
@@ -163,8 +163,11 @@ LLM_PROVIDER=none
 
 Enable Google Calendar API and share a dedicated test calendar with the service account with event
 edit permission. Do not invite attendees. Use only Stripe test-mode secrets; startup rejects other
-keys. Keep credential JSON outside the repository. These adapters make real sandbox API mutations;
-they were not invoked for this delivery. Run in two terminals from the repository root:
+keys. Supported prefixes are `sk_test_` and the CLI's temporary `rkcs_test_` sandbox keys;
+production and publishable keys are rejected. Keep credential JSON outside the repository.
+The [Stripe sandbox setup and evidence](docs/stripe-sandbox.md) covers account-free provisioning,
+expiry, local configuration, and the connected smoke check recorded on 18 September 2026.
+Run in two terminals from the repository root:
 
 ```sh
 uv sync --frozen
@@ -179,7 +182,9 @@ The scripted path needs no model. Explicit connected smoke test:
 uv run --env-file .env pytest -m connected
 ```
 
-It creates/moves/deletes a calendar event and records a $1 Stripe test payment. Full connected fault
+It creates/moves/deletes a calendar event and records a $1 Stripe test payment, then repeats the
+payment request with the same idempotency key and checks that it returns the same PaymentIntent.
+Full connected fault
 acceptance and provider-dashboard evidence remain pending. For free input, set
 `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY` and an available `ANTHROPIC_MODEL`, or use Bedrock below;
 select **Free voice** to start a new session. Normal CI requires no provider credentials.
@@ -282,7 +287,8 @@ trace. The reusable MIT package is in `core/`;
 - Fake stores and SQLite require one server process; no distributed workers or durable hosted deployment.
 - Simulator sessions/SSE history do not survive restart. Recap is historical evidence.
 - Replay windows are bounded; unresolved effects can remain UNKNOWN rather than be resent.
-- Google/Stripe acceptance, simulator live LLM, real-adapter latency and human audio rehearsal pending.
+- Google/Stripe provider smoke passed; full connected fault acceptance, simulator live LLM,
+  real-adapter latency and human audio rehearsal remain pending.
 - Inspector CLI, Python ClientSession and Claude Code have evidence; Desktop and official Alexa+ do not.
 - No public deployment, published package or final video claimed. Source: https://github.com/Walter102202/alexa-donewise.
 

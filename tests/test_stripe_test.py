@@ -39,13 +39,15 @@ def payment(**changes):
     }
 
 
-def test_payment_replay_read_and_search(payment_req, respx_mock):
-    adapter = StripeTest("sk_test_example", run_id="run_a")
+@pytest.mark.parametrize("key", ["sk_test_example", "rkcs_test_example"])
+def test_payment_replay_read_and_search(payment_req, respx_mock, key):
+    adapter = StripeTest(key, run_id="run_a")
     post = respx_mock.post("https://api.stripe.com/v1/payment_intents").respond(200, json=payment())
     assert adapter.write(payment_req).provider_ref == "pi_test"
     assert adapter.write(payment_req).status == "acked"
     assert post.calls[0].request.content == post.calls[1].request.content
     assert post.calls.last.request.headers["idempotency-key"] == "idem_abc"
+    assert post.calls.last.request.headers["authorization"] == f"Bearer {key}"
     payload = parse_qs(post.calls.last.request.content.decode())
     assert payload["metadata[run_id]"] == ["run_a"] and payload["amount"] == ["100"]
     respx_mock.get("https://api.stripe.com/v1/payment_intents/pi_test").respond(200, json=payment())
@@ -66,7 +68,9 @@ def test_payment_replay_read_and_search(payment_req, respx_mock):
     adapter.close()
 
 
-@pytest.mark.parametrize("key", ["sk_live_example", "rk_test_example", ""])
+@pytest.mark.parametrize(
+    "key", ["sk_live_example", "rkcs_live_example", "pk_test_example", "rk_test_example", ""]
+)
 def test_test_keys_only(key):
     with pytest.raises(ValueError, match="sk_test_"):
         StripeTest(key)

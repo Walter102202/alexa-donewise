@@ -10,6 +10,7 @@ Estado al 17-sep-2026. Orden de lectura:
 | `schemas/` | JSON Schema de entrada y salida de cada tool MCP, exportados con `scripts/export_schemas.py`. | Generados. |
 | `traces/` | Evidencia de clientes reales contra el servidor: Inspector, ClientSession, Claude Code, Docker Compose, elicitation. | Capturados 17-sep-2026. |
 | `screenshots/` | Capturas del simulador en sandbox usadas en el README. | Capturadas 17-sep-2026. |
+| `stripe-sandbox.md` | Creación del sandbox Stripe sin registro, configuración local, caducidad y evidencia de conexión con Google Calendar. | Smoke conectado verificado 18-sep-2026; sandbox temporal hasta 25-sep. |
 
 Los documentos de planificación interna que cita el PRD (`analisis-y-plan.md`, `revision-critica-ganar.md`, `plan-desarrollo.md`, `briefs/`, `archive/`) no se publican en este repositorio.
 

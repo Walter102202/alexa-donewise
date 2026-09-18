@@ -21,7 +21,8 @@ def test_real_sandbox_create_read_cleanup():
         os.environ[names[0]], os.environ[names[1]], run_id="run_smoke_" + uuid4().hex
     )
     key = "evt_" + uuid4().hex
-    start = datetime.now(UTC) + timedelta(days=1)
+    # Google Calendar reads event times back at whole-second precision.
+    start = (datetime.now(UTC) + timedelta(days=1)).replace(microsecond=0)
     target = CalendarTarget(
         calendar_id=calendar.calendar_id,
         event_id=key,
@@ -70,6 +71,8 @@ def test_real_sandbox_create_read_cleanup():
         )
         result = payments.write(charge)
         assert result.status == "acked"
+        replay = payments.write(charge)
+        assert replay.status == "acked" and replay.provider_ref == result.provider_ref
         assert (
             payments.read(
                 ReadRequest(action=charge.action, provider_ref=result.provider_ref)

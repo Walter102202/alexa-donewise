@@ -9,13 +9,17 @@ from donewise_harness.errors import ReadUnavailable
 
 from .provider_http import ProviderHTTP
 
+STRIPE_TEST_KEY_PREFIXES = ("sk_test_", "rkcs_test_")
+
 
 class StripeTest(ProviderHTTP):
     source = EvidenceSource.STRIPE_TEST
 
     def __init__(self, secret_key, *, base_url="https://api.stripe.com", **kwargs):
-        if not secret_key.startswith("sk_test_"):
-            raise ValueError("Stripe requires a sk_test_ key; real money is forbidden")
+        if not secret_key.startswith(STRIPE_TEST_KEY_PREFIXES):
+            raise ValueError(
+                "Stripe requires a sk_test_ or rkcs_test_ key; real money is forbidden"
+            )
         super().__init__(base_url, **kwargs)
         self._secret_key = secret_key
 

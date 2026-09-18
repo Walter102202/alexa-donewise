@@ -7,6 +7,8 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from donewise_adapters.stripe_test import STRIPE_TEST_KEY_PREFIXES
+
 
 def pending_after_from_env() -> float | None:
     value = os.getenv("DONEWISE_PENDING_AFTER", "0.45").strip().lower()
@@ -48,11 +50,15 @@ class Settings:
             raise ValueError("DONEWISE_PENDING_AFTER must be nonnegative seconds or off")
         if self.mode not in ("sandbox", "connected"):
             raise ValueError("DONEWISE_MODE must be sandbox or connected")
-        if self.stripe_secret_key and not self.stripe_secret_key.startswith("sk_test_"):
-            raise ValueError("Stripe requires a sk_test_ key; real money is forbidden")
+        if self.stripe_secret_key and not self.stripe_secret_key.startswith(
+            STRIPE_TEST_KEY_PREFIXES
+        ):
+            raise ValueError(
+                "Stripe requires a sk_test_ or rkcs_test_ key; real money is forbidden"
+            )
         if self.mode == "connected":
-            if not self.stripe_secret_key.startswith("sk_test_"):
-                raise ValueError("Connected mode requires a Stripe sk_test_ key")
+            if not self.stripe_secret_key.startswith(STRIPE_TEST_KEY_PREFIXES):
+                raise ValueError("Connected mode requires a Stripe sk_test_ or rkcs_test_ key")
             if not self.google_service_account_json or not self.google_calendar_id:
                 raise ValueError("Connected mode requires Google credentials and calendar ID")
 

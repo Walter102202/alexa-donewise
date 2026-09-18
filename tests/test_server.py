@@ -22,7 +22,14 @@ def anyio_backend():
 
 
 @pytest.mark.parametrize(
-    "key,google", [("sk_live_example", True), ("", True), ("sk_test_x", False)]
+    "key,google",
+    [
+        ("sk_live_example", True),
+        ("rkcs_live_example", True),
+        ("", True),
+        ("sk_test_x", False),
+        ("rkcs_test_x", False),
+    ],
 )
 def test_connected_configuration_fails_closed(key, google):
     with pytest.raises(ValueError):
@@ -32,6 +39,16 @@ def test_connected_configuration_fails_closed(key, google):
             google_service_account_json="sandbox.json" if google else "",
             google_calendar_id="sandbox" if google else "",
         )
+
+
+def test_connected_configuration_accepts_cli_sandbox_key():
+    settings = Settings(
+        mode="connected",
+        stripe_secret_key="rkcs_test_example",
+        google_service_account_json="sandbox.json",
+        google_calendar_id="sandbox",
+    )
+    assert settings.mode == "connected"
 
 
 @pytest.fixture
