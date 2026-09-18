@@ -2,28 +2,33 @@
   "additionalProperties": false,
   "properties": {
     "submission_id": {
+      "description": "New UUID for each user intent. Reuse the same value only when resending the identical request; a different intent always gets a new submission_id.",
       "minLength": 1,
       "pattern": "\\S",
       "title": "Submission Id",
       "type": "string"
     },
     "amount_minor": {
+      "description": "Amount in minor units of the currency as an integer greater than 0, for example 6000 for USD 60.00.",
       "exclusiveMinimum": 0,
       "title": "Amount Minor",
       "type": "integer"
     },
     "currency": {
+      "description": "ISO 4217 code in uppercase, for example USD.",
       "pattern": "^[A-Z]{3}$",
       "title": "Currency",
       "type": "string"
     },
     "payee": {
+      "description": "Name of the person or business the user wants to pay, as the user said it, for example Ridge Plumbing. It is recorded on the charge and read back in the receipt.",
       "minLength": 1,
       "pattern": "\\S",
       "title": "Payee",
       "type": "string"
     },
     "concept": {
+      "description": "What the payment is for, in a few words, for example deposit.",
       "minLength": 1,
       "pattern": "\\S",
       "title": "Concept",
@@ -40,6 +45,7 @@
         }
       ],
       "default": null,
+      "description": "approval_id from the session backend after the user approved this exact charge. Omit on the first call; the receipt then says NEEDS_APPROVAL and the backend collects consent.",
       "title": "Approval Id"
     },
     "retry_of_operation_id": {
@@ -53,6 +59,7 @@
         }
       ],
       "default": null,
+      "description": "Only when the user explicitly asks to retry an operation whose receipt was NOT_OBSERVED: the operation_id from that receipt. Never set it on your own initiative.",
       "title": "Retry Of Operation Id"
     }
   },

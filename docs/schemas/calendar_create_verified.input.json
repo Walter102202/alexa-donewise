@@ -2,12 +2,14 @@
   "additionalProperties": false,
   "properties": {
     "submission_id": {
+      "description": "New UUID for each user intent. Reuse the same value only when resending the identical request; a different intent always gets a new submission_id.",
       "minLength": 1,
       "pattern": "\\S",
       "title": "Submission Id",
       "type": "string"
     },
     "title": {
+      "description": "Short event title as the user would see it on the calendar, for example Plumber.",
       "minLength": 1,
       "pattern": "\\S",
       "title": "Title",
@@ -40,6 +42,7 @@
         }
       ],
       "default": null,
+      "description": "Optional free-text notes stored with the event; omit when the user gave none.",
       "title": "Notes"
     }
   },

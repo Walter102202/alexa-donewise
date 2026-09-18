@@ -2,6 +2,7 @@
   "additionalProperties": false,
   "properties": {
     "operation_id": {
+      "description": "operation_id from a receipt (op_...), used to read its current status.",
       "pattern": "^op_[A-Za-z0-9_-]+$",
       "title": "Operation Id",
       "type": "string"

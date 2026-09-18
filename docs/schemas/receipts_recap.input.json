@@ -12,6 +12,7 @@
         }
       ],
       "default": null,
+      "description": "Omit; the server derives the run from the session. Only set when given explicitly.",
       "title": "Run Id"
     }
   },

@@ -2,11 +2,13 @@
   "additionalProperties": false,
   "properties": {
     "approval_request_id": {
+      "description": "approval_request_id from the NEEDS_APPROVAL receipt.",
       "pattern": "^apr_[A-Za-z0-9_-]+$",
       "title": "Approval Request Id",
       "type": "string"
     },
     "consent_token": {
+      "description": "Consent capability held by the trusted UI, never by a model.",
       "minLength": 1,
       "pattern": "\\S",
       "title": "Consent Token",

@@ -403,6 +403,44 @@ PUBLIC_RULES = frozenset(
         "Exactly one of event_id and event_query is required",
     }
 )
+SUBMISSION_DESCRIPTION = (
+    "New UUID for each user intent. Reuse the same value only when resending the identical "
+    "request; a different intent always gets a new submission_id."
+)
+TITLE_DESCRIPTION = (
+    "Short event title as the user would see it on the calendar, for example Plumber."
+)
+NOTES_DESCRIPTION = "Optional free-text notes stored with the event; omit when the user gave none."
+EVENT_ID_DESCRIPTION = (
+    "DoneWise event id from an earlier receipt, always evt_... (not a Google id). Give exactly "
+    "one of event_id or event_query."
+)
+EVENT_QUERY_DESCRIPTION = (
+    "Words from the event title to locate it, for example Plumber, when the event_id is unknown. "
+    "Give exactly one of event_id or event_query."
+)
+RETRY_DESCRIPTION = (
+    "Only when the user explicitly asks to retry an operation whose receipt was NOT_OBSERVED: "
+    "the operation_id from that receipt. Never set it on your own initiative."
+)
+AMOUNT_DESCRIPTION = (
+    "Amount in minor units of the currency as an integer greater than 0, for example 6000 for "
+    "USD 60.00."
+)
+CURRENCY_DESCRIPTION = "ISO 4217 code in uppercase, for example USD."
+PAYEE_DESCRIPTION = (
+    "Name of the person or business the user wants to pay, as the user said it, for example "
+    "Ridge Plumbing. It is recorded on the charge and read back in the receipt."
+)
+CONCEPT_DESCRIPTION = "What the payment is for, in a few words, for example deposit."
+APPROVAL_DESCRIPTION = (
+    "approval_id from the session backend after the user approved this exact charge. Omit on the "
+    "first call; the receipt then says NEEDS_APPROVAL and the backend collects consent."
+)
+OPERATION_ID_DESCRIPTION = "operation_id from a receipt (op_...), used to read its current status."
+RUN_ID_DESCRIPTION = (
+    "Omit; the server derives the run from the session. Only set when given explicitly."
+)
 
 
 def check_window(start: datetime, end: datetime, info: ValidationInfo) -> None:
@@ -415,12 +453,12 @@ def check_window(start: datetime, end: datetime, info: ValidationInfo) -> None:
 
 
 class CalendarCreateInput(Contract):
-    submission_id: Text
-    title: Text
+    submission_id: Annotated[Text, Field(description=SUBMISSION_DESCRIPTION)]
+    title: Annotated[Text, Field(description=TITLE_DESCRIPTION)]
     start: Annotated[UtcDatetime, Field(description=START_DESCRIPTION)]
     end: Annotated[UtcDatetime, Field(description=END_DESCRIPTION)]
     timezone: Annotated[Timezone, Field(description=TIMEZONE_DESCRIPTION)]
-    notes: str | None = None
+    notes: Annotated[str | None, Field(description=NOTES_DESCRIPTION)] = None
 
     @model_validator(mode="after")
     def schedule(self, info: ValidationInfo) -> Self:
@@ -429,13 +467,15 @@ class CalendarCreateInput(Contract):
 
 
 class CalendarRescheduleInput(Contract):
-    submission_id: Text
-    event_id: EventId | None = None
-    event_query: Text | None = None
+    submission_id: Annotated[Text, Field(description=SUBMISSION_DESCRIPTION)]
+    event_id: Annotated[EventId | None, Field(description=EVENT_ID_DESCRIPTION)] = None
+    event_query: Annotated[Text | None, Field(description=EVENT_QUERY_DESCRIPTION)] = None
     new_start: Annotated[UtcDatetime, Field(description=START_DESCRIPTION)]
     new_end: Annotated[UtcDatetime, Field(description=END_DESCRIPTION)]
     timezone: Annotated[Timezone, Field(description=TIMEZONE_DESCRIPTION)]
-    retry_of_operation_id: OperationId | None = None
+    retry_of_operation_id: Annotated[OperationId | None, Field(description=RETRY_DESCRIPTION)] = (
+        None
+    )
 
     @model_validator(mode="after")
     def schedule(self, info: ValidationInfo) -> Self:
@@ -446,26 +486,35 @@ class CalendarRescheduleInput(Contract):
 
 
 class PaymentChargeInput(Contract):
-    submission_id: Text
-    amount_minor: PositiveAmount
-    currency: Currency
-    payee: Text
-    concept: Text
-    approval_id: ApprovalId | None = None
-    retry_of_operation_id: OperationId | None = None
+    submission_id: Annotated[Text, Field(description=SUBMISSION_DESCRIPTION)]
+    amount_minor: Annotated[PositiveAmount, Field(description=AMOUNT_DESCRIPTION)]
+    currency: Annotated[Currency, Field(description=CURRENCY_DESCRIPTION)]
+    payee: Annotated[Text, Field(description=PAYEE_DESCRIPTION)]
+    concept: Annotated[Text, Field(description=CONCEPT_DESCRIPTION)]
+    approval_id: Annotated[ApprovalId | None, Field(description=APPROVAL_DESCRIPTION)] = None
+    retry_of_operation_id: Annotated[OperationId | None, Field(description=RETRY_DESCRIPTION)] = (
+        None
+    )
 
 
 class OperationGetInput(Contract):
-    operation_id: OperationId
+    operation_id: Annotated[OperationId, Field(description=OPERATION_ID_DESCRIPTION)]
 
 
 class ApprovalGrantInput(Contract):
-    approval_request_id: ApprovalId
-    consent_token: Annotated[Text, Field(repr=False)]
+    approval_request_id: Annotated[
+        ApprovalId, Field(description="approval_request_id from the NEEDS_APPROVAL receipt.")
+    ]
+    consent_token: Annotated[
+        Text,
+        Field(
+            repr=False, description="Consent capability held by the trusted UI, never by a model."
+        ),
+    ]
 
 
 class ReceiptsRecapInput(Contract):
-    run_id: RunId | None = None
+    run_id: Annotated[RunId | None, Field(description=RUN_ID_DESCRIPTION)] = None
 
 
 class ToolSpec(Contract):

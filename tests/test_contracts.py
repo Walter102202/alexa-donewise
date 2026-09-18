@@ -305,3 +305,12 @@ def test_schemas_are_current(tmp_path):
     assert {p.name for p in tmp_path.glob("*.json")} == {p.name for p in committed.glob("*.json")}
     for path in tmp_path.glob("*.json"):
         assert path.read_bytes() == (committed / path.name).read_bytes()
+
+
+def test_every_input_property_has_a_description():
+    missing = []
+    for spec in c.TOOL_SPECS:
+        for name, prop in spec.input_model.model_json_schema()["properties"].items():
+            if not prop.get("description", "").strip():
+                missing.append(f"{spec.name}.{name}")
+    assert missing == []
