@@ -393,6 +393,16 @@ START_DESCRIPTION = (
 )
 END_DESCRIPTION = "RFC 3339 date-time with an explicit UTC offset; must be later than the start."
 TIMEZONE_DESCRIPTION = "IANA timezone the user is scheduling in, for example America/Los_Angeles."
+# Contract rules that may be quoted back to a model. Any other validator message stays private.
+PUBLIC_RULES = frozenset(
+    {
+        "Unsupported identity prefix",
+        "Unknown IANA timezone",
+        "end must be after start",
+        "start must be between now and twelve calendar months from now",
+        "Exactly one of event_id and event_query is required",
+    }
+)
 
 
 def check_window(start: datetime, end: datetime, info: ValidationInfo) -> None:

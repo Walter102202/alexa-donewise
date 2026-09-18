@@ -24,15 +24,53 @@ class PaymentConsent(c.Contract):
     approve: StrictBool
 
 
+# Pydantic error types whose message is a fixed template (constraint, never the input value).
+PYDANTIC_PUBLIC_TYPES = frozenset(
+    {
+        "missing",
+        "extra_forbidden",
+        "string_type",
+        "string_too_short",
+        "string_too_long",
+        "string_pattern_mismatch",
+        "int_type",
+        "int_parsing",
+        "greater_than",
+        "datetime_type",
+        "datetime_parsing",
+        "timezone_aware",
+        "literal_error",
+        "bool_type",
+    }
+)
+RECOVERY_HINT = (
+    "If the fix only completes the format (for example the UTC offset), call the tool again. "
+    "If the fix would change the date, time, amount or target the user asked for, ask the user "
+    "first and do not call the tool until they answer."
+)
+
+
+def public_message(e) -> str:
+    # Never e["input"] or e["ctx"]. Only fixed-template Pydantic messages and the contract rules
+    # in PUBLIC_RULES reach the model; anything else collapses to a generic phrase.
+    if e["type"] == "value_error":
+        rule = e["msg"].removeprefix("Value error, ")
+        return rule if rule in c.PUBLIC_RULES else "invalid value"
+    return e["msg"] if e["type"] in PYDANTIC_PUBLIC_TYPES else "invalid value"
+
+
 def invalid_input(exc: ValidationError, model) -> ToolError:
-    # Only declared field names; unknown keys and validator messages may contain secrets.
-    fields = sorted(
-        {
-            e["loc"][0] if e["loc"] and e["loc"][0] in model.model_fields else "input"
-            for e in exc.errors()
-        }
-    )
-    return ToolError("Invalid tool input: " + ", ".join(fields))
+    field_errors: list[str] = []
+    model_errors: list[str] = []
+    for e in exc.errors():
+        if e["loc"] and e["loc"][0] in model.model_fields:
+            field_errors.append(f"{e['loc'][0]}: {public_message(e)}")
+        elif e["loc"]:
+            field_errors.append("input: unexpected field")  # unknown key names are not echoed
+        else:
+            model_errors.append(public_message(e))
+    parts = "; ".join(sorted(set(field_errors)) + sorted(set(model_errors)))
+    return ToolError(f"Invalid tool input. {parts}. {RECOVERY_HINT}")
 
 
 class SafeTool(Tool):

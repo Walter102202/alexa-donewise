@@ -37,9 +37,10 @@ async def turn(session, text):
         await session.emit("status", {"status": "thinking"})
         reply = await session.llm.reply(session.messages, session.tools)
         if not reply.tool_calls:
-            if not called:
+            # A turn with a receipt speaks only the receipt. Without one (rejected or failed
+            # calls) the model's explanation or question is the only thing the user can hear.
+            if not called or not session.turn_spoken:
                 await session.emit("assistant", {"text": reply.text, "source": "model"})
-            if not called:
                 session.messages.append(
                     {"role": "assistant", "content": [{"type": "text", "text": reply.text}]}
                 )

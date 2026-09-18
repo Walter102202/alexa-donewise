@@ -236,6 +236,59 @@ async def test_model_cannot_grant_or_replace_receipt_speech(mcp):
         assert app.state.sessions[sid].consent_token not in messages
 
 
+class PastHourLLM:
+    """Asks for a past hour, reads the rule, asks the user, then books what the user chose."""
+
+    QUESTION = "8:00 a.m. today has already passed. Which time would you like instead?"
+
+    def __init__(self):
+        self.calls = 0
+        self.feedback = ""
+
+    async def reply(self, messages, tools):
+        self.calls += 1
+        if self.calls == 1:
+            past = calendar_args("past") | {
+                "start": "2020-09-18T08:00:00-07:00",
+                "end": "2020-09-18T09:00:00-07:00",
+            }
+            return Reply("", [ToolCall("past", "calendar_create_verified", past)])
+        if self.calls == 2:
+            self.feedback = messages[-1]["content"][0]["content"]
+            return Reply(self.QUESTION)
+        if self.calls == 3:
+            assert messages[-2]["content"][0]["text"] == self.QUESTION  # question kept in history
+            return Reply("", [ToolCall("ok", "calendar_create_verified", calendar_args("ok"))])
+        return Reply("Done, I booked it.")  # never spoken: the receipt is
+
+
+@pytest.mark.anyio
+async def test_rejected_write_shows_the_question_and_writes_only_after_the_answer(mcp):
+    llm = PastHourLLM()
+    async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, app):
+        sid = metadata["session_id"]
+        await act(client, sid, "/turn", {"text": "Schedule an appointment for today at 8 a.m."})
+        assert "start must be between now and twelve calendar months from now" in llm.feedback
+        assert "ask the user first" in llm.feedback and "2020-09-18" not in llm.feedback
+        assert llm.calls == 2
+        assert [e["data"] for e in events if e["event"] == "assistant"] == [
+            {"text": PastHourLLM.QUESTION, "source": "model"}
+        ]
+        assert not [e for e in events if e["event"] == "receipt"]
+        assert not mcp[0].state.harness.calendar.events()
+        assert app.state.sessions[sid].messages[-1] == {
+            "role": "assistant",
+            "content": [{"type": "text", "text": PastHourLLM.QUESTION}],
+        }
+
+        await act(client, sid, "/turn", {"text": "Tomorrow at 8 a.m. then"})
+        receipts = [e["data"]["result"] for e in events if e["event"] == "receipt"]
+        assert len(receipts) == 1 and receipts[0]["outcome"] == "VERIFIED"
+        speech = [e["data"] for e in events if e["event"] == "assistant"]
+        assert speech[-1] == {"text": receipts[0]["spoken"], "source": "spoken"}
+        assert "Done, I booked it." not in json.dumps(speech)
+
+
 @pytest.mark.anyio
 @pytest.mark.parametrize("provider", ["bedrock", "anthropic"])
 async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provider):

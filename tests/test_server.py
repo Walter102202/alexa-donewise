@@ -8,12 +8,15 @@ from pathlib import Path
 import anyio
 import httpx2
 import pytest
+from donewise_harness import contracts as c
 from donewise_harness.contracts import TOOL_SPECS, CalendarCreateResult
 from donewise_server.app import build_app
 from donewise_server.config import Settings
 from donewise_server.local import serving
+from donewise_server.tools import invalid_input
 from mcp import ClientSession
 from mcp.client.streamable_http import streamable_http_client
+from pydantic import ValidationError, field_validator
 
 
 @pytest.fixture
@@ -459,3 +462,72 @@ async def test_recap_timezone_header_overrides_the_server_default(tmp_path):
                         await session.initialize()
                         recap = await session.call_tool("receipts_recap", {})
                         assert recap.structured_content["timezone"] == expected
+
+
+def _invalid(model, data):
+    try:
+        model.model_validate(data, context={"now": datetime.now(UTC)})
+    except ValidationError as exc:
+        return str(invalid_input(exc, model))
+    raise AssertionError("expected a validation error")
+
+
+def test_invalid_input_explains_rules_without_echoing_values():
+    naive = _invalid(
+        c.CalendarCreateInput,
+        dict(
+            submission_id="s",
+            title="secret-title",
+            start="2026-09-19T10:00:00",
+            end="2026-09-19T11:00:00",
+            timezone="Mars/Olympus",
+        ),
+    )
+    assert "start: Input should have timezone info" in naive
+    assert "end: Input should have timezone info" in naive
+    assert "timezone: Unknown IANA timezone" in naive
+    assert "secret-title" not in naive and "Mars/Olympus" not in naive
+    assert "ask the user first" in naive
+
+    past = _invalid(
+        c.CalendarCreateInput,
+        dict(
+            submission_id="s",
+            title="t",
+            start="2020-09-19T10:00:00-07:00",
+            end="2020-09-19T11:00:00-07:00",
+            timezone="America/Los_Angeles",
+        ),
+    )
+    assert "start must be between now and twelve calendar months from now" in past
+    assert "2020-09-19" not in past
+
+    payment = _invalid(
+        c.PaymentChargeInput,
+        dict(
+            submission_id="s",
+            amount_minor=-5,
+            currency="usd",
+            payee="p",
+            concept="c",
+            private_amount="do-not-echo",
+        ),
+    )
+    assert "amount_minor: Input should be greater than 0" in payment
+    assert "currency: String should match pattern" in payment
+    assert "input: unexpected field" in payment
+    assert "do-not-echo" not in payment and "private_amount" not in payment
+
+
+def test_invalid_input_hides_validator_messages_outside_the_public_list():
+    class Leaky(c.Contract):
+        code: str
+
+        @field_validator("code")
+        @classmethod
+        def _leak(cls, value):
+            raise ValueError(f"bad code {value}")
+
+    message = _invalid(Leaky, {"code": "secret-xyz"})
+    assert "code: invalid value" in message
+    assert "secret-xyz" not in message and "bad code" not in message
