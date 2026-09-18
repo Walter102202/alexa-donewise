@@ -22,7 +22,15 @@ def anyio_backend():
 @pytest.fixture
 def mcp(tmp_path):
     app = build_server(
-        ServerSettings(data_dir=tmp_path, mcp_bearer_token="bearer", demo_admin_token="admin")
+        ServerSettings(
+            data_dir=tmp_path,
+            mcp_bearer_token="bearer",
+            demo_admin_token="admin",
+            # Wide budget so slow CI runners keep fast writes synchronous; the Fake payment
+            # delay stays above it so the PENDING path is still exercised.
+            pending_after=2.0,
+            fake_payment_delay_seconds=3.0,
+        )
     )
     with serving(app) as url:
         yield app, url

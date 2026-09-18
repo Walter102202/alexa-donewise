@@ -37,7 +37,15 @@ def test_connected_configuration_fails_closed(key, google):
 @pytest.fixture
 def live(tmp_path):
     app = build_app(
-        Settings(data_dir=tmp_path, mcp_bearer_token="bearer", demo_admin_token="admin")
+        Settings(
+            data_dir=tmp_path,
+            mcp_bearer_token="bearer",
+            demo_admin_token="admin",
+            # Wide budget so slow CI runners keep fast writes synchronous; the Fake payment
+            # delay stays above it so the PENDING path is still exercised.
+            pending_after=2.0,
+            fake_payment_delay_seconds=3.0,
+        )
     )
     with serving(app) as url:
         yield app, url
@@ -164,13 +172,13 @@ async def test_official_client_contract_and_pending(live):
                     url + "/admin/faults",
                     json={"run_id": "run_wire", "kind": "drop_response_after_write"},
                 )
-                h.payments.delay_seconds = 0.65
                 started = time.monotonic()
                 pending = await session.call_tool("payment_charge_verified", pay)
-                assert time.monotonic() - started < 0.5
+                # PENDING is returned at the budget, before the delayed Fake write completes.
+                assert time.monotonic() - started < h.payments.delay_seconds
                 assert not pending.is_error and pending.structured_content["outcome"] == "PENDING"
                 op_id = pending.structured_content["operation_id"]
-                for _ in range(50):
+                while time.monotonic() - started < h.background_timeout:
                     status = await session.call_tool("operation_get", {"operation_id": op_id})
                     if status.structured_content["outcome"] != "PENDING":
                         break
