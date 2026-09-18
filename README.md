@@ -272,8 +272,8 @@ uv run donewise-evals --runner deterministic --output-dir data/evals
 ```
 
 [CI](.github/workflows/ci.yml) checks Windows/Ubuntu, excludes connected tests and uploads Markdown
-tables plus JSON evidence per OS. GitHub execution awaits a future push. Local Windows and Linux
-container results are in the Docker trace. The reusable MIT package is in `core/`;
+tables plus JSON evidence per OS. Local Windows and Linux container results are in the Docker
+trace. The reusable MIT package is in `core/`;
 [schemas](docs/schemas) document the contracts.
 
 ## Known limits and delivery status
@@ -284,7 +284,7 @@ container results are in the Docker trace. The reusable MIT package is in `core/
 - Replay windows are bounded; unresolved effects can remain UNKNOWN rather than be resent.
 - Google/Stripe acceptance, simulator live LLM, real-adapter latency and human audio rehearsal pending.
 - Inspector CLI, Python ClientSession and Claude Code have evidence; Desktop and official Alexa+ do not.
-- No public deployment, published package, repository URL or final video claimed. No git remote is configured.
+- No public deployment, published package or final video claimed. Source: https://github.com/Walter102202/alexa-donewise.
 
 [Product feedback](docs/product-feedback.md) · [Friction log](docs/friction-log.md) ·
-[Devpost draft](docs/devpost.md) · [MIT license](LICENSE).
+[MIT license](LICENSE).

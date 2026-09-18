@@ -4,6 +4,7 @@
 **Aprueba:** Walter. **Escribe:** Claude (sesión del 14 y 15-sep-2026).
 **Qué es este documento:** los requisitos del producto que se entrega al track Alexa+ de la "Build, Ship, Shape: Amazon Developer Hackathon" 2026 (cierre **23-oct-2026 12:00 PT, 16:00 Chile**). Fija qué se construye, qué no, cómo se comporta, cómo se prueba y qué ve el jurado. No es el plan de implementación (está en `docs/analisis-y-plan.md` §7) ni el diseño técnico por módulo (se escribe al empezar cada uno).
 **Documentos base:** `docs/analisis-y-plan.md` (hechos verificados, decisiones §8, estrategia §9), `docs/revision-critica-ganar.md` (riesgos y recomendaciones), `docs/archive/spec-v1-2026-09-14.md` (spec v1, contratos y casos T06–T16), `design/mockups/donewise-3min.html` (prototipo estático de la pantalla única y de la historia, en inglés; deriva de `design/mockups/donewise-evening.codex.html`, la propuesta visual de Codex aprobada por Walter el 16-sep-2026). `Main.dc.html` y los demás `*.dc.html` quedan como exploración previa.
+**Nota de publicación:** `docs/analisis-y-plan.md`, `docs/revision-critica-ganar.md` y `docs/archive/` son documentos internos y no se publican en el repositorio; las referencias a sus secciones se conservan como cita.
 **Prioridades:** **P0** = sin esto no se entrega. **P1** = sube nota; se hace si el hito del video se cumple. **P2** = stretch.
 
 ---
@@ -332,7 +333,7 @@ Historia de 5.1 en la pantalla de `donewise-3min.html`. Tiempos medidos sobre el
 | 1:55–2:20 | Recibo abierto; handshake con 2025-11-25; Claude Desktop o Inspector; Alexa del simulador si entró. | "Any MCP client gets the same receipt." |
 | 2:20–2:45 | Tabla baseline vs DoneWise; repo; `docker compose up`. | "Zero false confirmations, zero duplicates in our fault suite. Numbers, denominators and code in the repo." |
 
-## 10. Hitos (detalle en `docs/analisis-y-plan.md` §7)
+## 10. Hitos
 
 | Fecha | Hito | Condición |
 | --- | --- | --- |
@@ -346,7 +347,7 @@ Historia de 5.1 en la pantalla de `donewise-3min.html`. Tiempos medidos sobre el
 
 ---
 
-## 11. Riesgos principales (detalle en `docs/revision-critica-ganar.md` §4)
+## 11. Riesgos principales
 
 | Riesgo | Mitigación en este PRD |
 | --- | --- |
