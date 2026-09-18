@@ -9,7 +9,8 @@ from mcp.client.streamable_http import streamable_http_client
 
 
 class MCPClient:
-    def __init__(self, settings, run_id):
+    def __init__(self, settings, run_id, timezone=None):
+        self.timezone = timezone
         self.settings, self.run_id = settings, run_id
         self.protocol_version = self.mcp_session_id = None
         self._task = None
@@ -31,6 +32,8 @@ class MCPClient:
                     self.mcp_session_id = sid
 
             auth = {"X-DoneWise-Run-Id": self.run_id, "X-DoneWise-Channel": "session-ui"}
+            if self.timezone:
+                auth["X-DoneWise-Timezone"] = self.timezone
             if self.settings.mcp_bearer_token:
                 auth["Authorization"] = "Bearer " + self.settings.mcp_bearer_token
             async with httpx2.AsyncClient(

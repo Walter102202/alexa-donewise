@@ -37,7 +37,9 @@ def mcp(tmp_path):
 
 
 @asynccontextmanager
-async def simulation(mcp, llm=None, *, ui_mode=None, admin_token="admin"):
+async def simulation(
+    mcp, llm=None, *, ui_mode=None, admin_token="admin", user_timezone="America/Los_Angeles"
+):
     server, url = mcp
     app = build_app(
         Settings(
@@ -45,6 +47,7 @@ async def simulation(mcp, llm=None, *, ui_mode=None, admin_token="admin"):
             mcp_bearer_token="bearer",
             demo_admin_token=admin_token,
             llm_provider="none",
+            user_timezone=user_timezone,
         ),
         llm=llm,
     )
@@ -356,3 +359,68 @@ async def test_fault_endpoint_disabled_without_admin():
             json={"kind": "drop_response_after_write", "uses": 1},
         )
         assert response.status_code == 404
+
+
+@pytest.mark.parametrize("zone", ["America/Los_Angeles", "America/Santiago"])
+def test_sim_user_timezone_accepts_the_two_demo_zones(zone):
+    assert Settings(user_timezone=zone).user_timezone == zone
+
+
+def test_sim_user_timezone_rejects_other_zones():
+    with pytest.raises(ValueError, match="USER_TIMEZONE"):
+        Settings(user_timezone="Europe/Madrid")
+
+
+def test_system_prompt_follows_the_user_timezone(monkeypatch):
+    from datetime import UTC, datetime
+    from types import SimpleNamespace
+
+    from donewise_sim import llm
+
+    fixed = datetime(2026, 10, 2, 7, 1, tzinfo=UTC)
+    monkeypatch.setattr(llm, "datetime", SimpleNamespace(now=lambda tz: fixed.astimezone(tz)))
+    santiago = llm.system_prompt("America/Santiago")
+    assert "2026-10-02 04:01:00 -0300 America/Santiago" in santiago
+    assert "America/Los_Angeles" not in santiago
+    assert "2026-10-02 00:01:00 -0700 America/Los_Angeles" in llm.system_prompt()
+
+
+@pytest.mark.anyio
+async def test_session_metadata_and_script_follow_the_user_timezone(mcp):
+    from donewise_sim.scripted import next_step
+
+    async with simulation(mcp, ui_mode="scripted", user_timezone="America/Santiago") as (
+        client,
+        metadata,
+        events,
+        app,
+    ):
+        assert metadata["timezone"] == "America/Santiago"
+        session = app.state.sessions[metadata["session_id"]]
+        await next_step(session)
+        assert session.script_args["create"]["timezone"] == "America/Santiago"
+        assert session.script_args["move"]["timezone"] == "America/Santiago"
+        assert session.script_args["create"]["start"].endswith("+00:00")
+
+
+@pytest.mark.anyio
+async def test_timezone_toggle_restarts_the_session_and_reaches_the_recap(mcp):
+    async with simulation(mcp, ui_mode="scripted") as (client, metadata, events, app):
+        assert metadata["timezone"] == "America/Los_Angeles"
+        prefix = f"/session/{metadata['session_id']}"
+        changed = await client.post(
+            prefix + "/mode", json={"ui_mode": "scripted", "timezone": "America/Santiago"}
+        )
+        assert changed.status_code == 200, changed.text
+        new = changed.json()
+        assert new["timezone"] == "America/Santiago" and new["run_id"] != metadata["run_id"]
+        session = app.state.sessions[new["session_id"]]
+        assert session.timezone == "America/Santiago"
+        assert session.client.timezone == "America/Santiago"
+        recap = await session.execute("receipts_recap", {})
+        assert recap["timezone"] == "America/Santiago"
+        # Mode changes keep the selected timezone; an unknown zone is rejected before any session.
+        kept = await client.post(f"/session/{new['session_id']}/mode", json={"ui_mode": "scripted"})
+        assert kept.json()["timezone"] == "America/Santiago"
+        bad = await client.post("/session", json={"ui_mode": "scripted", "timezone": "UTC"})
+        assert bad.status_code == 422

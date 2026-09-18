@@ -459,13 +459,26 @@ function go(i) { receiptIndex = Number.MAX_SAFE_INTEGER; renderState(STATES[(i +
 
 /* ---------- voice ---------- */
 
+// Text shown on screen keeps emojis and markdown; speech drops them so TTS never reads
+// symbol names or asterisks aloud.
+function speakable(phrase) {
+  return String(phrase)
+    .replace(/[\p{Extended_Pictographic}️‍\u{1F3FB}-\u{1F3FF}]/gu, '')
+    .replace(/[*_`#]+/g, '')
+    .replace(/\s*-\s+/g, '. ')
+    .replace(/:\.\s/g, ': ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 function speak(phrase) {
 
-  if (!voiceOn || !('speechSynthesis' in window) || !phrase || recognizing) return;
+  const utterance = speakable(phrase);
+  if (!voiceOn || !('speechSynthesis' in window) || !utterance || recognizing) return;
 
   try {
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(phrase); u.lang = 'en-US';
+    const u = new SpeechSynthesisUtterance(utterance); u.lang = 'en-US';
     speaking = true; updateControls();
     u.onend = u.onerror = () => { speaking = false; updateControls(); };
     speechSynthesis.speak(u);
@@ -611,6 +624,7 @@ function updateControls() {
   get('text').disabled = busy;
   get('mic').disabled = busy || !Recognition || ttsActive();
   get('session-mode').disabled = busy;
+  get('session-timezone').disabled = busy;
   const armed = !LIVE.fault_state || Object.keys(LIVE.fault_state.armed).length > 0;
   get('fault-drop').disabled = get('fault-ack').disabled = busy || armed || LIVE.ui_mode !== 'voice';
   get('fault-refresh').disabled = busy;
@@ -685,22 +699,26 @@ async function faultControl(kind, uses) {
 get('fault-drop').addEventListener('click', () => faultControl('drop_response_after_write', 1));
 get('fault-ack').addEventListener('click', () => faultControl('ack_without_write', 2));
 get('fault-refresh').addEventListener('click', () => faultControl());
-get('session-mode').addEventListener('change', async () => {
-  const ui_mode = get('session-mode').value;
-  if (LIVE_BUSY || controlBusy || recognizing) { get('session-mode').value = LIVE.ui_mode; return; }
+// Mode and timezone both restart the conversation through the same endpoint.
+async function restartSession() {
+  const ui_mode = get('session-mode').value, timezone = get('session-timezone').value;
+  const revert = () => { get('session-mode').value = LIVE.ui_mode; get('session-timezone').value = LIVE.timezone; };
+  if (LIVE_BUSY || controlBusy || recognizing) { revert(); return; }
   controlBusy = true; updateControls();
   try {
     const response = await fetch(`/session/${LIVE.session_id}/mode`, {
-      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ui_mode})
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ui_mode, timezone})
     });
-    if (!response.ok) throw new Error((await response.json()).detail || 'Could not change mode.');
+    if (!response.ok) throw new Error((await response.json()).detail || 'Could not restart the session.');
     eventSource?.close();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     speaking = false;
     loadSession(await response.json());
-  } catch (error) { note(error.message); get('session-mode').value = LIVE.ui_mode; }
+  } catch (error) { note(error.message); revert(); }
   finally { controlBusy = false; updateControls(); }
-});
+}
+get('session-mode').addEventListener('change', restartSession);
+get('session-timezone').addEventListener('change', restartSession);
 
 function renderLive() {
 
@@ -878,6 +896,7 @@ function loadSession(session) {
 
   root.querySelector('.de-director').hidden = !LIVE.admin_enabled || LIVE.ui_mode === 'voice';
   get('session-controls').hidden = false; get('session-mode').value = LIVE.ui_mode;
+  if (LIVE.timezone) { TZ = LIVE.timezone; get('session-timezone').value = LIVE.timezone; }
   get('session-label').hidden = false;
   text('session-label', LIVE.ui_mode === 'voice' ? 'live voice session' : 'scripted session');
   text('llm-note', LIVE.llm_enabled ? 'Language model configured · connection not yet validated' : 'Language model off · input check only');

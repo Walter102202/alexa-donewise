@@ -4,6 +4,7 @@ import asyncio
 import json
 from uuid import uuid4
 
+from .config import USER_TIMEZONES
 from .mcp_client import MCPClient
 
 
@@ -12,13 +13,16 @@ class ToolCallError(RuntimeError):
 
 
 class Session:
-    def __init__(self, settings, llm, ui_mode=None):
+    def __init__(self, settings, llm, ui_mode=None, timezone=None):
         self.id = uuid4().hex
         self.run_id = "run_" + uuid4().hex
         self.settings, self.llm = settings, llm
+        self.timezone = timezone or settings.user_timezone
+        if self.timezone not in USER_TIMEZONES:
+            raise ValueError("timezone must be one of: " + ", ".join(USER_TIMEZONES))
         self.ui_mode = ui_mode or ("scripted" if settings.llm_provider == "none" else "voice")
         self.fault_state = None
-        self.client = MCPClient(settings, self.run_id)
+        self.client = MCPClient(settings, self.run_id, self.timezone)
         self.consent_token = None
         self.messages = []
         self.pending_approval = None
@@ -61,6 +65,7 @@ class Session:
             "protocol_version": self.client.protocol_version,
             "mcp_session_id": self.client.mcp_session_id,
             "admin_enabled": bool(self.settings.demo_admin_token),
+            "timezone": self.timezone,
         }
 
     async def emit(self, kind, data):

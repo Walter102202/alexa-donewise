@@ -129,7 +129,7 @@ def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=
         clock=clock,
     )
     reconciler = Reconciler(registry, harness)
-    server = MCPServer("DoneWise", tools=make_tools(harness))
+    server = MCPServer("DoneWise", tools=make_tools(harness, settings.user_timezone))
     register_resources(server, registry)
     register_admin(server, settings, harness)
     app = server.streamable_http_app(

@@ -418,3 +418,44 @@ async def test_payment_elicitation_official_client(tmp_path, monkeypatch, action
     trace_path = tmp_path / "elicitation-trace.json"
     trace_path.write_text(json.dumps(trace, indent=2), encoding="utf-8")
     print(f"Elicitation trace ({action}, {approve}): {trace_path}")
+
+
+@pytest.mark.parametrize("zone", ["America/Los_Angeles", "America/Santiago"])
+def test_user_timezone_accepts_the_two_demo_zones(zone):
+    assert Settings(user_timezone=zone).user_timezone == zone
+
+
+@pytest.mark.parametrize("zone", ["Europe/Madrid", "UTC", "", "Mars/Olympus"])
+def test_user_timezone_rejects_other_zones(zone):
+    with pytest.raises(ValueError, match="USER_TIMEZONE"):
+        Settings(user_timezone=zone)
+
+
+@pytest.mark.anyio
+async def test_recap_uses_the_configured_timezone(tmp_path):
+    app = build_app(
+        Settings(data_dir=tmp_path, demo_admin_token="admin", user_timezone="America/Santiago")
+    )
+    with serving(app) as url:
+        async with streamable_http_client(url + "/mcp") as streams:
+            async with ClientSession(*streams) as session:
+                await session.initialize()
+                recap = await session.call_tool("receipts_recap", {})
+                assert recap.structured_content["timezone"] == "America/Santiago"
+
+
+@pytest.mark.anyio
+async def test_recap_timezone_header_overrides_the_server_default(tmp_path):
+    app = build_app(Settings(data_dir=tmp_path, demo_admin_token="admin"))
+    with serving(app) as url:
+        for header, expected in [
+            ({"X-DoneWise-Timezone": "America/Santiago"}, "America/Santiago"),
+            ({"X-DoneWise-Timezone": "Europe/Madrid"}, "America/Los_Angeles"),
+            ({}, "America/Los_Angeles"),
+        ]:
+            async with httpx2.AsyncClient(headers=header) as http:
+                async with streamable_http_client(url + "/mcp", http_client=http) as streams:
+                    async with ClientSession(*streams) as session:
+                        await session.initialize()
+                        recap = await session.call_tool("receipts_recap", {})
+                        assert recap.structured_content["timezone"] == expected

@@ -12,8 +12,8 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import agent, scripted
-from .config import Settings
-from .llm import make_llm
+from .config import USER_TIMEZONES, Settings
+from .llm import make_llm, system_prompt
 from .session import Session
 
 SIM_ROOT = Path(__file__).resolve().parent.parent
@@ -30,6 +30,7 @@ class FaultInput(BaseModel):
 
 class ModeInput(BaseModel):
     ui_mode: Literal["voice", "scripted"]
+    timezone: Literal[USER_TIMEZONES] | None = None
 
 
 def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
@@ -66,8 +67,10 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     async def index():
         return FileResponse(SIM_ROOT / "static" / "index.html")
 
-    async def new_session(ui_mode=None):
-        session = Session(settings, llm or make_llm(settings), ui_mode)
+    async def new_session(ui_mode=None, timezone=None):
+        timezone = timezone or settings.user_timezone
+        model = llm or make_llm(settings, lambda: system_prompt(timezone))
+        session = Session(settings, model, ui_mode, timezone)
         try:
             await session.start()
         except Exception:
@@ -79,7 +82,7 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
 
     @app.post("/session")
     async def create_session(body: ModeInput | None = None):
-        return await new_session(body.ui_mode if body else None)
+        return await new_session(body.ui_mode if body else None, body.timezone if body else None)
 
     @app.post("/session/{session_id}/mode")
     async def change_mode(session_id: str, body: ModeInput):
@@ -87,7 +90,7 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
         if session.busy:
             raise HTTPException(409, "Wait for the current action before changing mode")
         async with session.lock:
-            return await new_session(body.ui_mode)
+            return await new_session(body.ui_mode, body.timezone or session.timezone)
 
     @app.get("/session/{session_id}/events")
     async def events(session_id: str, request: Request):

@@ -15,6 +15,8 @@ from mcp.server.mcpserver.tools import Tool
 from mcp.types import CallToolResult, TextContent
 from pydantic import StrictBool, TypeAdapter, ValidationError
 
+from .config import USER_TIMEZONES
+
 ELICITATION_TIMEOUT = 120
 
 
@@ -66,13 +68,16 @@ def harness_context(ctx: Context) -> HarnessContext:
     return HarnessContext(user_id="demo", run_id=run_id)
 
 
-def make_tools(harness):
+def make_tools(harness, user_timezone="America/Los_Angeles"):
     async def invoke(model, method, ctx, values):
         try:
             inp = model.model_validate(values, context={"now": harness.clock.now()})
             context = harness_context(ctx)
             arg = inp.operation_id if model is c.OperationGetInput else inp
             kwargs = {}
+            if model is c.ReceiptsRecapInput:
+                requested = ctx.headers.get("x-donewise-timezone", "")
+                kwargs["timezone"] = requested if requested in USER_TIMEZONES else user_timezone
             if model is c.ApprovalGrantInput:
                 kwargs["granted_by"] = (
                     c.GrantedBy.SESSION_UI

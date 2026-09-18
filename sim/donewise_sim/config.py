@@ -3,6 +3,8 @@
 import os
 from dataclasses import dataclass, field
 
+USER_TIMEZONES = ("America/Los_Angeles", "America/Santiago")
+
 
 @dataclass
 class Settings:
@@ -18,3 +20,10 @@ class Settings:
         default_factory=lambda: os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
     )
     port: int = field(default_factory=lambda: int(os.getenv("SIM_PORT", "8080")))
+    user_timezone: str = field(
+        default_factory=lambda: os.getenv("USER_TIMEZONE", USER_TIMEZONES[0]).strip()
+    )
+
+    def __post_init__(self):
+        if self.user_timezone not in USER_TIMEZONES:
+            raise ValueError("USER_TIMEZONE must be one of: " + ", ".join(USER_TIMEZONES))

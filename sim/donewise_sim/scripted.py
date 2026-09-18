@@ -19,7 +19,7 @@ async def next_step(session):
     step = session.step
     await session.emit("user", {"text": UTTERANCES[step]})
     if not session.script_args:
-        zone = ZoneInfo("America/Los_Angeles")
+        zone = ZoneInfo(session.timezone)
         tomorrow = datetime.now(zone).date() + timedelta(days=1)
         start = datetime.combine(tomorrow, time(9), zone).astimezone(UTC)
         session.script_args = {
@@ -28,7 +28,7 @@ async def next_step(session):
                 "title": "Ridge Plumbing",
                 "start": start.isoformat(),
                 "end": (start + timedelta(hours=1)).isoformat(),
-                "timezone": "America/Los_Angeles",
+                "timezone": session.timezone,
             },
             "pay": {
                 "submission_id": str(uuid4()),
@@ -42,7 +42,7 @@ async def next_step(session):
                 "event_query": "the plumber",
                 "new_start": (start + timedelta(hours=1)).isoformat(),
                 "new_end": (start + timedelta(hours=2)).isoformat(),
-                "timezone": "America/Los_Angeles",
+                "timezone": session.timezone,
             },
         }
     args = session.script_args

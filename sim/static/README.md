@@ -19,6 +19,7 @@ Environment variables are read from the process; `.env.example` documents them b
 `MCP_URL` defaults to `http://127.0.0.1:8765/mcp`; `SIM_PORT` defaults to 8080.
 `LLM_PROVIDER=bedrock` is the default: set `AWS_REGION`, `BEDROCK_MODEL_ID` and AWS credentials.
 For `anthropic`, set `ANTHROPIC_API_KEY`; `ANTHROPIC_MODEL` defaults to `claude-sonnet-5`.
+`USER_TIMEZONE` is `America/Los_Angeles` by default or `America/Santiago`; set the same value for the server.
 No live LLM/provider calls are needed for the scripted demo or tests. Missing admin config hides
 the demo controls and disables approval. The application currently uses local Fake adapters only.
 

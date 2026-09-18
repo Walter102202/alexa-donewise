@@ -9,6 +9,12 @@ from pathlib import Path
 
 from donewise_adapters.stripe_test import STRIPE_TEST_KEY_PREFIXES
 
+USER_TIMEZONES = ("America/Los_Angeles", "America/Santiago")
+
+
+def user_timezone_from_env() -> str:
+    return os.getenv("USER_TIMEZONE", USER_TIMEZONES[0]).strip()
+
 
 def pending_after_from_env() -> float | None:
     value = os.getenv("DONEWISE_PENDING_AFTER", "0.45").strip().lower()
@@ -38,6 +44,7 @@ class Settings:
     google_calendar_id: str = field(default_factory=lambda: os.getenv("GOOGLE_CALENDAR_ID", ""))
     stripe_secret_key: str = field(default_factory=lambda: os.getenv("STRIPE_SECRET_KEY", ""))
     pending_after: float | None = field(default_factory=pending_after_from_env)
+    user_timezone: str = field(default_factory=user_timezone_from_env)
     fake_payment_delay_seconds: float = field(
         default_factory=lambda: float(os.getenv("FAKE_PAYMENT_DELAY_SECONDS", "0.65"))
     )
@@ -50,6 +57,8 @@ class Settings:
             raise ValueError("DONEWISE_PENDING_AFTER must be nonnegative seconds or off")
         if self.mode not in ("sandbox", "connected"):
             raise ValueError("DONEWISE_MODE must be sandbox or connected")
+        if self.user_timezone not in USER_TIMEZONES:
+            raise ValueError("USER_TIMEZONE must be one of: " + ", ".join(USER_TIMEZONES))
         if self.stripe_secret_key and not self.stripe_secret_key.startswith(
             STRIPE_TEST_KEY_PREFIXES
         ):

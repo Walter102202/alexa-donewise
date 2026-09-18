@@ -159,6 +159,7 @@ DEMO_ADMIN_TOKEN=your-own-local-admin-secret
 MCP_BEARER_TOKEN=your-own-local-mcp-secret
 DONEWISE_DATA_DIR=./data/connected
 LLM_PROVIDER=none
+USER_TIMEZONE=America/Los_Angeles
 ```
 
 Enable Google Calendar API and share a dedicated test calendar with the service account with event
@@ -187,7 +188,9 @@ payment request with the same idempotency key and checks that it returns the sam
 Full connected fault
 acceptance and provider-dashboard evidence remain pending. For free input, set
 `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY` and an available `ANTHROPIC_MODEL`, or use Bedrock below;
-select **Free voice** to start a new session. Normal CI requires no provider credentials.
+select **Free voice** to start a new session. `USER_TIMEZONE` (`America/Los_Angeles` by default, or
+`America/Santiago`) sets the clock the model, the scripted story, the recap and the page use.
+Normal CI requires no provider credentials.
 
 ## Latency: pending real adapters
 
