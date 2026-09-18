@@ -2,7 +2,10 @@
 name = "donewise"
 version = "0.1.0"
 description = "DoneWise application contracts and skeleton"
+readme = "README.md"
 requires-python = ">=3.12,<3.13"
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = [
     "boto3>=1.42",
     "anthropic>=0.75",
