@@ -192,6 +192,13 @@ select **Free voice** to start a new session. `USER_TIMEZONE` (`America/Los_Ange
 `America/Santiago`) sets the clock the model, the scripted story, the recap and the page use.
 Normal CI requires no provider credentials.
 
+The model never sees `submission_id` or `approval_id`: the simulator generates the submission per
+call and only the consent path adds an approval. A rejected tool call returns the violated rule
+(never the value) and, when the turn produced no receipt, the model's question is shown. A small
+manual eval, `scripts/eval_tool_calls.py`, measured this with Sonnet 4.6 in sandbox mode (3 runs
+per scenario, 18-sep-2026): a future time books on the first call 3/3; a past time yields a
+visible question with zero writes 3/3 and books only after the user answers 3/3.
+
 ## Latency: pending real adapters
 
 | Tool | Fake p50 / p95 | Connected p50 / p95 |
