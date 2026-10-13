@@ -75,6 +75,7 @@ class Session:
             "mode": self.settings.mode,
             "ui_mode": self.ui_mode,
             "llm_enabled": self.settings.llm_provider != "none",
+            "model_label": self.settings.model_label,
             "fault_state": self.fault_state,
             "event_cursor": len(self.events),
             "tools": [t["name"] for t in self.tools],

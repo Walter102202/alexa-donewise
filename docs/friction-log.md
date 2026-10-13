@@ -101,3 +101,17 @@ No AgentCore or ASK CLI experience is asserted in the historical entries above.
 | Suggestion | Distinguish model entitlement from account verification in onboarding; show which principal a budget action actually covers |
 | Command | `uv run python scripts/bedrock_smoke.py --output data/bedrock-smoke-new.json` |
 | Evidence | [Smoke, commands and limits](traces/bedrock-smoke-2026-10-12.md), [request IDs and output](traces/bedrock-smoke-2026-10-12.json) |
+
+## 7. Connected Stripe renewal and Nova time/retry errors — 12 October 2026
+
+| Field | Observation |
+| --- | --- |
+| Task | Complete the five-turn connected simulator with Nova Pro |
+| Steps | Renew expired Stripe sandbox; run connected provider smoke and simulator smoke |
+| Expected | One test payment; requested local time preserved; explicit retry reuses the operation |
+| Observed | Old key expired; new sandbox rejected `payment_method_types`. After fixing that, Nova used 13:00 instead of 10:00 and a new operation on retry |
+| Severity | High: provider incompatibility and incorrect requested calendar time |
+| Workaround | Authorized minimal Stripe API migration; explicit UTC/retry prompt guidance; live acceptance now checks local hour and operation identity. Third Nova attempt passed, with one rejected/corrected call; Sonnet API passed separately |
+| Suggestion | Stripe: surface version changes during sandbox renewal. Bedrock/Nova: include timezone and identifier-preservation cases in tool-use examples |
+| Command | `uv run --env-file .env python scripts/simulator_smoke.py --provider bedrock --model us.amazon.nova-pro-v1:0 --output data/new-smoke.json --data-dir data/new-smoke` |
+| Evidence | [Connected run and limits](traces/bedrock-sim-2026-10-12.md) |

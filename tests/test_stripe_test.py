@@ -49,6 +49,9 @@ def test_payment_replay_read_and_search(payment_req, respx_mock, key):
     assert post.calls.last.request.headers["idempotency-key"] == "idem_abc"
     assert post.calls.last.request.headers["authorization"] == f"Bearer {key}"
     payload = parse_qs(post.calls.last.request.content.decode())
+    assert "payment_method_types[]" not in payload  # Rejected by the current sandbox API.
+    assert payload["automatic_payment_methods[enabled]"] == ["true"]
+    assert payload["automatic_payment_methods[allow_redirects]"] == ["never"]
     assert payload["metadata[run_id]"] == ["run_a"] and payload["amount"] == ["100"]
     respx_mock.get("https://api.stripe.com/v1/payment_intents/pi_test").respond(200, json=payment())
     assert (

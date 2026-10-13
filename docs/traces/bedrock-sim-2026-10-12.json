@@ -1,0 +1,183 @@
+{
+  "observed_at": "2026-10-13T01:59:30.391626+00:00",
+  "run_id": "run_890feef149ff403a88f9f7372241f36a",
+  "mode": "connected",
+  "model_label": "Model: Amazon Nova Pro \u00b7 Amazon Bedrock",
+  "boundary": "Simulator backend and MCP; no browser/audio verification",
+  "turns": [
+    {
+      "turn": 1,
+      "input": "Book the plumber tomorrow nine to ten and pay the sixty-dollar deposit to Ridge Plumbing.",
+      "spoken": [
+        {
+          "text": "I'm on it. I'll confirm in a moment.",
+          "source": "spoken"
+        },
+        {
+          "text": "It's on your calendar: Plumber, tomorrow 9 to 10 AM. For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
+          "source": "spoken"
+        }
+      ],
+      "elapsed_ms": 6425.23,
+      "passed": true,
+      "errors": [],
+      "operations": [
+        {
+          "tool": "calendar_create_verified",
+          "operation_id": "op_ffa077ec5e3d4bb788923273720db88b",
+          "outcome": "PENDING",
+          "start": "2026-10-13T12:00:00Z",
+          "charges_applied": null
+        },
+        {
+          "tool": "operation_get",
+          "operation_id": "op_ffa077ec5e3d4bb788923273720db88b",
+          "outcome": "VERIFIED",
+          "start": "2026-10-13T12:00:00Z",
+          "charges_applied": null
+        },
+        {
+          "tool": "payment_charge_verified",
+          "operation_id": "op_74813a4257974f16a444acef6a16cfe6",
+          "outcome": "NEEDS_APPROVAL",
+          "start": null,
+          "charges_applied": 0
+        }
+      ]
+    },
+    {
+      "turn": 2,
+      "input": "Yes, charge it.",
+      "spoken": [
+        {
+          "text": "I'm on it. I'll confirm in a moment.",
+          "source": "spoken"
+        },
+        {
+          "text": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_3UPuzaFik9VWGlFf0AeyQDot. You don't need to try again.",
+          "source": "spoken"
+        }
+      ],
+      "elapsed_ms": 2495.47,
+      "passed": true,
+      "errors": [],
+      "operations": [
+        {
+          "tool": "payment_charge_verified",
+          "operation_id": "op_74813a4257974f16a444acef6a16cfe6",
+          "outcome": "PENDING",
+          "start": null,
+          "charges_applied": 0
+        },
+        {
+          "tool": "operation_get",
+          "operation_id": "op_74813a4257974f16a444acef6a16cfe6",
+          "outcome": "VERIFIED",
+          "start": null,
+          "charges_applied": 1
+        }
+      ]
+    },
+    {
+      "turn": 3,
+      "input": "I'm running late. Move the plumber to ten.",
+      "spoken": [
+        {
+          "text": "I'm on it. I'll confirm in a moment.",
+          "source": "spoken"
+        },
+        {
+          "text": "I couldn't confirm the change. I tried twice; the latest calendar check still shows 9 AM.",
+          "source": "spoken"
+        }
+      ],
+      "elapsed_ms": 13956.31,
+      "passed": true,
+      "errors": [],
+      "operations": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "operation_id": "op_179da05a539245c0884a826922b5e912",
+          "outcome": "PENDING",
+          "start": "2026-10-13T13:00:00Z",
+          "charges_applied": null
+        },
+        {
+          "tool": "operation_get",
+          "operation_id": "op_179da05a539245c0884a826922b5e912",
+          "outcome": "NOT_OBSERVED",
+          "start": "2026-10-13T13:00:00Z",
+          "charges_applied": null
+        }
+      ]
+    },
+    {
+      "turn": 4,
+      "input": "Try that again.",
+      "spoken": [
+        {
+          "text": "I'm on it. I'll confirm in a moment.",
+          "source": "spoken"
+        },
+        {
+          "text": "Plumber is now at 10 to 11 AM. I read it back from your calendar.",
+          "source": "spoken"
+        }
+      ],
+      "elapsed_ms": 8608.08,
+      "passed": true,
+      "errors": [
+        {
+          "message": "Tool failed or denied: calendar_reschedule_verified"
+        }
+      ],
+      "operations": [
+        {
+          "tool": "calendar_reschedule_verified",
+          "operation_id": "op_179da05a539245c0884a826922b5e912",
+          "outcome": "PENDING",
+          "start": "2026-10-13T13:00:00Z",
+          "charges_applied": null
+        },
+        {
+          "tool": "operation_get",
+          "operation_id": "op_179da05a539245c0884a826922b5e912",
+          "outcome": "VERIFIED",
+          "start": "2026-10-13T13:00:00Z",
+          "charges_applied": null
+        }
+      ]
+    },
+    {
+      "turn": 5,
+      "input": "Recap tomorrow. And what did you charge?",
+      "spoken": [
+        {
+          "text": "From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 10:59 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 10:59 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+          "source": "spoken"
+        }
+      ],
+      "elapsed_ms": 4044.2,
+      "passed": true,
+      "errors": [],
+      "operations": [
+        {
+          "tool": "receipts_recap",
+          "operation_id": null,
+          "outcome": null,
+          "start": null,
+          "charges_applied": null
+        }
+      ]
+    }
+  ],
+  "independent_stripe_read": [
+    {
+      "id": "pi_3UPuzaFik9VWGlFf0AeyQDot",
+      "amount": 6000,
+      "currency": "usd",
+      "status": "succeeded",
+      "livemode": false
+    }
+  ]
+}

@@ -937,6 +937,7 @@ function loadSession(session) {
   root.querySelector('.de-director').hidden = !LIVE.admin_enabled || LIVE.ui_mode === 'voice';
   get('session-controls').hidden = false; get('session-mode').value = LIVE.ui_mode;
   if (LIVE.timezone) { TZ = LIVE.timezone; get('session-timezone').value = LIVE.timezone; }
+  text('model-label', LIVE.model_label || 'Model: not configured');
   get('session-label').hidden = false;
   text('session-label', LIVE.ui_mode === 'voice' ? 'live voice session' : 'scripted session');
   text('llm-note', LIVE.llm_enabled ? 'Language model configured · connection not yet validated' : 'Language model off · input check only');
@@ -980,6 +981,7 @@ async function boot() {
   }
 
   STATES = data.states; RUN_ID = data.run_id || ''; TZ = data.timezone || TZ;
+  text('model-label', 'Model: off · offline fixture');
 
 
 

@@ -97,6 +97,7 @@ async def test_five_scripted_turns_over_mcp_and_sse(mcp):
     async with simulation(mcp) as (client, metadata, events, app):
         sid = metadata["session_id"]
         assert metadata["protocol_version"] == "2025-11-25" and metadata["mcp_session_id"]
+        assert metadata["model_label"] == "Model: off · scripted inputs"
         assert len(metadata["tools"]) == 5 and "approval_grant" not in metadata["tools"]
         for step in range(5):
             state = await act(client, sid, "/script/next")

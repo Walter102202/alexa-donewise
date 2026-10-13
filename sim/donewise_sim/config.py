@@ -27,3 +27,18 @@ class Settings:
     def __post_init__(self):
         if self.user_timezone not in USER_TIMEZONES:
             raise ValueError("USER_TIMEZONE must be one of: " + ", ".join(USER_TIMEZONES))
+
+    @property
+    def model_label(self):
+        if self.llm_provider == "none":
+            return "Model: off · scripted inputs"
+        model = self.bedrock_model_id if self.llm_provider == "bedrock" else self.anthropic_model
+        name = {
+            "claude-sonnet-4-6": "Claude Sonnet 4.6",
+            "us.anthropic.claude-sonnet-4-6": "Claude Sonnet 4.6",
+            "us.amazon.nova-pro-v1:0": "Amazon Nova Pro",
+            "us.openai.gpt-5.6-terra": "GPT-5.6 Terra",
+            "openai.gpt-oss-120b-1:0": "gpt-oss-120b",
+        }.get(model, model or "not configured")
+        provider = "Amazon Bedrock" if self.llm_provider == "bedrock" else "Anthropic API"
+        return f"Model: {name} · {provider}"

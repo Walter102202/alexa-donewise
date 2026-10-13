@@ -1,5 +1,25 @@
 # Stripe sandbox setup and connected-provider evidence
 
+## Current renewal — 12 October 2026 (America/Santiago)
+
+The former `.env` key returned `401 api_key_expired`. A new anonymous test sandbox
+was created with Stripe CLI and reports expiry **20 October 2026**. Its profile,
+claim URL and creation output remain outside Git; private `.env` uses its test key.
+The former profile was preserved. A fresh sandbox is still required for any final
+recording after expiry.
+
+The current API rejected `payment_method_types` with HTTP 400. With Walter's
+approval, the adapter now enables automatic payment methods and disables redirects,
+while continuing to use `pm_card_visa`, the same idempotency key and test-only guards.
+See Stripe's [migration guidance](https://docs.stripe.com/payments/payment-methods/dynamic-payment-methods).
+The connected smoke then passed: one USD 1 test PaymentIntent, same-key replay,
+provider read-back, calendar operations and cleanup. An independent list confirmed
+`succeeded`, `amount=100`, `livemode=false`. Additional USD 60 test intents belong
+to separate explicitly approved simulator runs, not duplicate delivery of one intent.
+See [connected simulator evidence](traces/bedrock-sim-2026-10-12.md).
+
+The record below is historical and does not describe the current sandbox lifetime.
+
 Verified 18 September 2026 using Stripe CLI **1.51.0**, Windows PowerShell and Python 3.12.
 This is a temporary, unclaimed Stripe sandbox. No live payments or bank accounts are involved.
 The sandbox created for this run **expires on 25 September 2026 unless claimed beforehand**.
