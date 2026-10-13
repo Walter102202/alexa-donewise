@@ -1,9 +1,9 @@
 # Product feedback — Devpost draft
 
 Scope: observed local development, client experiments and connected-provider checks through
-18 September 2026. Developer feedback, not a user study. Google Calendar and Stripe test evidence
-includes one connected smoke test; cloud deployment and full connected fault acceptance remain
-unvalidated. These historical results do not establish current provider or credential availability.
+18 September 2026 in the historical tables below, followed by connected AWS/Alexa evidence
+from 12–13 October. Developer feedback, not a user study. Historical results do not establish
+current provider availability; the dated traces identify what was reverified.
 
 ## Tools used and why
 
@@ -132,5 +132,19 @@ These decisions concern the uses tested here; they do not imply production accep
 | Stripe PaymentIntents API | **Yes, for payment integration tests.** Read-back and same-key replay exercised the adapter without moving real money. Production payment onboarding was not evaluated. |
 | Stripe CLI | **Yes, for temporary test provisioning.** Before relying on it for a lasting demo, we would verify sandbox lifetime and a supported renewal or claim path. |
 
-Unevaluated Amazon services and command-line tools are deliberately omitted. Planned integrations
-belong in the README's pending-validation section, not in an experience report.
+## AWS work observed on 12–13 October 2026 (Chile)
+
+| Tool | What we used / what worked | Friction and next step | Would reuse |
+| --- | --- | --- | --- |
+| Amazon Bedrock Converse | Nova Pro, Sonnet 4.6 and gpt-oss-120b selected real MCP schemas; 20 scenario/variant rows per model completed with tokens and latency recorded | Terra was unavailable to this account. Sonnet rejected top-level anyOf accepted by Nova. Model-generated local time and retry identity needed explicit guidance. Model access and schema compatibility should be visible before first invocation | Yes, with per-model contract checks and honest application-level evaluation |
+| Strands Agents SDK 1.60.0 | Native Streamable HTTP MCP, five connected turns, separate operator consent, receipt-only returned speech; fresh-session recap completed locally in 2160 ms | MCP dependency upper bound required a separate environment from server 2.2; Windows needed tzdata. Explicit examples covering this split would shorten setup | Yes, with a guard that cancels queued tools after recap and a fresh read-only morning session |
+| AgentCore Runtime/SDK | ARM64 Strands agent deployed; first-session recap 2579 ms, three warm calls 1358–1804 ms; exact receipt and one tool per trace | Deprecated toolkit CodeBuild path used fixed bucket names outside the scoped policy. Runtime creation has hidden endpoint/identity/tagging permission dependencies | Yes, for the measured read-only client workload; improve preflight discovery of dependent permissions |
+| AgentCore Observability / CloudWatch | 50 exported ADOT spans across five actual traces, each with one recap; Transaction Search enabled with 1% summary indexing | Spans needed ADOT instrumentation, execution-role permissions and account-level setup; log ingestion is asynchronous | Yes; a single prerequisite check would reduce setup iterations |
+| Lightsail / Caddy | Minimum USD5/month instance, static IP, HTTPS and persistent SQLite; five remote connected turns | Caddy directive sorting initially shadowed MCP; Docker file bind mount retained an old inode after replacement | Yes, for this small single-process demo; do not infer high availability |
+| ASK SDK / Lambda / Developer Console | ARM64 Lambda spoke the actual AgentCore receipt in 3/3 Test-console text requests, after a fixed-response check; exact SSML and skill-ID checks | Classic skill Development testing is distinct from Alexa+ tooling. Human microphone and final recording remain pending | Yes, for this classic skill integration; no Alexa+ or Echo claim |
+
+No onboarding duration was measured. Commands, failures, workarounds and reproducible
+evidence are in the [friction log](friction-log.md), [Bedrock traces](traces/bedrock-smoke-2026-10-12.md)
+[Strands trace](traces/strands-local-2026-10-12.md), [Lightsail proof](traces/lightsail-2026-10-13.md),
+[AgentCore/Observability proof](traces/agentcore-2026-10-13.md) and the [Alexa runbook](../integrations/alexa/README.md).
+The CodeBuild path failed before a build; Kiro, Memory and OAuth were not used.

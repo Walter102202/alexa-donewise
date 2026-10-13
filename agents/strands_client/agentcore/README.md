@@ -59,4 +59,3 @@ Invoke the existing runtime from PowerShell (profile `donewise`):
 $runtimeSession = 'donewise-' + [guid]::NewGuid().ToString('N')
 aws bedrock-agentcore invoke-agent-runtime --profile donewise --region us-east-1 --agent-runtime-arn arn:aws:bedrock-agentcore:us-east-1:027018013541:runtime/donewise_receipts-wbsa177WJQ --runtime-session-id $runtimeSession --content-type application/json --payload fileb://data/agentcore-prompt.json data/agentcore-response.json
 ```
-

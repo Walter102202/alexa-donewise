@@ -24,12 +24,11 @@ owner to AWS Sales. Nova is the planned development fallback, gpt-oss the second
 OpenAI choice. Private `.env` now selects Nova for Bedrock; the local demo retains
 `LLM_PROVIDER=anthropic` and `claude-sonnet-4-6`.
 
-The provider prepares `additionalModelRequestFields={"reasoning_effort":"none"}`
-for GPT-5.6. **That setting has not been validated live:** Terra was denied before
-we could test reasoning or its tools. Do not describe Terra as an evaluated model.
-AWS documents Converse field mapping in [OpenAI parameters](https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-openai.html),
-but that page's detailed mapping concerns gpt-oss; GPT-5.6 compatibility must still
-be confirmed with an accepted request. The smoke evidence uses provider defaults.
+An initial unvalidated GPT-5.6 reasoning setting was removed after Walter explicitly
+excluded frontier GPT models. The smoke script now defaults only to the three
+available models and never retries Terra by default. The first recorded probe remains
+in the JSON as historical access evidence. No reasoning-off or Terra evaluation is claimed;
+the successful smoke and evaluation requests use provider defaults with maxTokens=1200.
 
 `aws budgets describe-budgets --account-id 027018013541 --profile donewise --region us-east-1`
 returned AccessDenied for `budgets:ViewBudget`. Walter instructed us to retain the

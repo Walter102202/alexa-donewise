@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="280" viewBox="0 0 1400 280" role="img" aria-labelledby="title desc">
+  <title id="title">DoneWise receipt architecture and deployment status</title>
+  <desc id="desc">Local Anthropic simulator and Strands Bedrock client share the MCP harness. Classic Alexa Test calls Lambda and AgentCore, which reads saved receipts on Lightsail over HTTPS.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#285c54"/></marker></defs>
+  <rect width="1400" height="280" fill="#f4f1e8"/>
+  <g font-family="Arial,sans-serif" fill="#173d37">
+    <text x="32" y="35" font-size="22">The model proposes. The harness verifies. The client repeats the receipt.</text>
+    <g fill="#e3eee6" stroke="#285c54">
+      <rect x="32" y="65" width="280" height="72" rx="8"/>
+      <rect x="32" y="153" width="280" height="72" rx="8"/>
+      <rect x="440" y="108" width="335" height="84" rx="8"/>
+      <rect x="910" y="108" width="450" height="84" rx="8"/>
+    </g>
+    <g font-size="18">
+      <text x="50" y="94">Local simulator Â· Anthropic API</text>
+      <text x="50" y="120" font-size="15">Claude Sonnet 4.6 Â· verified locally</text>
+      <text x="50" y="182">Strands Â· Nova Pro on Bedrock</text>
+      <text x="50" y="208" font-size="15">Local verified Â· AgentCore pending</text>
+      <text x="462" y="141">DoneWise MCP + persistent receipts</text>
+      <text x="462" y="170" font-size="15">Local verified Â· Lightsail HTTPS pending</text>
+      <text x="934" y="141">Google Calendar + Stripe test</text>
+      <text x="934" y="170" font-size="15">Idempotent write â†’ independent read â†’ receipt</text>
+    </g>
+    <g fill="none" stroke="#285c54" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M312 101L440 135"/><path d="M312 189L440 165"/><path d="M775 150H910"/>
+    </g>
+    <text x="32" y="255" font-size="14">test mode Â· no real money Â· simulated Alexa+ experience</text>
+    <text x="610" y="255" font-size="14">Verified: classic Alexa Skill â†’ Lambda â†’ AgentCore. Not an Alexa+ add-on.</text>
+  </g>
+</svg>

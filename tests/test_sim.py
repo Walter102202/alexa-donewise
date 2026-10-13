@@ -450,7 +450,7 @@ async def test_bedrock_tool_results_metrics_and_incomplete_response(monkeypatch,
     monkeypatch.setattr(
         boto3, "client", lambda *a, **k: SimpleNamespace(converse=converse, close=lambda: None)
     )
-    model = BedrockLLM(Settings(bedrock_model_id="us.openai.gpt-5.6-terra"))
+    model = BedrockLLM(Settings(bedrock_model_id="us.amazon.nova-pro-v1:0"))
     messages = [
         {
             "role": "user",
@@ -473,7 +473,7 @@ async def test_bedrock_tool_results_metrics_and_incomplete_response(monkeypatch,
         assert reply.metadata["usage"]["inputTokens"] == 12
         assert reply.metadata["latency_ms"] >= 0
     assert requests[0]["messages"][0]["content"][0]["toolResult"]["status"] == "error"
-    assert requests[0]["additionalModelRequestFields"] == {"reasoning_effort": "none"}
+    assert "additionalModelRequestFields" not in requests[0]
     assert "toolConfig" not in requests[0]
 
 

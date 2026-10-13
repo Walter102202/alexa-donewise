@@ -21,7 +21,6 @@ def main():
         "--models",
         nargs="+",
         default=[
-            "us.openai.gpt-5.6-terra",
             "us.amazon.nova-pro-v1:0",
             "us.anthropic.claude-sonnet-4-6",
             "openai.gpt-oss-120b-1:0",

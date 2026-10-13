@@ -1,7 +1,8 @@
 # DoneWise
 
 An assistant that verifies external effects before claiming success. The asynchronous harness,
-MCP Streamable HTTP server and web simulator run against persisted local Fake adapters.
+MCP Streamable HTTP server and web simulator support persisted local Fake adapters and
+dedicated Google Calendar / Stripe test integrations.
 The five-turn demo uses real MCP calls and receipt-derived speech; no real money is moved.
 
 ## Deterministic sandbox · Fake adapters · no model
@@ -42,7 +43,7 @@ This table is not a live LLM, Google or Stripe run. A separate Claude Code/Sonne
 | Faults | Injected lost responses and acknowledgements without writes | Controlled experiments, not provider failure rates |
 | Offline preview | Same UI loading `sim/fixtures/story-3min.json` | Invented fixture; labelled disconnected; not acceptance evidence |
 | Claude Code | Sonnet completed five turns in the [recorded sandbox run](docs/traces/claude-code-client.md) | Not the simulator's live LLM path or an Alexa integration |
-| Google Calendar / Stripe test | [Connected provider smoke passed](docs/stripe-sandbox.md): calendar create/move/read and one $1 Stripe test payment, replayed with the same identity | Full connected fault acceptance and latency measurements pending |
+| Google Calendar / Stripe test | [Connected provider smoke passed](docs/stripe-sandbox.md): calendar create/move/read and one $1 Stripe test payment, replayed with the same identity | [Five connected fault turns and measured remote latency](docs/traces/lightsail-2026-10-13.md); finite sample |
 | Voice / Alexa+ | Browser speech controls and a simulated Alexa+ experience | No official Alexa+ integration, account linking or certification; human audio rehearsal pending |
 
 ## Quickstart: no keys, no real money
@@ -93,13 +94,13 @@ Capture conditions and persisted-store checks: [Docker acceptance](docs/traces/d
 ## Video claims → evidence
 
 Every narration segment from [PRD §9.1](docs/prd.md) is mapped below. No final video exists yet.
-Use the qualified wording; the planned connected-provider and Alexa+ claims remain unsupported.
+Use the qualified wording. The table preserves the original sandbox evidence; the AWS section below adds connected/cloud proof. Official Alexa+ integration remains unsupported.
 
 | Segment / planned claim | Receipt, trace or test | Supported wording today |
 | --- | --- | --- |
 | 0:00 “This one charged twice” / “Nothing was checked” | [S01 baseline result](evals/results/2026-09-17-sandbox-run_c1489defba8445f1a7592d550df68884.md) and companion JSON | Deterministic Fake baseline recorded two charges totaling $120; not Stripe or a model-generated quote |
 | 0:08 “MCP add-on for Alexa+… reads… never does it twice” | [Recovery/replay tests](tests/test_harness.py), [client trace](docs/traces/claude-code-client.md) | MCP verification harness in a simulated Alexa+ UI; zero duplicates in this finite suite, no universal guarantee |
-| 0:15 “Real MCP… 2025-11-25… real calendar and test payment… two faults” | [Initialize](docs/traces/initialize.json), [simulator trace](docs/traces/simulator-flow.md), [fault tests](tests/test_fault_proxy.py) | Real MCP; Fake calendar/payment and deliberate faults. Connected claim pending |
+| 0:15 “Real MCP… 2025-11-25… real calendar and test payment… two faults” | [Initialize](docs/traces/initialize.json), [simulator trace](docs/traces/simulator-flow.md), [fault tests](tests/test_fault_proxy.py) | Real MCP; original trace uses Fake providers. [Connected faults also verified](docs/traces/lightsail-2026-10-13.md) |
 | 0:25 “Books, reads back, asks… exact amount and payee… nothing charged” | [Five-turn trace](docs/traces/simulator-flow.md), [consent trace](docs/traces/elicitation.md), [tests](tests/test_sim.py) | Verified sandbox event and bound $60 approval with zero writes before consent |
 | 0:45 “Response lost… recovered by reading… one test charge” | [Client turn 2](docs/traces/claude-code-client.md), `test_t08_payment_response_lost_recovered_charged_once` in [tests](tests/test_harness.py) | One Fake charge recovered through read-back and bounded identity-preserving replay |
 | 1:15 “Calendar said OK… twice… retried once… then asked… showed ten” | [Client turns 3–4](docs/traces/claude-code-client.md), [five-turn MCP/SSE test](tests/test_sim.py) | NOT_OBSERVED after two false acknowledgements; explicit retry of the same operation verified 10–11 |
@@ -199,8 +200,7 @@ uv run --env-file .env pytest -m connected
 
 It creates/moves/deletes a calendar event and records a $1 Stripe test payment, then repeats the
 payment request with the same idempotency key and checks that it returns the same PaymentIntent.
-Full connected fault
-acceptance and provider-dashboard evidence remain pending. For free input, set
+[Five connected fault turns](docs/traces/lightsail-2026-10-13.md) and independent Stripe read-back are now recorded. For free input, set
 `LLM_PROVIDER=anthropic`, `ANTHROPIC_API_KEY` and an available `ANTHROPIC_MODEL`, or use Bedrock below;
 select **Free voice** to start a new session. `USER_TIMEZONE` (`America/Los_Angeles` by default, or
 `America/Santiago`) sets the clock the model, the scripted story, the recap and the page use.
@@ -213,35 +213,38 @@ manual eval, `scripts/eval_tool_calls.py`, measured this with Sonnet 4.6 in sand
 per scenario, 18-sep-2026): a future time books on the first call 3/3; a past time yields a
 visible question with zero writes 3/3 and books only after the user answers 3/3.
 
-## Latency: pending real adapters
+## Measured cloud latency
 
-| Tool | Fake p50 / p95 | Connected p50 / p95 |
+[Per-tool p50/p95, sample counts and full-turn latency](docs/traces/lightsail-2026-10-13.md)
+were measured from Chile against Lightsail us-east-1 with Google Calendar and Stripe test.
+The small sample includes injected faults; initial tool responses and pending polls are
+separate. These are diagnostic measurements, not production percentile estimates.
+
+[AgentCore](docs/traces/agentcore-2026-10-13.md) returned the saved recap in 2579 ms on
+the first new-session call and 1358/1804/1606 ms on three warm calls. Warm latency passed
+the 6500 ms gate. Deterministic eval timing uses a logical clock and is not this benchmark.
+
+## AWS integration: observed results and deployment gates
+
+| Component | Verified evidence | Remaining boundary |
 | --- | --- | --- |
-| calendar_create_verified | Not benchmarked | pending real adapters |
-| calendar_reschedule_verified | Not benchmarked | pending real adapters |
-| payment_charge_verified | Not benchmarked | pending real adapters |
-| approval_grant | Not benchmarked | pending real adapters |
-| operation_get | Not benchmarked | pending real adapters |
-| receipts_recap | Not benchmarked | pending real adapters |
+| Amazon Bedrock | Nova Pro, Sonnet 4.6 and gpt-oss-120b passed Converse/tool smoke; [three live-model fault evaluations](evals/README.md) with reviewed claims | Finite Fake-adapter evaluation; billing cost not retrieved |
+| Connected simulator | [Five backend/MCP turns](docs/traces/bedrock-sim-2026-10-12.md) with Nova on Bedrock and Sonnet via Anthropic, real Google Calendar and Stripe test; configured model shown in header | Human microphone/TTS and final recording pending; Nova needed a corrected tool call |
+| Strands SDK | [Native MCP client](agents/strands_client/README.md), five connected turns, exact receipt speech; new-session recap without history | Separate dependency environment; single-user demo, not multi-tenant authorization |
+| AgentCore Runtime | [Deployed ARM64 Strands/Nova agent](docs/traces/agentcore-2026-10-13.md), exact receipt, one recap per trace; 50 actual exported spans | Small first-session/warm sample; read-only historical recap, no multi-user account binding |
+| Lightsail | [HTTPS MCP deployed](docs/traces/lightsail-2026-10-13.md), persistent SQLite, five remote connected turns; bearer and private-admin boundaries verified | Single instance, no high availability; temporary Stripe sandbox must be renewed |
+| Classic Alexa Skill | [Development skill → Lambda → AgentCore](docs/traces/alexa-test-2026-10-13.json); 3/3 real Test-console text requests returned exact receipt speech | Classic skill, not Alexa+ add-on; Echo, human microphone and final video not verified |
 
-Deterministic timing uses a logical clock and omits read-window latency. It is not a benchmark.
-`DONEWISE_PENDING_AFTER=0.45` is a budget, not a percentile; `FAKE_PAYMENT_DELAY_SECONDS=0.65` makes
-PENDING visible. Future measurements must distinguish initial response from verified completion
-and record sample size, environment and faults.
+The local demo remains **Claude Sonnet 4.6 · Anthropic API**. Bedrock development and
+Strands use **Nova Pro**. GPT frontier models are unavailable to this account and
+are excluded; gpt-oss-120b is the third evaluated model. Existing AWS budget alerts
+were left unchanged at Walter's request; this work does not assert a hard spending cap.
 
-## AWS integration: pending validation
-
-| Service | Purpose | Configuration / boundary |
-| --- | --- | --- |
-| Amazon Bedrock | Optional boto3 Converse model tool selection in `sim/donewise_sim/llm.py` | Set `LLM_PROVIDER=bedrock`, `AWS_REGION`, `BEDROCK_MODEL_ID` and credentials through the boto3 credential chain. Live invocation, permissions and performance pending |
-| Amazon Bedrock AgentCore Runtime | Proposed managed MCP hosting | No integration/deployment configuration exists here. Future setup needs an execution role, region, ARM64 image, MCP runtime configuration, authentication and durable state design; deployment/recovery acceptance pending |
-
-For Bedrock, start `uv run --env-file .env donewise-sim` with those values. Compose intentionally
-mounts no AWS credentials. Select a model/inference profile supporting Converse tool use and grant
-model invocation access. See [AWS boto3 onboarding](https://docs.aws.amazon.com/bedrock/latest/userguide/getting-started-api-ex-python.html).
-For AgentCore, follow the [MCP runtime contract](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-mcp-protocol-contract.html)
-when implementing deployment; local SQLite is not a validated cloud persistence design.
-Neither service is claimed as observed product-feedback experience.
+The three-model comparison observed no duplicate charges in either variant.
+Baseline false-claim counts were Nova 5/14, Sonnet 5/19 and gpt-oss 4/15;
+DoneWise was 0/11, 0/14 and 0/11. These are application outcomes, including speech
+presentation, not a claim that the models always obey receipt instructions.
+Review method, denominators, run IDs and all limitations are in [evals/README.md](evals/README.md).
 
 ## A second adapter in ~30 lines
 
@@ -308,13 +311,13 @@ trace. The reusable MIT package is in `core/`;
 ## Known limits and delivery status
 
 - Finite deterministic sample, not a reliability guarantee or isolated-verifier experiment.
-- Fake stores and SQLite require one server process; no distributed workers or durable hosted deployment.
+- SQLite runs in one Lightsail server process on persistent disk; no distributed workers or high availability.
 - Simulator sessions/SSE history do not survive restart. Recap is historical evidence.
 - Replay windows are bounded; unresolved effects can remain UNKNOWN rather than be resent.
-- Google/Stripe provider smoke passed; full connected fault acceptance, simulator live LLM,
-  real-adapter latency and human audio rehearsal remain pending.
+- Google/Stripe smoke and five connected backend/MCP fault turns passed with Nova and Sonnet.
+  Cloud latency and classic Alexa Test are recorded; human audio rehearsal and final recording remain pending.
 - Inspector CLI, Python ClientSession and Claude Code have evidence; Desktop and official Alexa+ do not.
-- No public deployment, published package or final video claimed. Source: https://github.com/Walter102202/alexa-donewise.
+- Authenticated MCP is hosted; the skill stays in Development. No package release or final video claimed. Source: https://github.com/Walter102202/alexa-donewise.
 
 [Product feedback](docs/product-feedback.md) · [Friction log](docs/friction-log.md) ·
 [MIT license](LICENSE).

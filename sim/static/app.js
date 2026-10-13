@@ -930,7 +930,9 @@ function loadSession(session) {
 
   text('answer', ''); text('receipt-title', 'No receipts yet');
 
-  text('bottom', 'Connected to the MCP server. This build uses local sandbox adapters; no real money. Demo controls send inputs, and every receipt comes from the server.');
+  text('bottom', LIVE.mode === 'connected'
+    ? 'Connected to MCP, Google Calendar and Stripe test mode; no real money. Every result is spoken from its receipt.'
+    : 'Connected to the MCP server with local Fake adapters; no real money. Every result is spoken from its receipt.');
 
   get('chapters').replaceChildren(); get('contrast').hidden = true;
 

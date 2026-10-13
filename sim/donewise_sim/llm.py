@@ -65,13 +65,6 @@ class Reply:
     metadata: dict = field(default_factory=dict)
 
 
-def bedrock_request_fields(model_id):
-    # Account access is required to validate this setting live for GPT-5.6.
-    if "openai.gpt-5.6-" in model_id:
-        return {"reasoning_effort": "none"}
-    return {}
-
-
 class LLM(Protocol):
     async def reply(self, messages: list, tools: list) -> Reply: ...
 
@@ -135,8 +128,6 @@ class BedrockLLM:
                     messages=converted,
                     inferenceConfig={"maxTokens": 1200},
                 )
-                if fields := bedrock_request_fields(self.settings.bedrock_model_id):
-                    request["additionalModelRequestFields"] = fields
                 if tools:
                     request["toolConfig"] = {
                         "tools": [
@@ -169,10 +160,7 @@ class BedrockLLM:
             {
                 "provider": "bedrock",
                 "model": self.settings.bedrock_model_id,
-                "parameters": {
-                    "maxTokens": 1200,
-                    **bedrock_request_fields(self.settings.bedrock_model_id),
-                },
+                "parameters": {"maxTokens": 1200},
                 "usage": response.get("usage", {}),
                 "stop_reason": response.get("stopReason"),
                 "latency_ms": round((time.perf_counter() - started) * 1000, 2),
