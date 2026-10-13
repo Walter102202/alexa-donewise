@@ -1,0 +1,144 @@
+{
+  "mode": "AGENT_RUNTIME_ARN",
+  "skill_id": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b",
+  "lambda_arn": "arn:aws:lambda:us-east-1:027018013541:function:donewise-alexa",
+  "runtime_arn": "arn:aws:bedrock-agentcore:us-east-1:027018013541:runtime/donewise_receipts-wbsa177WJQ",
+  "runtime_version": "1",
+  "demo_run_id": "run_b7d652a00a1e444d9ba6e54b0823107c",
+  "demo_provenance": "Five local Sonnet 4.6 Anthropic demo turns; persisted registry copied to authenticated Lightsail MCP",
+  "reference_response": {
+    "speech": "From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 11:01 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 11 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+    "receipt": {
+      "spoken": "From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 11:01 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 11 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+      "structured_version": "1.0",
+      "run_id": "run_b7d652a00a1e444d9ba6e54b0823107c",
+      "items": [
+        {
+          "operation_id": "op_004fbb77b6574e1aa0d85bc180c249fe",
+          "action": "CALENDAR_RESCHEDULE",
+          "outcome": "VERIFIED",
+          "observed_at": "2026-10-13T02:01:20.648400Z",
+          "summary": "plumber is at 10 to 11 AM"
+        },
+        {
+          "operation_id": "op_428f496b202948c3beb53c37386da05c",
+          "action": "PAYMENT_CHARGE",
+          "outcome": "VERIFIED",
+          "observed_at": "2026-10-13T02:00:49.756112Z",
+          "summary": "One $60 test charge for the deposit"
+        }
+      ],
+      "generated_at": "2026-10-13T03:41:45.493197Z",
+      "timezone": "America/Santiago"
+    }
+  },
+  "runtime_measurements": [
+    {
+      "phase": "new_session",
+      "elapsed_ms_including_cli": 3786,
+      "time_chile": "2026-10-13T00:41:45.330789-03:00",
+      "runtime_session_id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+    },
+    {
+      "phase": "warm",
+      "elapsed_ms_including_cli": 2816,
+      "time_chile": "2026-10-13T00:41:48.148235-03:00",
+      "runtime_session_id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+    },
+    {
+      "phase": "warm",
+      "elapsed_ms_including_cli": 2808,
+      "time_chile": "2026-10-13T00:41:50.958112-03:00",
+      "runtime_session_id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+    },
+    {
+      "phase": "warm",
+      "elapsed_ms_including_cli": 3367,
+      "time_chile": "2026-10-13T00:41:54.326810-03:00",
+      "runtime_session_id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+    }
+  ],
+  "warm_max_ms_including_cli": 3367,
+  "gate_limit_ms": 6500,
+  "gate_passed": true,
+  "alexa_trials": [
+    {
+      "trial": 1,
+      "time_chile": "2026-10-13T00:42:18.819721-03:00",
+      "launch_simulation_id": "da0b8645-3f1c-408a-9ca3-808861758fd3",
+      "question_simulation_id": "e9575aab-8d4d-43e2-96a9-e3db6a64bf6b",
+      "input": "what did you charge last night and when is the plumber",
+      "status": "SUCCESSFUL",
+      "intent": "RequestIntent",
+      "request_id": "amzn1.echo-api.request.e6bf9800-75d4-4bee-98a2-bc3b9497c34b",
+      "runtime_session_sha256": "00d9e87f03d9c6c9ec374012d57b70b44bd0e32b01c89fda26da273d2ae736c6",
+      "prewarm_ms": 2829,
+      "metrics": {
+        "skillExecutionTimeInMilliseconds": 1250
+      },
+      "speech": "From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 11:01 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 11 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+      "matches_reference_receipt": true,
+      "reference_run_id": "run_b7d652a00a1e444d9ba6e54b0823107c",
+      "reference_runtime_version": "1"
+    },
+    {
+      "trial": 2,
+      "time_chile": "2026-10-13T00:42:42.874358-03:00",
+      "launch_simulation_id": "d20aca24-1c5b-41db-834f-19f650e7cfd1",
+      "question_simulation_id": "9333a6de-b248-427a-9a82-1ff55c48e430",
+      "input": "what did you charge last night and when is the plumber",
+      "status": "SUCCESSFUL",
+      "intent": "RequestIntent",
+      "request_id": "amzn1.echo-api.request.e0242001-2225-4f4e-a591-fec45a0429f6",
+      "runtime_session_sha256": "00d9e87f03d9c6c9ec374012d57b70b44bd0e32b01c89fda26da273d2ae736c6",
+      "prewarm_ms": 1870,
+      "metrics": {
+        "skillExecutionTimeInMilliseconds": 1124
+      },
+      "speech": "From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 11:01 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 11 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+      "matches_reference_receipt": true,
+      "reference_run_id": "run_b7d652a00a1e444d9ba6e54b0823107c",
+      "reference_runtime_version": "1"
+    },
+    {
+      "trial": 3,
+      "time_chile": "2026-10-13T00:43:06.148824-03:00",
+      "launch_simulation_id": "86022165-9efb-4bf9-86ef-9f29ec278fee",
+      "question_simulation_id": "61270597-bafb-4fd5-8acf-a75f83e161d4",
+      "input": "what did you charge last night and when is the plumber",
+      "status": "SUCCESSFUL",
+      "intent": "RequestIntent",
+      "request_id": "amzn1.echo-api.request.78d47dd9-45c5-4de2-9d2d-fea9dea2ae74",
+      "runtime_session_sha256": "00d9e87f03d9c6c9ec374012d57b70b44bd0e32b01c89fda26da273d2ae736c6",
+      "prewarm_ms": 1713,
+      "metrics": {
+        "skillExecutionTimeInMilliseconds": 1853
+      },
+      "speech": "From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 11:01 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 11 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+      "matches_reference_receipt": true,
+      "reference_run_id": "run_b7d652a00a1e444d9ba6e54b0823107c",
+      "reference_runtime_version": "1"
+    }
+  ],
+  "lambda_resource_policy": {
+    "Version": "2012-10-17",
+    "Id": "default",
+    "Statement": [
+      {
+        "Sid": "AlexaSkillDevelopmentCurrent",
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "alexa-appkit.amazon.com"
+        },
+        "Action": "lambda:InvokeFunction",
+        "Resource": "arn:aws:lambda:us-east-1:027018013541:function:donewise-alexa",
+        "Condition": {
+          "StringEquals": {
+            "lambda:EventSourceToken": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b"
+          }
+        }
+      }
+    ]
+  },
+  "verification_boundary": "No new provider reads or writes requested; read-only receipts_recap only. CloudWatch exported tool spans prove the invoked path. No forced timeout or microphone test."
+}

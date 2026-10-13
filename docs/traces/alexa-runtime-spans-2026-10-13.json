@@ -1,0 +1,554 @@
+{
+  "log_group": "/aws/bedrock-agentcore/runtimes/donewise_receipts-wbsa177WJQ-DEFAULT",
+  "trace_count": 4,
+  "spans": [
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "4db20e37473ea9e2",
+      "parentSpanId": "b25e440bfe1e1254",
+      "name": "MCP send server/discover",
+      "durationNano": 39507005,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "07a2a44e013b4064",
+      "parentSpanId": "578c039eb151c238",
+      "name": "MCP send tools/list",
+      "durationNano": 8662824,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "34015f56be84d4d1",
+      "parentSpanId": "f691af359d32c9ec",
+      "name": "chat us.amazon.nova-pro-v1:0",
+      "durationNano": 1084428373,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "f691af359d32c9ec",
+      "parentSpanId": "a9bcb6bdd11e8027",
+      "name": "chat",
+      "durationNano": 1087300362,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "0f0494920241d5b7",
+      "parentSpanId": "fd3f4b8579977ecf",
+      "name": "MCP send tools/call receipts_recap",
+      "durationNano": 10215191,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "fd3f4b8579977ecf",
+      "parentSpanId": "a9bcb6bdd11e8027",
+      "name": "execute_tool receipts_recap",
+      "durationNano": 24101051,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.tool.status": "success",
+        "gen_ai.tool.name": "receipts_recap",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "a9bcb6bdd11e8027",
+      "parentSpanId": "3f3d4e78b0e994a7",
+      "name": "execute_event_loop_cycle",
+      "durationNano": 1112528718,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "3f3d4e78b0e994a7",
+      "parentSpanId": "578c039eb151c238",
+      "name": "invoke_agent Strands Agents",
+      "durationNano": 1113684553,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "b25e440bfe1e1254",
+      "parentSpanId": "578c039eb151c238",
+      "name": "mcp.session",
+      "durationNano": 1225506930,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8776a8cea7a2448b5ee4ecbe3a8",
+      "spanId": "578c039eb151c238",
+      "parentSpanId": "318637789ebe85a8",
+      "name": "POST /invocations",
+      "durationNano": 1242338158,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "78cd7f8ee213895a",
+      "parentSpanId": "92c152dc3bae6c5a",
+      "name": "MCP send server/discover",
+      "durationNano": 21073883,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "88a07cd0a834b5e4",
+      "parentSpanId": "6a5a230f4ad89ecf",
+      "name": "MCP send tools/list",
+      "durationNano": 8086529,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "720d7023553c9ce7",
+      "parentSpanId": "16a8cb81722f8d3c",
+      "name": "chat us.amazon.nova-pro-v1:0",
+      "durationNano": 1184641397,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "16a8cb81722f8d3c",
+      "parentSpanId": "b6da4a23ffb989e9",
+      "name": "chat",
+      "durationNano": 1185641082,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "27a20cd2e1261b20",
+      "parentSpanId": "d8fabcc26ab6661e",
+      "name": "MCP send tools/call receipts_recap",
+      "durationNano": 9206770,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "d8fabcc26ab6661e",
+      "parentSpanId": "b6da4a23ffb989e9",
+      "name": "execute_tool receipts_recap",
+      "durationNano": 16395505,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.tool.status": "success",
+        "gen_ai.tool.name": "receipts_recap",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "b6da4a23ffb989e9",
+      "parentSpanId": "e250517e867453cd",
+      "name": "execute_event_loop_cycle",
+      "durationNano": 1203023398,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "e250517e867453cd",
+      "parentSpanId": "6a5a230f4ad89ecf",
+      "name": "invoke_agent Strands Agents",
+      "durationNano": 1203597737,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "92c152dc3bae6c5a",
+      "parentSpanId": "6a5a230f4ad89ecf",
+      "name": "mcp.session",
+      "durationNano": 1295723945,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87a2459f16573dad163781f9934",
+      "spanId": "6a5a230f4ad89ecf",
+      "parentSpanId": "e3e1746166e507ed",
+      "name": "POST /invocations",
+      "durationNano": 1299650803,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "125bdd00572de1cf",
+      "parentSpanId": "32da1e7a154a3ae9",
+      "name": "MCP send server/discover",
+      "durationNano": 21446466,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "88473f34f02ac43c",
+      "parentSpanId": "9bc331686421032e",
+      "name": "MCP send tools/list",
+      "durationNano": 8371475,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "9a92f4e8a76a3c81",
+      "parentSpanId": "a9e6c086ddfb7016",
+      "name": "chat us.amazon.nova-pro-v1:0",
+      "durationNano": 1034118925,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "a9e6c086ddfb7016",
+      "parentSpanId": "0ca46633ab364efb",
+      "name": "chat",
+      "durationNano": 1035242478,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "4fa8de5ac9ec5f67",
+      "parentSpanId": "37aef2637020c1e1",
+      "name": "MCP send tools/call receipts_recap",
+      "durationNano": 10067530,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "37aef2637020c1e1",
+      "parentSpanId": "0ca46633ab364efb",
+      "name": "execute_tool receipts_recap",
+      "durationNano": 17155704,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.tool.status": "success",
+        "gen_ai.tool.name": "receipts_recap",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "0ca46633ab364efb",
+      "parentSpanId": "5781411971be396c",
+      "name": "execute_event_loop_cycle",
+      "durationNano": 1053394683,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "5781411971be396c",
+      "parentSpanId": "9bc331686421032e",
+      "name": "invoke_agent Strands Agents",
+      "durationNano": 1053998142,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "32da1e7a154a3ae9",
+      "parentSpanId": "9bc331686421032e",
+      "name": "mcp.session",
+      "durationNano": 1236039190,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda87d03b4b2a1017ae13b1ff5e5c2",
+      "spanId": "9bc331686421032e",
+      "parentSpanId": "e17a9885fc2ce467",
+      "name": "POST /invocations",
+      "durationNano": 1240173435,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "a639df331a4fecab",
+      "parentSpanId": "5828aab1f5dfa87a",
+      "name": "MCP send server/discover",
+      "durationNano": 20346839,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "78048ddd86c110d7",
+      "parentSpanId": "e6a4253633513862",
+      "name": "MCP send tools/list",
+      "durationNano": 8222166,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "0bfc441d1b404963",
+      "parentSpanId": "d333c57031939e58",
+      "name": "chat us.amazon.nova-pro-v1:0",
+      "durationNano": 1519797903,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "d333c57031939e58",
+      "parentSpanId": "608ec2098ec8a720",
+      "name": "chat",
+      "durationNano": 1520809961,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "f57b16875c8b9b4b",
+      "parentSpanId": "9c814e23e1f45616",
+      "name": "MCP send tools/call receipts_recap",
+      "durationNano": 9695965,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "9c814e23e1f45616",
+      "parentSpanId": "608ec2098ec8a720",
+      "name": "execute_tool receipts_recap",
+      "durationNano": 17022661,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.tool.status": "success",
+        "gen_ai.tool.name": "receipts_recap",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "608ec2098ec8a720",
+      "parentSpanId": "12b616ffc491a6a1",
+      "name": "execute_event_loop_cycle",
+      "durationNano": 1538826449,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "12b616ffc491a6a1",
+      "parentSpanId": "e6a4253633513862",
+      "name": "invoke_agent Strands Agents",
+      "durationNano": 1539418183,
+      "status": {
+        "code": "OK"
+      },
+      "attributes": {
+        "gen_ai.request.model": "us.amazon.nova-pro-v1:0",
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "5828aab1f5dfa87a",
+      "parentSpanId": "e6a4253633513862",
+      "name": "mcp.session",
+      "durationNano": 1639356328,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    },
+    {
+      "traceId": "6acda8806da7e1fb12806b5631f673ce",
+      "spanId": "e6a4253633513862",
+      "parentSpanId": "c75c5b61988327d5",
+      "name": "POST /invocations",
+      "durationNano": 1643439144,
+      "status": {
+        "code": "UNSET"
+      },
+      "attributes": {
+        "http.response.status_code": 200,
+        "session.id": "donewise-final-d8b2b4da6e044076a23a240e00cc4598"
+      }
+    }
+  ]
+}

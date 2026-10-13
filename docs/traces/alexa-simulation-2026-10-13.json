@@ -1,0 +1,111 @@
+{
+  "mode": "FIXED_SPEECH",
+  "receipt_acceptance_passed": false,
+  "reason": "No AgentCore runtimes deployed in us-east-1",
+  "skill_id": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b",
+  "lambda_arn": "arn:aws:lambda:us-east-1:027018013541:function:donewise-alexa",
+  "simulations": [
+    {
+      "trial": 1,
+      "time_chile": "2026-10-13T00:18:11.862355-03:00",
+      "input": "open done wise",
+      "simulation_id": "6836494a-741b-4b68-85ef-faf660d2ec24",
+      "status": "SUCCESSFUL",
+      "request_type": "LaunchRequest",
+      "request_id": "amzn1.echo-api.request.850b22f2-ea72-4349-b64c-7a9b445c398f",
+      "intent": null,
+      "slot": null,
+      "output_speech": {
+        "type": "SSML",
+        "ssml": "<speak>DoneWise is ready for the receipt test.</speak>"
+      },
+      "skill_execution_ms": 28,
+      "cli_roundtrip_ms": 11248
+    },
+    {
+      "trial": 1,
+      "time_chile": "2026-10-13T00:18:22.242998-03:00",
+      "input": "what did you charge last night and when is the plumber",
+      "simulation_id": "7d130153-eab0-45c0-9d8a-2da9276d5916",
+      "status": "SUCCESSFUL",
+      "request_type": "IntentRequest",
+      "request_id": "amzn1.echo-api.request.0a5ab7e4-30c6-47b6-b81a-8e9cfbfb21f8",
+      "intent": "RequestIntent",
+      "slot": "what did you charge last night and when is the plumber",
+      "output_speech": {
+        "type": "SSML",
+        "ssml": "<speak>DoneWise is ready for the receipt test.</speak>"
+      },
+      "skill_execution_ms": 28,
+      "cli_roundtrip_ms": 10379
+    },
+    {
+      "trial": 2,
+      "time_chile": "2026-10-13T00:18:33.607346-03:00",
+      "input": "open done wise",
+      "simulation_id": "1291fe56-3175-4837-bd9e-80f4bb67f164",
+      "status": "SUCCESSFUL",
+      "request_type": "LaunchRequest",
+      "request_id": "amzn1.echo-api.request.884f7d10-a011-46fd-bf41-8f5e465735f6",
+      "intent": null,
+      "slot": null,
+      "output_speech": {
+        "type": "SSML",
+        "ssml": "<speak>DoneWise is ready for the receipt test.</speak>"
+      },
+      "skill_execution_ms": 27,
+      "cli_roundtrip_ms": 11151
+    },
+    {
+      "trial": 2,
+      "time_chile": "2026-10-13T00:18:44.320443-03:00",
+      "input": "what did you charge last night and when is the plumber",
+      "simulation_id": "3f21b0d2-83cd-420e-a841-a62006af94da",
+      "status": "SUCCESSFUL",
+      "request_type": "IntentRequest",
+      "request_id": "amzn1.echo-api.request.bd4d9d91-6b9e-49d2-8d12-01489eb87e86",
+      "intent": "RequestIntent",
+      "slot": "what did you charge last night and when is the plumber",
+      "output_speech": {
+        "type": "SSML",
+        "ssml": "<speak>DoneWise is ready for the receipt test.</speak>"
+      },
+      "skill_execution_ms": 43,
+      "cli_roundtrip_ms": 10711
+    },
+    {
+      "trial": 3,
+      "time_chile": "2026-10-13T00:18:54.995754-03:00",
+      "input": "open done wise",
+      "simulation_id": "7327f6df-6953-4d83-8e46-6ae8b1d05fb0",
+      "status": "SUCCESSFUL",
+      "request_type": "LaunchRequest",
+      "request_id": "amzn1.echo-api.request.9b2a3a5f-64ee-4b22-b690-08166b8dae0a",
+      "intent": null,
+      "slot": null,
+      "output_speech": {
+        "type": "SSML",
+        "ssml": "<speak>DoneWise is ready for the receipt test.</speak>"
+      },
+      "skill_execution_ms": 30,
+      "cli_roundtrip_ms": 10512
+    },
+    {
+      "trial": 3,
+      "time_chile": "2026-10-13T00:19:05.157706-03:00",
+      "input": "what did you charge last night and when is the plumber",
+      "simulation_id": "2198a842-4ce9-4f5b-b03e-a9c52975a996",
+      "status": "SUCCESSFUL",
+      "request_type": "IntentRequest",
+      "request_id": "amzn1.echo-api.request.189049ed-e3f5-43f4-abc8-e788230e2542",
+      "intent": "RequestIntent",
+      "slot": "what did you charge last night and when is the plumber",
+      "output_speech": {
+        "type": "SSML",
+        "ssml": "<speak>DoneWise is ready for the receipt test.</speak>"
+      },
+      "skill_execution_ms": 36,
+      "cli_roundtrip_ms": 10161
+    }
+  ]
+}

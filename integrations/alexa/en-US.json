@@ -1,0 +1,31 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "done wise",
+      "intents": [
+        {
+          "name": "RequestIntent",
+          "slots": [{"name": "request", "type": "RequestPhrase"}],
+          "samples": ["{request}"]
+        },
+        {
+          "name": "AskIntent",
+          "slots": [{"name": "query", "type": "AMAZON.SearchQuery"}],
+          "samples": ["ask {query}", "tell me {query}"]
+        },
+        {"name": "AMAZON.HelpIntent", "samples": []},
+        {"name": "AMAZON.StopIntent", "samples": []},
+        {"name": "AMAZON.CancelIntent", "samples": []},
+        {"name": "AMAZON.FallbackIntent", "samples": []}
+      ],
+      "types": [{
+        "name": "RequestPhrase",
+        "values": [
+          {"name": {"value": "what did you charge last night and when is the plumber"}},
+          {"name": {"value": "what did you do last night"}},
+          {"name": {"value": "what did you charge last night"}}
+        ]
+      }]
+    }
+  }
+}

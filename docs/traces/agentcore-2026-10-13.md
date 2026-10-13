@@ -67,3 +67,26 @@ session ID and payload `{"prompt":"What did you charge last night and when is th
 Private environment configuration and receipt registry are intentionally not in Git.
 
 Official setup reference: [AgentCore Observability](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/observability-configure.html).
+
+## Final Alexa acceptance gate — 00:41–00:43 Chile
+
+The coordinated Alexa closure reused runtime version 1 and the original Sonnet demo
+run above. Four fresh **AWS CLI** calls used the exact prompt
+`What did you charge last night, and when is the plumber?` and a new 47-character
+runtime session. First/new session: **3786 ms**; warm: **2816, 2808, 3367 ms**,
+including CLI process overhead. Warm maximum remains below **6500 ms: PASS**.
+This is a new-session sample, not a guarantee for every container cold start.
+
+[Reference response and measurements](alexa-connected-2026-10-13.json) retain the
+full receipt. The returned speech, identical to receipt.spoken on every call, was:
+
+```json
+{"speech":"From the saved receipts: plumber is at 10 to 11 AM, read back at 2026-10-12 at 11:01 PM America/Santiago (UTC-0300). One $60 test charge for the deposit, read back at 2026-10-12 at 11 PM America/Santiago (UTC-0300). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments."}
+```
+
+[Forty fresh CloudWatch spans](alexa-runtime-spans-2026-10-13.json), filtered to this
+new session, cover four traces. Every trace has exactly one `execute_tool receipts_recap`
+and no mutation tool. Lambda is connected to the real ARN; three exact SMAPI
+launch/question pairs passed, skill execution 1250/1124/1853 ms. See
+[Alexa closure](alexa-2026-10-13.md). No new MCP/server/demo changes or full suite
+were performed for this acceptance check.

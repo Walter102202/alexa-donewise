@@ -104,6 +104,20 @@
       }
     },
     {
+      "Sid": "AlexaTriggerInspectionAndCleanup",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetPolicy",
+        "lambda:RemovePermission"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:027018013541:function:donewise-alexa",
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
       "Sid": "ProjectRoles",
       "Effect": "Allow",
       "Action": [

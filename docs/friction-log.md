@@ -201,6 +201,12 @@ No AgentCore or ASK CLI experience is asserted in the historical entries above.
 | Suggestion | Include read/cleanup actions alongside create/add permissions in bounded deployment policies |
 | Command / evidence | `aws lambda remove-permission --function-name donewise-alexa --statement-id AlexaSkillDevelopment --profile donewise --region us-east-1`; [trace and cleanup](traces/alexa-2026-10-13.md) |
 
+Follow-up to entry 14, 00:37–00:39 Chile: Walter authorized console execution.
+DoneWiseDeployment20261013 now grants GetPolicy/RemovePermission on the exact
+donewise-alexa ARN. Both the failed-ID trigger and an identical active-ID duplicate
+were removed. Fresh GetPolicy confirms only the current skill-scoped statement.
+This blocker is resolved; [final evidence](traces/alexa-connected-2026-10-13.json).
+
 ## 15. Initial Development enablement returned an empty 403 — 13 October 2026
 
 | Field | Observation |
@@ -233,7 +239,13 @@ No AgentCore or ASK CLI experience is asserted in the historical entries above.
 | Suggestion | Expose runtime readiness and distinguish simulation-tool overhead from endpoint latency |
 | Command / evidence | `aws bedrock-agentcore-control list-agent-runtimes --profile donewise --region us-east-1`; [timings and limits](traces/alexa-2026-10-13.md), [wiring commands](../integrations/alexa/README.md) |
 
-## 11. Lightsail Caddy routing and Windows TLS — 13 October 2026
+Follow-up to entry 17, 00:43 Chile: AgentCore is deployed and the real receipt gate
+now passes. Fresh warm CLI maximum 3367 ms; exact Alexa pairs 3/3 at 1250/1124/1853 ms,
+with dates/timezone preserved. The original fixed-response evidence remains historical.
+[Connected proof](traces/alexa-connected-2026-10-13.json) and
+[recap-only spans](traces/alexa-runtime-spans-2026-10-13.json).
+
+## 18. Lightsail Caddy routing and Windows TLS — 13 October 2026
 
 | Field | Observation |
 | --- | --- |
@@ -247,7 +259,7 @@ No AgentCore or ASK CLI experience is asserted in the historical entries above.
 | Command | `docker compose --env-file /opt/donewise/private/compose.env -f deploy/lightsail/compose.yaml up -d`; run documented Strands smoke with SSL_CERT_FILE |
 | Evidence | [Remote five-turn proof and latency](traces/lightsail-2026-10-13.md) |
 
-## 12. Strands executes a queued tool after recap — 13 October 2026
+## 19. Strands executes a queued tool after recap — 13 October 2026
 
 | Field | Observation |
 | --- | --- |
@@ -260,3 +272,36 @@ No AgentCore or ASK CLI experience is asserted in the historical entries above.
 | Suggestion | Document that stopping the event loop does not cancel the current batch, or offer a batch-cancellation flag |
 | Command | `python agents/strands_client/smoke.py --five-turns --output data/new-remote-trace.json` in the isolated environment |
 | Evidence | [Earlier attempts and successful rerun](traces/lightsail-2026-10-13.md) |
+
+## 20. AgentCore toolkit source bucket conflicts with deployment scope — 13 October 2026
+
+| Field | Observation |
+| --- | --- |
+| Task / steps | Configure a container deployment with the AgentCore starter toolkit, then launch |
+| Expected / observed | Toolkit 0.3.14 selected fixed bucket bedrock-agentcore-codebuild-sources-027018013541-us-east-1, outside the approved donewise-prefixed artifacts policy. CodeBuild did not run |
+| Severity | Medium: default launch path blocked |
+| Workaround | Approved local buildx ARM64 fallback, ECR push and control-plane creation; image digest and actual runtime recorded |
+| Suggestion | Allow a caller-supplied source bucket and show required resource names before launch |
+| Command / evidence | `agentcore launch`; [deployment and gate](traces/agentcore-2026-10-13.md) |
+
+## 21. AgentCore creation checks dependent identities before a final runtime ARN — 13 October 2026
+
+| Field | Observation |
+| --- | --- |
+| Task / steps | Create tagged DoneWise runtime under scoped IAM permissions |
+| Expected / observed | TagResource/endpoint and workload identity/directory authorization needed separate creation grants; request Project tag did not propagate to every dependent check |
+| Severity | Medium: runtime creation initially denied |
+| Workaround | Approved creation/tagging policy with account, region and expiry restrictions; operating permissions remain scoped to donewise resources. Inline cloud JSON was compared exactly to the working tree |
+| Suggestion | Document the full dependent-action/resource matrix for runtime creation |
+| Command / evidence | `aws bedrock-agentcore-control create-agent-runtime`; [policy](../deploy/aws-runtime-creation-tagging-policy.json), [actual deployment](traces/agentcore-2026-10-13.md) |
+
+## 22. Concurrent closure and ambiguous demo run provenance — 13 October 2026
+
+| Field | Observation |
+| --- | --- |
+| Task / steps | Finish Alexa while the AWS Builder chat was also closing AgentCore |
+| Expected / observed | Runtime already existed and used the original Sonnet demo run; a different run ID in the remote Strands smoke trace initially looked inconsistent. Trigger policy also had two identical active-skill statements |
+| Severity | Medium: risk of replacing the demo story or overwriting concurrent work |
+| Workaround | Walter authorized chat coordination; assigned one writer per surface, kept the original demo run_b7d652a00a1e444d9ba6e54b0823107c copied to Lightsail, reused runtime v1, removed duplicate trigger, preserved each evidence set separately |
+| Suggestion | Record demo versus smoke run provenance explicitly alongside runtime configuration |
+| Command / evidence | `aws bedrock-agentcore-control get-agent-runtime --agent-runtime-id donewise_receipts-wbsa177WJQ --profile donewise --region us-east-1` (do not publish its secret environment); [final receipt identity](traces/alexa-connected-2026-10-13.json) |
