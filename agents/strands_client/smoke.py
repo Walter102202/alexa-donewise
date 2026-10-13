@@ -33,7 +33,7 @@ def main():
     with ReceiptAgent() as agent:
 
         def admin(path, payload):
-            url = urlsplit(agent.url)
+            url = urlsplit(os.getenv("DONEWISE_ADMIN_URL", agent.url))
             response = httpx.post(
                 urlunsplit((url.scheme, url.netloc, "/admin/" + path, "", "")),
                 headers={"X-Demo-Admin-Token": os.environ["DEMO_ADMIN_TOKEN"]},
@@ -46,7 +46,13 @@ def main():
         try:
             for index, text in enumerate(UTTERANCES if args.five_turns else UTTERANCES[-1:]):
                 start = time.perf_counter()
-                if args.five_turns and index == 1:
+                if text == UTTERANCES[-1]:
+                    # The morning scene starts without history and cannot write.
+                    with ReceiptAgent(read_only=True) as morning:
+                        result = morning.turn(text)
+                        agent.trace.extend(morning.trace)
+                        assert [item["tool"] for item in morning.trace] == ["receipts_recap"]
+                elif args.five_turns and index == 1:
                     admin("faults", {"kind": "drop_response_after_write", "uses": 1})
                     capability = admin("consent-token", {})["consent_token"]
                     result = agent.approve(capability)

@@ -101,7 +101,10 @@ class ReceiptAgent:
 
     def before_tool(self, event: BeforeToolCallEvent):
         name, args = event.tool_use["name"], event.tool_use["input"]
-        if name == "approval_grant":
+        if self.recap_complete:
+            # Strands can still execute later tools in the same model response.
+            event.cancel_tool = "Recap completed; further tools denied"
+        elif name == "approval_grant":
             event.cancel_tool = "Approval requires the trusted operator"
         elif name == "receipts_recap":
             args["run_id"] = self.run_id  # A prompt cannot select another run.
@@ -156,12 +159,14 @@ class ReceiptAgent:
         event.result["structuredContent"] = receipt
         event.result["content"] = [{"text": json.dumps(receipt)}]
         if event.tool_use["name"] == "receipts_recap":
+            self.recap_complete = True
             event.invocation_state["request_state"]["stop_event_loop"] = True
 
     def turn(self, text):
         self.receipts = []
         self.attempted = set()
         self.model_calls = 0
+        self.recap_complete = False
         now = datetime.now(ZoneInfo(self.timezone))
         self.agent.system_prompt = SYSTEM + (
             f"\nNow: {now.isoformat()}; user's timezone: {self.timezone}; run_id: {self.run_id}."

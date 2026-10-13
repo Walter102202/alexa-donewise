@@ -12,6 +12,7 @@ class ReceiptBoundaryTests(unittest.TestCase):
         client = ReceiptAgent.__new__(ReceiptAgent)
         client.run_id, client.timezone = "run_test", "America/Santiago"
         client.receipts, client.trace, client.pending = [], [], None
+        client.recap_complete = False
         return client
 
     def test_model_prose_cannot_replace_receipt(self):
@@ -63,6 +64,23 @@ class ReceiptBoundaryTests(unittest.TestCase):
                 pending,
             )
         call.assert_called_once_with("operation_get", {"operation_id": "op_existing"})
+
+    def test_recap_cancels_later_write_in_same_model_response(self):
+        client = self.client()
+        receipt = {"spoken": "From the saved receipts."}
+        event = SimpleNamespace(
+            cancel_message=None,
+            exception=None,
+            duration=0.1,
+            result={"structuredContent": receipt},
+            tool_use={"name": "receipts_recap", "input": {}},
+            invocation_state={"request_state": {}},
+        )
+        client.after_tool(event)
+        queued = SimpleNamespace(tool_use={"name": "calendar_create_verified", "input": {}})
+        client.before_tool(queued)
+        self.assertEqual(queued.cancel_tool, "Recap completed; further tools denied")
+        self.assertEqual(client.receipts, [receipt])
 
 
 if __name__ == "__main__":

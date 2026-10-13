@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "RuntimeCreationDependencies",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:TagResource",
+        "bedrock-agentcore:CreateAgentRuntimeEndpoint"
+      ],
+      "Resource": [
+        "arn:aws:bedrock-agentcore:us-east-1:027018013541:runtime/*",
+        "arn:aws:bedrock-agentcore:us-east-1:027018013541:workload-identity-directory/default/workload-identity/*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    }
+  ]
+}

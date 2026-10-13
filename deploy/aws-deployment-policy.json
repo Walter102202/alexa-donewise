@@ -1,0 +1,269 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LightsailDeploymentInVirginia",
+      "Effect": "Allow",
+      "Action": [
+        "lightsail:GetInstances",
+        "lightsail:GetInstance",
+        "lightsail:GetInstanceState",
+        "lightsail:GetBundles",
+        "lightsail:GetBlueprints",
+        "lightsail:GetStaticIps",
+        "lightsail:GetStaticIp",
+        "lightsail:GetInstanceAccessDetails",
+        "lightsail:GetInstancePortStates",
+        "lightsail:CreateInstances",
+        "lightsail:AllocateStaticIp",
+        "lightsail:AttachStaticIp",
+        "lightsail:PutInstancePublicPorts",
+        "lightsail:CreateKeyPair",
+        "lightsail:GetKeyPair",
+        "lightsail:TagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "CreateTaggedProjectRuntime",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:CreateAgentRuntime",
+        "bedrock-agentcore:CreateAgentRuntimeEndpoint"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:RequestTag/Project": "DoneWise"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "CreateRuntimeIdentityServiceRole",
+      "Effect": "Allow",
+      "Action": "iam:CreateServiceLinkedRole",
+      "Resource": "arn:aws:iam::027018013541:role/aws-service-role/runtime-identity.bedrock-agentcore.amazonaws.com/AWSServiceRoleForBedrockAgentCoreRuntimeIdentity",
+      "Condition": {
+        "StringEquals": {
+          "iam:AWSServiceName": "runtime-identity.bedrock-agentcore.amazonaws.com"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectRuntime",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:GetAgentRuntime",
+        "bedrock-agentcore:UpdateAgentRuntime",
+        "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+        "bedrock-agentcore:GetAgentRuntimeEndpoint",
+        "bedrock-agentcore:UpdateAgentRuntimeEndpoint",
+        "bedrock-agentcore:InvokeAgentRuntime",
+        "bedrock-agentcore:TagResource"
+      ],
+      "Resource": "arn:aws:bedrock-agentcore:us-east-1:027018013541:runtime/donewise*",
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectLambda",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:AddPermission",
+        "lambda:InvokeFunction",
+        "lambda:TagResource"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:027018013541:function:donewise-*",
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:GetRole",
+        "iam:PutRolePolicy",
+        "iam:GetRolePolicy",
+        "iam:TagRole"
+      ],
+      "Resource": "arn:aws:iam::027018013541:role/donewise-*",
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "PassProjectRoles",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::027018013541:role/donewise-*",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": [
+            "lambda.amazonaws.com",
+            "bedrock-agentcore.amazonaws.com",
+            "codebuild.amazonaws.com"
+          ]
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "LambdaBasicLogging",
+      "Effect": "Allow",
+      "Action": "iam:AttachRolePolicy",
+      "Resource": "arn:aws:iam::027018013541:role/donewise-*",
+      "Condition": {
+        "ArnEquals": {
+          "iam:PolicyARN": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectEcr",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:CreateRepository",
+        "ecr:DescribeRepositories",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "ecr:InitiateLayerUpload",
+        "ecr:UploadLayerPart",
+        "ecr:CompleteLayerUpload",
+        "ecr:PutImage",
+        "ecr:TagResource"
+      ],
+      "Resource": [
+        "arn:aws:ecr:us-east-1:027018013541:repository/donewise*",
+        "arn:aws:ecr:us-east-1:027018013541:repository/bedrock-agentcore-donewise*"
+      ],
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "EcrLogin",
+      "Effect": "Allow",
+      "Action": "ecr:GetAuthorizationToken",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectBuild",
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:CreateProject",
+        "codebuild:UpdateProject",
+        "codebuild:StartBuild",
+        "codebuild:BatchGetBuilds",
+        "codebuild:BatchGetProjects"
+      ],
+      "Resource": [
+        "arn:aws:codebuild:us-east-1:027018013541:project/donewise*",
+        "arn:aws:codebuild:us-east-1:027018013541:build/donewise*"
+      ],
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectArtifacts",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:GetBucketLocation",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:PutBucketPublicAccessBlock"
+      ],
+      "Resource": [
+        "arn:aws:s3:::donewise-027018013541-*",
+        "arn:aws:s3:::donewise-027018013541-*/*"
+      ],
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ProjectLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogStreams",
+        "logs:GetLogEvents",
+        "logs:FilterLogEvents"
+      ],
+      "Resource": [
+        "arn:aws:logs:us-east-1:027018013541:log-group:/aws/bedrock-agentcore/runtimes/donewise*",
+        "arn:aws:logs:us-east-1:027018013541:log-group:/aws/lambda/donewise-*",
+        "arn:aws:logs:us-east-1:027018013541:log-group:/aws/codebuild/donewise*"
+      ],
+      "Condition": {
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "ListRuntimesInVirginia",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:ListAgentRuntimes",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    }
+  ]
+}

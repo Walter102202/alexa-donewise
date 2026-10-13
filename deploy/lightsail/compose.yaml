@@ -1,0 +1,37 @@
+services:
+  server:
+    build:
+      context: ../..
+      target: server
+    env_file: ${DONEWISE_SERVER_ENV:-/opt/donewise/private/server.env}
+    environment:
+      HOST: server
+      PORT: "8765"
+      DONEWISE_MODE: connected
+      DONEWISE_DATA_DIR: /app/data
+      GOOGLE_SERVICE_ACCOUNT_JSON: /run/secrets/google.json
+    volumes:
+      - /opt/donewise/data:/app/data
+      - /opt/donewise/private/google.json:/run/secrets/google.json:ro
+    ports:
+      - "127.0.0.1:8765:8765"
+    mem_limit: 256m
+    cpus: 0.75
+    restart: unless-stopped
+  caddy:
+    image: caddy:2.10.2-alpine
+    environment:
+      MCP_HOST: ${MCP_HOST:?Set the DNS name pointing to the static IP}
+      ACME_EMAIL: ${ACME_EMAIL:?Set the certificate contact email}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /opt/donewise/caddy-data:/data
+      - /opt/donewise/caddy-config:/config
+    mem_limit: 96m
+    cpus: 0.25
+    restart: unless-stopped
+    depends_on:
+      - server
