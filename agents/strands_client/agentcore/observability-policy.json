@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DoneWiseXRayIngestion",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "xray.amazonaws.com"
+      },
+      "Action": "logs:PutLogEvents",
+      "Resource": [
+        "arn:aws:logs:us-east-1:027018013541:log-group:aws/spans:*",
+        "arn:aws:logs:us-east-1:027018013541:log-group:/aws/application-signals/data:*"
+      ],
+      "Condition": {
+        "ArnLike": {
+          "aws:SourceArn": "arn:aws:xray:us-east-1:027018013541:*"
+        },
+        "StringEquals": {
+          "aws:SourceAccount": "027018013541"
+        }
+      }
+    }
+  ]
+}

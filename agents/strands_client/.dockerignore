@@ -1,0 +1,6 @@
+*
+!requirements.txt
+!client.py
+!agentcore/
+!agentcore/app.py
+!agentcore/Dockerfile

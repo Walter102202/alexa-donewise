@@ -10,6 +10,27 @@
       ],
       "Resource": [
         "arn:aws:bedrock-agentcore:us-east-1:027018013541:runtime/*",
+        "arn:aws:bedrock-agentcore:us-east-1:027018013541:workload-identity-directory/default/workload-identity/*",
+        "arn:aws:bedrock-agentcore:us-east-1:027018013541:workload-identity-directory/default"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1"
+        },
+        "DateLessThan": {
+          "aws:CurrentTime": "2026-11-21T03:00:00Z"
+        }
+      }
+    },
+    {
+      "Sid": "CreateRuntimeManagedIdentity",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:CreateWorkloadIdentity",
+        "bedrock-agentcore:GetWorkloadIdentity"
+      ],
+      "Resource": [
+        "arn:aws:bedrock-agentcore:us-east-1:027018013541:workload-identity-directory/default",
         "arn:aws:bedrock-agentcore:us-east-1:027018013541:workload-identity-directory/default/workload-identity/*"
       ],
       "Condition": {
