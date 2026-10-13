@@ -443,6 +443,63 @@ def test_user_timezone_rejects_other_zones(zone):
 
 
 @pytest.mark.anyio
+async def test_saved_recap_from_second_mcp_session_without_history(tmp_path):
+    from donewise_sim.config import Settings as ClientSettings
+    from donewise_sim.mcp_client import MCPClient
+
+    app = build_app(
+        Settings(data_dir=tmp_path, mcp_bearer_token="same-user-bearer", pending_after=None)
+    )
+    previous_run = "run_" + "a" * 32
+    with serving(app) as url:
+        settings = ClientSettings(mcp_url=url + "/mcp", mcp_bearer_token="same-user-bearer")
+        first = MCPClient(settings, previous_run)
+        await first.start()
+        try:
+            created, error, _ = await first.call("calendar_create_verified", calendar_args())
+            assert not error and created["outcome"] == "VERIFIED"
+            pending, error, _ = await first.call(
+                "payment_charge_verified",
+                {
+                    "submission_id": "unapproved",
+                    "amount_minor": 6000,
+                    "currency": "USD",
+                    "payee": "Ridge Plumbing",
+                    "concept": "deposit",
+                },
+            )
+            assert not error and pending["outcome"] == "NEEDS_APPROVAL"
+            first_session = first.mcp_session_id
+        finally:
+            await first.close()
+        h = app.state.harness
+        writes = (h.calendar.write_calls, h.payments.write_calls)
+        second = MCPClient(settings, "run_" + "b" * 32, "America/Santiago")
+        await second.start()
+        try:
+            assert second.mcp_session_id != first_session
+            recap, error, _ = await second.call("receipts_recap", {"run_id": previous_run})
+            assert not error and recap["run_id"] == previous_run
+            assert len(recap["items"]) == 1
+            speech = recap["spoken"]
+            assert "From the saved receipts:" in speech
+            assert "1 operation remains unverified or pending." in speech
+            assert "America/Santiago (UTC" in speech
+            from datetime import datetime
+            from zoneinfo import ZoneInfo
+
+            date = (
+                datetime.fromisoformat(created["observed_at"])
+                .astimezone(ZoneInfo("America/Santiago"))
+                .strftime("%Y-%m-%d")
+            )
+            assert date in speech
+            assert (h.calendar.write_calls, h.payments.write_calls) == writes
+        finally:
+            await second.close()
+
+
+@pytest.mark.anyio
 async def test_recap_uses_the_configured_timezone(tmp_path):
     app = build_app(
         Settings(data_dir=tmp_path, demo_admin_token="admin", user_timezone="America/Santiago")

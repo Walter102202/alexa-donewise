@@ -449,9 +449,11 @@ class Harness:
         run_id = inp.run_id or ctx.run_id
         items: list[RecapItem] = []
         selected = {}
+        unverified_count = 0
         for row in self.registry.latest_receipts_for_run(run_id):
             data = json.loads(row["receipt_json"])
             if data["outcome"] != Outcome.VERIFIED:
+                unverified_count += 1
                 continue
             target = data["expected"]
             key = (
@@ -483,7 +485,9 @@ class Harness:
         recap = RecapResult(
             spoken="x", run_id=run_id, items=items, generated_at=self.clock.now(), timezone=timezone
         )
-        return recap.model_copy(update={"spoken": render_spoken(recap)})
+        return recap.model_copy(
+            update={"spoken": render_spoken(recap, recap_unverified_count=unverified_count)}
+        )
 
     # ------------------------------------------------------------------ intent/operation --
 

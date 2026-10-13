@@ -42,7 +42,10 @@ TEMPLATES = {
         "Your calendar changed since I last looked. It now shows {observed}. "
         "Still move it to {target}?"
     ),
-    "recap": "From the receipts in this conversation: {items} Nothing new was written.",
+    "recap": (
+        "From the saved receipts: {items} {unverified} "
+        "Nothing new was written to your calendar or payments."
+    ),
     "recovered": " You don't need to try again.",
     "recap_item": "{summary}, read back at {observed_at}.",
     "grant": "Your approval is recorded. Nothing has been charged by this approval.",
@@ -81,17 +84,36 @@ def amount(target: PaymentTarget) -> str:
     return f"${value:.0f}" if value == value.to_integral_value() else f"${value:.2f}"
 
 
-def render_spoken(receipt: ToolResult, *, historical: bool = False, follow_up: bool = True) -> str:
+def render_spoken(
+    receipt: ToolResult,
+    *,
+    historical: bool = False,
+    follow_up: bool = True,
+    recap_unverified_count: int = 0,
+) -> str:
     """Render only receipt data. Historical mode is explicit; no wall-clock staleness guess."""
     if isinstance(receipt, RecapResult):
         items = " ".join(
             TEMPLATES["recap_item"].format(
                 summary=item.summary.rstrip("."),
-                observed_at=clock_time(item.observed_at, receipt.timezone),
+                observed_at=(
+                    f"{item.observed_at.astimezone(timezone_for(receipt.timezone)):%Y-%m-%d} "
+                    f"at {clock_time(item.observed_at, receipt.timezone)} {receipt.timezone} "
+                    f"(UTC{item.observed_at.astimezone(timezone_for(receipt.timezone)):%z})"
+                ),
             )
             for item in receipt.items
         )
-        return TEMPLATES["recap"].format(items=items)
+        count = recap_unverified_count
+        unverified = (
+            "1 operation remains unverified or pending."
+            if count == 1
+            else f"{count} operations remain unverified or pending."
+        )
+        return TEMPLATES["recap"].format(
+            items=items or "No verified operations were recorded.",
+            unverified=unverified,
+        )
     if isinstance(receipt, ApprovalGrantResult):
         return TEMPLATES["grant"]
     if not isinstance(receipt, Receipt):

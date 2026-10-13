@@ -109,6 +109,20 @@ Use the qualified wording; the planned connected-provider and Alexa+ claims rema
 
 ## Connect an MCP client
 
+### Saved receipts in a new session
+
+`receipts_recap` can receive an explicit previous `run_id`, with the same MCP bearer
+and user as the original session. It reports saved observations with full date,
+time and timezone, and states how many operations remain unverified or pending.
+It performs no new calendar/payment reads or writes. A new MCP connection needs
+no chat history: [the second-session regression](tests/test_server.py) exercises this.
+
+This server is a **single-user demo**: its authenticated MCP context is `user_id=demo`.
+Knowing a run ID is not authorization. Keep the bearer private and provision a
+separate server/data directory for another user; production requires an authenticated
+account-to-run ownership mapping. The new Strands client must retain this explicit
+boundary instead of treating an arbitrary user ID/header as authorization.
+
 Start Compose first. The demo has no MCP bearer token. If configured, supply
 `Authorization: Bearer <your-token>` through the client, never a model prompt. Keep the MCP session
 and operation ID when polling PENDING; a late response is not permission to submit another write.
