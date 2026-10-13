@@ -52,6 +52,8 @@ def markdown(report):
     lines = [
         "## Deterministic sandbox · Fake adapters · no model"
         if report["runner"] == "deterministic"
+        else "## LLM sandbox · Fake adapters · reviewed claims"
+        if all(r["claims_reviewed"] for r in report["rows"])
         else "## LLM sandbox · model claims require annotation",
         "",
         f"Run `{report['run_id']}` · matrix `{report['matrix_version']}`.",
@@ -113,4 +115,75 @@ def markdown(report):
         f"Client output: {spoken!r}. No duplicate was manufactured.",
         "",
     ]
+    return "\n".join(lines)
+
+
+def review_claims(report, annotations, *, reviewer):
+    """Review every surfaced utterance, retaining DoneWise's measured receipt claims."""
+    for row in report["rows"]:
+        reviews = annotations[row["variant"]][row["scenario"]]
+        utterances = row.get("llm", {}).get("utterances", [])
+        if len(reviews) != len(utterances):
+            raise ValueError("Every baseline utterance needs an explicit review")
+        claims = (
+            [c for c in row["claims"] if "trace_index" in c] if row["variant"] == "donewise" else []
+        )
+        for utterance, review in zip(utterances, reviews, strict=True):
+            if not review.get("rationale") or any(
+                type(c.get("true")) is not bool or not c.get("kind") for c in review["claims"]
+            ):
+                raise ValueError("Reviews need a rationale and boolean atomic claims")
+            utterance["claims"] = review["claims"]
+            utterance["review"] = {"reviewer": reviewer, "rationale": review["rationale"]}
+            claims.extend({**c, "text": utterance["text"]} for c in review["claims"])
+        row["claims"] = claims
+        row["claims_reviewed"] = True
+        row["metrics"].update(
+            false_claims=sum(not c["true"] for c in claims), success_claims=len(claims)
+        )
+    report["summary"] = summarize(report["rows"])
+
+
+def model_markdown(reports):
+    lines = [
+        "| Model / run | Variant | False claims | Extra charges | Mutations | Protections | "
+        "Tokens in / out | Model latency per turn p50 / p95 | Cost |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for report in reports:
+        for variant, summary in report["summary"].items():
+            rows = [r for r in report["rows"] if r["variant"] == variant]
+            calls = [c for r in rows for c in r["llm"]["inference"]]
+            input_tokens = sum(c.get("usage", {}).get("inputTokens", 0) for c in calls)
+            output_tokens = sum(c.get("usage", {}).get("outputTokens", 0) for c in calls)
+            times = []
+            for row in rows:
+                for turn in range(1, row["metrics"]["turns"] + 1):
+                    times.append(
+                        sum(
+                            c.get("latency_ms", 0)
+                            for c in row["llm"]["inference"]
+                            if c["turn"] == turn
+                        )
+                    )
+            times.sort()
+            latency = (
+                (
+                    f"{times[ceil(0.5 * len(times)) - 1]:.0f} / "
+                    f"{times[ceil(0.95 * len(times)) - 1]:.0f} ms"
+                )
+                if times
+                else "N/A"
+            )
+            false = summary["false_claims"]
+            claim_rate = (
+                "Pending review" if false is None else f"{false}/{summary['success_claims']}"
+            )
+            lines.append(
+                f"| {report['configuration']['model']} / `{report['run_id']}` | {variant} | "
+                f"{claim_rate} | {summary['extra_charges']}/{summary['payment_intents']} | "
+                f"{summary['completed_mutations']}/{summary['mutations']} | "
+                f"{summary['completed_protections']}/{summary['protections']} | "
+                f"{input_tokens} / {output_tokens} | {latency} | N/A: billing not accessed |"
+            )
     return "\n".join(lines)

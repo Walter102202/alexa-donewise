@@ -209,9 +209,12 @@ def test_story_shapes_spoken_and_shared_identity():
         "Confirmation pi_story_deposit. You don't need to try again.",
         "I couldn't confirm the change. I tried twice; the latest calendar check still shows 9 AM.",
         "The plumber is now at 10 to 11 AM. I read it back from your calendar.",
-        "From the receipts in this conversation: the plumber is at 10 to 11 AM, read back at "
-        "7:44 PM. One $60 test charge for the deposit, read back at 7:40 PM. "
-        "Nothing new was written.",
+        "From the saved receipts: the plumber is at 10 to 11 AM, read back at "
+        "2026-09-16 at 7:44 PM America/Los_Angeles (UTC-0700). "
+        "One $60 test charge for the deposit, read back at "
+        "2026-09-16 at 7:40 PM America/Los_Angeles (UTC-0700). "
+        "0 operations remain unverified or pending. "
+        "Nothing new was written to your calendar or payments.",
     ]
     for result, phrase in zip(results, expected, strict=True):
         assert render_spoken(result) == result.spoken == phrase

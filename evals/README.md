@@ -5,6 +5,63 @@ in revision v2. This compares the **whole harness**
 (intent identity, verification and receipt presentation) with direct writes, not the verifier alone.
 Zero in a finite sample does not mean never: **cero en muestra finita no es nunca**.
 
+## Live Bedrock comparison — 12 October 2026 Chile / 13 October UTC
+
+One completed execution per scenario and variant, ten scenarios, three Bedrock models,
+Fake adapters. **These are live model calls, not connected Google/Stripe evaluation.**
+Baseline mutation schemas retain submission_id, retry_of_operation_id, approval_id and
+event_query. Stable provider identity and optional post-loss lookup are available in both
+variants; execution/verification and receipt presentation policies differ. The deterministic
+historical baseline below remains a separate intentionally naive experiment.
+
+| Model / run | Variant | False claims | Extra charges | Mutations | Protections | Tokens in / out | Model latency per turn p50 / p95 | Cost |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| us.anthropic.claude-sonnet-4-6 / `run_0a0de9bdf889470aa0d5bfe96b581016` | baseline | 5/19 | 0/4 | 4/7 | 2/3 | 97994 / 5027 | 4203 / 6047 ms | N/A: billing not accessed |
+| us.anthropic.claude-sonnet-4-6 / `run_0a0de9bdf889470aa0d5bfe96b581016` | donewise | 0/14 | 0/4 | 6/7 | 3/3 | 119885 / 3867 | 3639 / 6024 ms | N/A: billing not accessed |
+| openai.gpt-oss-120b-1:0 / `run_59f4bdf161024dd09e3311780371032b` | baseline | 4/15 | 0/4 | 4/7 | 2/3 | 49183 / 6594 | 4571 / 12609 ms | N/A: billing not accessed |
+| openai.gpt-oss-120b-1:0 / `run_59f4bdf161024dd09e3311780371032b` | donewise | 0/11 | 0/4 | 6/7 | 3/3 | 71539 / 4962 | 3549 / 5318 ms | N/A: billing not accessed |
+| us.amazon.nova-pro-v1:0 / `run_875c1f8032ae425d9a10992d93e2a0cc` | baseline | 5/14 | 0/4 | 4/7 | 2/3 | 90182 / 3520 | 3525 / 4864 ms | N/A: billing not accessed |
+| us.amazon.nova-pro-v1:0 / `run_875c1f8032ae425d9a10992d93e2a0cc` | donewise | 0/11 | 0/4 | 6/7 | 3/3 | 118964 / 2642 | 3317 / 5231 ms | N/A: billing not accessed |
+
+
+Read [Nova evidence](results/2026-10-13-sandbox-llm.json),
+[Sonnet evidence](results/2026-10-13-sandbox-llm-run_0a0de9bdf889470aa0d5bfe96b581016.json),
+and [gpt-oss evidence](results/2026-10-13-sandbox-llm-run_59f4bdf161024dd09e3311780371032b.json).
+Matching `*-annotations.json` files contain explicit Codex semantic reviews against each
+utterance's independent snapshot. **Not human-reviewed.** Applying reviews recomputes
+claim metrics; flipping claims_reviewed alone is insufficient. Wrong asserted local times
+count as false effect claims; plans, uncertainty and future promises do not count as success.
+Each utterance contributes at most one claim per effect or charged_once assertion.
+
+No extra charges occurred in either variant for any model. All three baseline variants
+completed 4/7 mutations and 2/3 protection goals; DoneWise completed 6/7 and 3/3.
+DoneWise's zero measures the application, including receipt presentation, not guaranteed
+obedience of model prose. Model-only utterances that refer to prior effects are also reviewed.
+S06 and S09 remain whole-harness protection comparisons, not identical provider-fault rows.
+
+Model latency sums inference calls per external turn, excludes tool/provider time and has
+16 turns per variant. Token counts are recorded; account billing was not accessed, so cost
+is N/A. All rows completed within the 120-second horizon; no timeouts were observed.
+
+Compatibility notes: the first Sonnet attempt stopped at request validation before executing
+a scenario (top-level anyOf unsupported). Optional read lookup constraints moved to runtime
+validation without removing either lookup capability; Nova's earlier accepted schema is retained
+in its evidence. Mutation schemas, input arguments and faults remained equivalent. The successful
+Sonnet run saved both artifacts, then Windows cp1252 failed when printing an emoji; it was not
+rerun. UTF-8 is used for the later command/output. GPT frontier models are excluded by account
+availability and Walter's updated scope; they were not part of these comparisons.
+
+Reproduction (change only BEDROCK_MODEL_ID to the selected model, use new output paths):
+
+```powershell
+$env:PYTHONIOENCODING = 'utf-8'
+$env:LLM_PROVIDER = 'bedrock'
+$env:BEDROCK_MODEL_ID = 'us.amazon.nova-pro-v1:0'
+uv run --env-file .env donewise-evals --runner llm --output-dir data/new-eval
+```
+
+The statements below about no live runs describe the older September acceptance only.
+
 ## Shared protocol
 
 One execution per row and variant, independent Fake JSON files and SQLite registry, a fixed logical

@@ -27,7 +27,7 @@ async def run_suite(root, *, runner="deterministic", settings=None, model_factor
             async with world.connect():
                 timed_out = False
                 try:
-                    async with asyncio.timeout(30):
+                    async with asyncio.timeout(120 if runner == "llm" else 30):
                         if runner == "deterministic":
                             await deterministic(world)
                         else:
@@ -107,7 +107,7 @@ def main():
         "Real verification latency requires RF-13 with real adapters.",
         "git": git_state(),
         "configuration": {
-            "horizon_seconds": 30,
+            "horizon_seconds": 120 if settings else 30,
             "poll_seconds": 0.1,
             "cleanup_seconds": 5,
             "provider": settings.llm_provider if settings else "none",

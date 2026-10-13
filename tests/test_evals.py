@@ -128,3 +128,51 @@ def test_llm_none_skips_without_output_or_provider(monkeypatch, tmp_path, capsys
     main()
     assert capsys.readouterr().out == "SKIPPED: LLM_PROVIDER=none\n"
     assert not output.exists()
+
+
+@pytest.mark.anyio
+async def test_llm_baseline_preserves_schema_identity_and_lost_response_lookup(tmp_path):
+    from donewise_evals.llm_runner import direct_tools
+    from donewise_harness.contracts import TOOL_SPECS
+
+    for spec, tool in zip(TOOL_SPECS[:3], direct_tools()[:3], strict=True):
+        assert tool["input_schema"] == spec.input_model.model_json_schema()
+    world = World(tmp_path / "baseline", SCENARIOS[0], "baseline")
+    world.stable_identity = True
+    await world.arm()
+    first = await world.call("payment_charge_verified", world.scenario.inputs, claims=False)
+    assert first["status"] == "response_lost" and first["provider_ref"] is None
+    found = await world.call("payment_read", {"intent_id": first["provider_key"]}, claims=False)
+    assert found["found"] and found["observed"]["amount_minor"] == 6000
+    retry = await world.call("payment_charge_verified", world.scenario.inputs, claims=False)
+    assert retry["provider_key"] == first["provider_key"]
+    assert len(world.snapshot()["payments"]["intents"]) == 1
+
+
+def test_review_recomputes_false_claim_metrics():
+    import copy
+    from pathlib import Path
+
+    from donewise_evals.report import review_claims
+
+    report = json.loads(next(Path("evals/results").glob("*-sandbox-*.json")).read_text())
+    report = copy.deepcopy(report)
+    baseline = [r for r in report["rows"] if r["variant"] == "baseline"]
+    for row in baseline:
+        row["llm"] = {"utterances": [{"text": "Done", "claims": None}]}
+        row["claims_reviewed"] = False
+    annotations = {
+        r["scenario"]: [
+            {
+                "rationale": "Fixture: unobserved effect",
+                "claims": [{"kind": "effect", "true": False}],
+            }
+        ]
+        for r in baseline
+    }
+    annotations = {
+        "baseline": annotations,
+        "donewise": {r["scenario"]: [] for r in report["rows"] if r["variant"] == "donewise"},
+    }
+    review_claims(report, annotations, reviewer="test")
+    assert report["summary"]["baseline"]["false_claims"] == len(baseline)

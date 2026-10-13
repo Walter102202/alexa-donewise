@@ -1,7 +1,6 @@
 """Provider-neutral LLM pass; baseline prose requires explicit human claim review."""
 
 import json
-from uuid import uuid4
 
 from donewise_harness.contracts import TOOL_SPECS
 from donewise_sim.llm import make_llm
@@ -19,7 +18,9 @@ For explicit retry use retry_of_operation_id. Keep the supplied submission_id fo
 Approval is supplied by the backend for the already approved first payment, never granted by you.
 """
 BASELINE = """Use direct write tools. Reads are available but optional. Write acknowledgements are
-not read-back evidence. Each invocation uses a fresh payment key or calendar creation ID.
+not read-back evidence. Reuse submission_id for the same intent; it preserves the provider key.
+On a lost response you can search payments by the returned provider_key using payment_read's
+intent_id, or read the calendar by provider_key. For explicit retries use retry_of_operation_id.
 You may choose tool calls within the common six-response budget; report what you actually know.
 """
 
@@ -28,12 +29,6 @@ def direct_tools():
     tools = []
     for spec in TOOL_SPECS[:3]:
         schema = spec.input_model.model_json_schema()
-        for key in ("submission_id", "approval_id", "retry_of_operation_id", "event_query"):
-            schema["properties"].pop(key, None)
-            if key in schema.get("required", []):
-                schema["required"].remove(key)
-        if spec.name == "calendar_reschedule_verified":
-            schema["required"].append("event_id")
         tools.append(
             {
                 "name": spec.name.removesuffix("_verified"),
@@ -45,11 +40,16 @@ def direct_tools():
         tools.append(
             {
                 "name": name,
-                "description": "Optional provider read by returned provider_ref.",
+                "description": "Optional provider read by provider_ref; payment may instead use "
+                "intent_id=provider_key to find a payment after a lost response.",
                 "input_schema": {
                     "type": "object",
-                    "properties": {"provider_ref": {"type": "string"}},
-                    "required": ["provider_ref"],
+                    "properties": {
+                        "provider_ref": {"type": "string"},
+                        **({"intent_id": {"type": "string"}} if name == "payment_read" else {}),
+                    },
+                    # Anthropic rejects top-level anyOf. The executor validates that a lookup
+                    # key is present; both optional lookup capabilities remain available.
                     "additionalProperties": False,
                 },
             }
@@ -58,6 +58,7 @@ def direct_tools():
 
 
 async def run_llm(world, settings, model=None):
+    world.stable_identity = True
     prompt = (
         f"Logical time: {NOW.isoformat()}.\n" + COMMON + (DONEWISE if world.client else BASELINE)
     )
@@ -76,6 +77,7 @@ async def run_llm(world, settings, model=None):
         "messages": [],
         "utterances": [],
         "budget_exhausted": False,
+        "inference": [],
     }
     messages = world.llm_record["messages"]
     args = world.scenario.inputs
@@ -112,6 +114,7 @@ async def run_llm(world, settings, model=None):
         called = False
         for _ in range(6):
             reply = await llm.reply(messages, tools)
+            world.llm_record["inference"].append({"turn": world.turns, **reply.metadata})
             if reply.text and (not world.client or (not called and not reply.tool_calls)):
                 world.llm_record["utterances"].append(
                     {
@@ -165,7 +168,7 @@ async def run_llm(world, settings, model=None):
                     else:
                         attempted.add(identity)
                         if name in TOOLS.values():
-                            payload.setdefault("submission_id", str(uuid4()))
+                            payload.setdefault("submission_id", args["submission_id"])
                         if world.client and name == "payment_charge_verified" and world.approval_id:
                             # The harness rejects changed or reused consent bindings.
                             payload["approval_id"] = world.approval_id

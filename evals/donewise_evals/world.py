@@ -1,6 +1,7 @@
 """Isolated providers, MCP transport and evidence capture shared by both runners."""
 
 import asyncio
+import hashlib
 import json
 import time
 from contextlib import asynccontextmanager
@@ -36,6 +37,8 @@ class World:
         self.started = None
         self.verification_ms = None
         self.approval_id = None
+        self.stable_identity = False  # Only the LLM comparison; preserve the historical matrix.
+        self.direct_operations = {}
         self.client = self.app = None
         window = timedelta(0) if scenario.id == "S10" else timedelta(hours=24)
         if variant == "donewise":
@@ -152,12 +155,18 @@ class World:
             return {"spoken": "No verification is available from this direct-write client."}
         if tool in ("calendar_read", "payment_read"):
             adapter = self.payments if tool == "payment_read" else self.calendar
+            ref = args.get("provider_ref")
+            if tool == "payment_read" and not ref:
+                matches = adapter.find_by_intent(args["intent_id"])
+                if len(matches) != 1:
+                    return {"found": False, "matches": matches}
+                ref = matches[0]
             result = adapter.read(
                 ReadRequest(
                     action=Action.PAYMENT_CHARGE
                     if tool == "payment_read"
                     else Action.CALENDAR_CREATE,
-                    provider_ref=args["provider_ref"],
+                    provider_ref=ref,
                 )
             )
             return result.model_dump(mode="json")
@@ -176,6 +185,11 @@ class World:
             if create
             else Action.CALENDAR_RESCHEDULE
         )
+        if self.stable_identity and not payment and not create and not args.get("event_id"):
+            hits = self.calendar.search(args["event_query"])
+            if len(hits) != 1:
+                return {"error": "Calendar target is missing or ambiguous"}
+            args = {**args, "event_id": hits[0].event_id}
         key = (
             "idem_" + uuid4().hex
             if payment
@@ -183,6 +197,21 @@ class World:
             if create
             else args["event_id"]
         )
+        if self.stable_identity:
+            retry = args.get("retry_of_operation_id")
+            if retry:
+                if retry not in self.direct_operations:
+                    return {"error": "Unknown retry operation"}
+                key = self.direct_operations[retry]
+                operation_id = retry
+            else:
+                digest = hashlib.sha256(f"{action}:{args['submission_id']}".encode()).hexdigest()[
+                    :32
+                ]
+                operation_id = "op_" + digest
+                if payment or create:
+                    key = ("idem_" if payment else "evt_") + digest
+                self.direct_operations[operation_id] = key
         if payment:
             target = PaymentTarget(
                 **{k: args[k] for k in ("amount_minor", "currency", "payee", "concept")},
@@ -209,6 +238,7 @@ class World:
         result = adapter.write(request).model_dump(mode="json")
         return {
             **result,
+            **({"operation_id": operation_id} if self.stable_identity else {}),
             "expected": target.model_dump(mode="json"),
             "action": action.value,
             "provider_key": key,

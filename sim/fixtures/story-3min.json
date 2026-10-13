@@ -370,7 +370,7 @@
         {
           "tool": "receipts_recap",
           "result": {
-            "spoken": "From the receipts in this conversation: the plumber is at 10 to 11 AM, read back at 7:44 PM. One $60 test charge for the deposit, read back at 7:40 PM. Nothing new was written.",
+            "spoken": "From the saved receipts: the plumber is at 10 to 11 AM, read back at 2026-09-16 at 7:44 PM America/Los_Angeles (UTC-0700). One $60 test charge for the deposit, read back at 2026-09-16 at 7:40 PM America/Los_Angeles (UTC-0700). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
             "structured_version": "1.0",
             "run_id": "run_story_3min",
             "items": [
