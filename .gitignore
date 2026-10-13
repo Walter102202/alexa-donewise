@@ -19,5 +19,6 @@ docs/devpost.md
 
 # Build and local data
 *.egg-info/
+core/build/
 data/
 node_modules/
