@@ -1,0 +1,4 @@
+# Separate environment: Strands currently requires mcp<2.2; server uses mcp>=2.2.
+strands-agents==1.60.0
+bedrock-agentcore==1.24.1
+tzdata>=2025.2
