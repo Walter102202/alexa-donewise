@@ -1,0 +1,223 @@
+{
+  "observed_at": "2026-10-13T01:51:49.092621+00:00",
+  "region": "us-east-1",
+  "profile": "donewise",
+  "tool_names": [
+    "calendar_create_verified",
+    "calendar_reschedule_verified",
+    "payment_charge_verified",
+    "operation_get",
+    "approval_grant",
+    "receipts_recap"
+  ],
+  "results": [
+    {
+      "model": "us.openai.gpt-5.6-terra",
+      "kind": "text",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "error": {
+        "Message": "openai.gpt-5.6-terra is not available for this account. You can explore other available models on Amazon Bedrock. For additional access options, contact AWS Sales at https://aws.amazon.com/contact-us/sales-support/",
+        "Code": "AccessDeniedException"
+      },
+      "passed": false,
+      "elapsed_ms": 802.62
+    },
+    {
+      "model": "us.amazon.nova-pro-v1:0",
+      "kind": "text",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "OK"
+            }
+          ]
+        }
+      },
+      "stop_reason": "end_turn",
+      "usage": {
+        "inputTokens": 6,
+        "outputTokens": 2,
+        "totalTokens": 8
+      },
+      "request_id": "dbde267c-3d35-4ede-aef1-3d3e02e88d26",
+      "passed": true,
+      "elapsed_ms": 453.33
+    },
+    {
+      "model": "us.amazon.nova-pro-v1:0",
+      "kind": "tools",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "<thinking> The User has requested to retrieve saved receipts using the receipts_recap tool with no additional parameters. I will proceed with this request as instructed. </thinking>\n"
+            },
+            {
+              "toolUse": {
+                "toolUseId": "tooluse_gKWwFaqFxQ2vHVgVlUucyJ",
+                "name": "receipts_recap",
+                "input": {
+                  "run_id": null
+                }
+              }
+            }
+          ]
+        }
+      },
+      "stop_reason": "tool_use",
+      "usage": {
+        "inputTokens": 2654,
+        "outputTokens": 56,
+        "totalTokens": 2710
+      },
+      "request_id": "b0507e47-b2be-4679-9aba-1ad86af2c5fd",
+      "passed": true,
+      "elapsed_ms": 1100.23
+    },
+    {
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "kind": "text",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "OK"
+            }
+          ]
+        }
+      },
+      "stop_reason": "end_turn",
+      "usage": {
+        "inputTokens": 13,
+        "outputTokens": 4,
+        "totalTokens": 17,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+      },
+      "request_id": "597e0446-07f6-4a2b-9d27-a4ae861a013b",
+      "passed": true,
+      "elapsed_ms": 720.25
+    },
+    {
+      "model": "us.anthropic.claude-sonnet-4-6",
+      "kind": "tools",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "text": "Sure! Let me retrieve the saved receipts right away."
+            },
+            {
+              "toolUse": {
+                "toolUseId": "tooluse_cwQ0KOVy9XwyEFrubSyCG8",
+                "name": "receipts_recap",
+                "input": {},
+                "type": "tool_use"
+              }
+            }
+          ]
+        }
+      },
+      "stop_reason": "tool_use",
+      "usage": {
+        "inputTokens": 2931,
+        "outputTokens": 50,
+        "totalTokens": 2981,
+        "cacheReadInputTokens": 0,
+        "cacheWriteInputTokens": 0
+      },
+      "request_id": "541510b9-4735-4c1b-8e60-4f4a953e53c7",
+      "passed": true,
+      "elapsed_ms": 1062.39
+    },
+    {
+      "model": "openai.gpt-oss-120b-1:0",
+      "kind": "text",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "The user asks: \"Reply with the single word OK\". So I should respond with just \"OK\". No extra punctuation maybe. Just the word."
+                }
+              }
+            },
+            {
+              "text": "OK"
+            }
+          ]
+        }
+      },
+      "stop_reason": "end_turn",
+      "usage": {
+        "inputTokens": 73,
+        "outputTokens": 41,
+        "totalTokens": 114
+      },
+      "request_id": "a3a37f39-51b6-4990-9ac8-1dd1a2a4745d",
+      "passed": true,
+      "elapsed_ms": 484.52
+    },
+    {
+      "model": "openai.gpt-oss-120b-1:0",
+      "kind": "tools",
+      "parameters": {
+        "maxTokens": 1200
+      },
+      "output": {
+        "message": {
+          "role": "assistant",
+          "content": [
+            {
+              "reasoningContent": {
+                "reasoningText": {
+                  "text": "The user wants us to call receipts_recap with {}. We need to call the function.\n\n"
+                }
+              }
+            },
+            {
+              "toolUse": {
+                "toolUseId": "tooluse_UAtrzjthXdEL0u1dpkgzyO",
+                "name": "receipts_recap",
+                "input": {}
+              }
+            }
+          ]
+        }
+      },
+      "stop_reason": "tool_use",
+      "usage": {
+        "inputTokens": 1360,
+        "outputTokens": 49,
+        "totalTokens": 1409
+      },
+      "request_id": "c2648479-b576-4f7c-a78a-73b0c78afe1f",
+      "passed": true,
+      "elapsed_ms": 761.96
+    }
+  ]
+}

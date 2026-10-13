@@ -423,6 +423,60 @@ async def test_llm_prompt_refreshes_la_clock_on_every_request(monkeypatch, provi
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("stop_reason", ["tool_use", "max_tokens", "guardrail_intervened"])
+async def test_bedrock_tool_results_metrics_and_incomplete_response(monkeypatch, stop_reason):
+    from types import SimpleNamespace
+
+    import boto3
+    from donewise_sim.llm import BedrockLLM
+
+    requests = []
+
+    def converse(**request):
+        requests.append(request)
+        return {
+            "stopReason": stop_reason,
+            "usage": {"inputTokens": 12, "outputTokens": 5},
+            "output": {
+                "message": {
+                    "content": [
+                        {"toolUse": {"toolUseId": "recap", "name": "receipts_recap", "input": {}}}
+                    ]
+                }
+            },
+        }
+
+    monkeypatch.setattr(
+        boto3, "client", lambda *a, **k: SimpleNamespace(converse=converse, close=lambda: None)
+    )
+    model = BedrockLLM(Settings(bedrock_model_id="us.openai.gpt-5.6-terra"))
+    messages = [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": "old",
+                    "content": "invalid input",
+                    "is_error": True,
+                }
+            ],
+        }
+    ]
+    if stop_reason != "tool_use":
+        with pytest.raises(RuntimeError, match="no tools executed"):
+            await model.reply(messages, [])
+    else:
+        reply = await model.reply(messages, [])
+        assert reply.tool_calls[0].name == "receipts_recap"
+        assert reply.metadata["usage"]["inputTokens"] == 12
+        assert reply.metadata["latency_ms"] >= 0
+    assert requests[0]["messages"][0]["content"][0]["toolResult"]["status"] == "error"
+    assert requests[0]["additionalModelRequestFields"] == {"reasoning_effort": "none"}
+    assert "toolConfig" not in requests[0]
+
+
+@pytest.mark.anyio
 async def test_fault_controls_restore_consume_and_isolate_modes(mcp):
     import threading
 

@@ -1,6 +1,7 @@
 """Provider adapters; canonical messages use text/tool_use/tool_result blocks."""
 
 import asyncio
+import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Protocol
@@ -56,6 +57,14 @@ class ToolCall:
 class Reply:
     text: str = ""
     tool_calls: list[ToolCall] = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
+
+
+def bedrock_request_fields(model_id):
+    # Account access is required to validate this setting live for GPT-5.6.
+    if "openai.gpt-5.6-" in model_id:
+        return {"reasoning_effort": "none"}
+    return {}
 
 
 class LLM(Protocol):
@@ -74,6 +83,7 @@ class BedrockLLM:
 
     async def reply(self, messages, tools):
         import boto3
+        from botocore.config import Config
 
         if not self.settings.bedrock_model_id:
             raise RuntimeError("BEDROCK_MODEL_ID is not configured")
@@ -106,14 +116,24 @@ class BedrockLLM:
             converted.append({"role": message["role"], "content": content})
 
         def converse():
-            client = boto3.client("bedrock-runtime", region_name=self.settings.aws_region)
+            client = boto3.client(
+                "bedrock-runtime",
+                region_name=self.settings.aws_region,
+                config=Config(
+                    read_timeout=120, connect_timeout=10, retries={"total_max_attempts": 1}
+                ),
+            )
             try:
-                return client.converse(
+                request = dict(
                     modelId=self.settings.bedrock_model_id,
                     system=[{"text": b["text"]} for b in system_blocks(self.prompt_factory())],
                     messages=converted,
                     inferenceConfig={"maxTokens": 1200},
-                    toolConfig={
+                )
+                if fields := bedrock_request_fields(self.settings.bedrock_model_id):
+                    request["additionalModelRequestFields"] = fields
+                if tools:
+                    request["toolConfig"] = {
                         "tools": [
                             {
                                 "toolSpec": {
@@ -124,12 +144,15 @@ class BedrockLLM:
                             }
                             for t in tools
                         ]
-                    },
-                )
+                    }
+                return client.converse(**request)
             finally:
                 client.close()
 
+        started = time.perf_counter()
         response = await asyncio.to_thread(converse)
+        if response.get("stopReason") in {"max_tokens", "guardrail_intervened", "content_filtered"}:
+            raise RuntimeError("Bedrock response incomplete or blocked; no tools executed")
         content = response["output"]["message"]["content"]
         return Reply(
             "".join(b.get("text", "") for b in content),
@@ -138,6 +161,17 @@ class BedrockLLM:
                 for b in content
                 if "toolUse" in b
             ],
+            {
+                "provider": "bedrock",
+                "model": self.settings.bedrock_model_id,
+                "parameters": {
+                    "maxTokens": 1200,
+                    **bedrock_request_fields(self.settings.bedrock_model_id),
+                },
+                "usage": response.get("usage", {}),
+                "stop_reason": response.get("stopReason"),
+                "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+            },
         )
 
 
@@ -151,6 +185,7 @@ class AnthropicLLM:
 
         if not self.settings.anthropic_api_key:
             raise RuntimeError("ANTHROPIC_API_KEY is not configured")
+        started = time.perf_counter()
         async with AsyncAnthropic(api_key=self.settings.anthropic_api_key) as client:
             response = await client.messages.create(
                 model=self.settings.anthropic_model,
@@ -162,6 +197,14 @@ class AnthropicLLM:
         return Reply(
             "".join(b.text for b in response.content if b.type == "text"),
             [ToolCall(b.id, b.name, b.input) for b in response.content if b.type == "tool_use"],
+            {
+                "provider": "anthropic",
+                "model": self.settings.anthropic_model,
+                "parameters": {"max_tokens": 1200},
+                "usage": response.usage.model_dump() if hasattr(response, "usage") else {},
+                "stop_reason": getattr(response, "stop_reason", None),
+                "latency_ms": round((time.perf_counter() - started) * 1000, 2),
+            },
         )
 
 

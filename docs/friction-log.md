@@ -86,4 +86,18 @@ service failure.
 | Reproducible command | `uv run pytest tests/test_contracts.py -q` checks deterministic validation; the trace contains configuration for repeating the model session |
 
 The exact model mistake is nondeterministic. No paid model run was performed for this log.
-No Bedrock, AgentCore or ASK CLI experience is asserted.
+No AgentCore or ASK CLI experience is asserted in the historical entries above.
+
+## 6. Bedrock model access and budget visibility — 12 October 2026
+
+| Field | Observation |
+| --- | --- |
+| Task | Run the first Bedrock text/tool smoke in the personal DoneWise account |
+| Steps | STS with profile `donewise`; Converse with Terra, Nova Pro, Sonnet 4.6 and gpt-oss-120b; describe budgets |
+| Expected | Available models accept text and canonical tool schemas; budget actions can be inspected |
+| Observed | Nova, Sonnet and gpt-oss passed both probes. Terra returned model-specific AccessDenied, no longer the prior account-verification message. Budgets denied `budgets:ViewBudget` |
+| Severity | Medium: selected development model unavailable; budget action coverage unverified |
+| Workaround | Use the approved Nova/gpt-oss fallbacks. Walter explicitly retained existing budget alerts; no alert edits |
+| Suggestion | Distinguish model entitlement from account verification in onboarding; show which principal a budget action actually covers |
+| Command | `uv run python scripts/bedrock_smoke.py --output data/bedrock-smoke-new.json` |
+| Evidence | [Smoke, commands and limits](traces/bedrock-smoke-2026-10-12.md), [request IDs and output](traces/bedrock-smoke-2026-10-12.json) |
