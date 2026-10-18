@@ -674,3 +674,48 @@ async def test_expired_approval_clears_pending_and_says_so(mcp):
         errors = [e["data"]["message"] for e in events if e["event"] == "error"]
         assert errors and "expired" in errors[-1].lower()
         assert len(mcp[0].state.harness.payments.intents()) == 0
+
+
+@pytest.mark.anyio
+async def test_voice_affirmation_without_admin_is_rejected_up_front(mcp):
+    args = {
+        "submission_id": "pay-no-admin",
+        "amount_minor": 6000,
+        "currency": "USD",
+        "payee": "Ridge Plumbing",
+        "concept": "deposit",
+    }
+    llm = OneCallLLM("payment_charge_verified", args)
+    async with simulation(mcp, llm, ui_mode="voice", admin_token="") as (
+        client,
+        metadata,
+        events,
+        _,
+    ):
+        sid = metadata["session_id"]
+        assert not metadata["admin_enabled"]
+        state = await act(client, sid, "/turn", {"text": "Pay the deposit"})
+        assert state["pending_approval"]
+        for path, body in (("/turn", {"text": "yes"}), ("/approve", None)):
+            response = await client.post(f"/session/{sid}{path}", json=body)
+            assert response.status_code == 409, response.text
+            assert "approval" in response.json()["detail"].lower()
+        assert not [e for e in events if e["event"] == "error"]
+        assert len(mcp[0].state.harness.payments.intents()) == 0
+
+
+@pytest.mark.anyio
+async def test_mode_change_retires_the_previous_session(mcp):
+    async with simulation(mcp) as (client, metadata, events, app):
+        sid = metadata["session_id"]
+        assert (await act(client, sid, "/script/next"))["step"] == 1
+        old_state = (await client.get(f"/session/{sid}/state")).json()
+        changed = await client.post(f"/session/{sid}/mode", json={"ui_mode": "scripted"})
+        assert changed.status_code == 200
+        old = app.state.sessions[sid]
+        assert old.closed
+        # Reads still work for the SSE replay and the audit; new actions are refused.
+        prefix = f"/session/{sid}"
+        assert (await client.get(prefix + "/state")).json()["receipts"] == old_state["receipts"]
+        assert (await client.post(prefix + "/script/next")).status_code == 409
+        assert (await client.post(prefix + "/mode", json={"ui_mode": "voice"})).status_code == 409

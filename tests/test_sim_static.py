@@ -37,7 +37,9 @@ def test_editorial_plano_layout_details():
     # Rail shows "Demo controls" once when session controls and the director bar are both visible.
     once = ".de-session-controls:not([hidden])+.de-director.de-director-label{display:none}"
     assert once in CSS.replace(" ", "")
-    # Evidence column never drops under ~340px: three columns only from 1200px up.
+    # Three fixed-plus-fluid columns only from 1200px up; below that the rail takes its own row.
+    grid = ".de-grid{display:grid;grid-template-columns:460pxminmax(0,1fr)340px"
+    assert grid in CSS.replace(" ", "")
     assert "@media(max-width:1199px)" in CSS.replace(" ", "")
     # Header carries the product tagline from the B2 artboard.
     assert "reads the result back before it says done" in HTML

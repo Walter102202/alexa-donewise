@@ -33,6 +33,9 @@ class ModeInput(BaseModel):
     timezone: Literal[USER_TIMEZONES] | None = None
 
 
+NO_CONSENT = "Approval is disabled: this simulator has no demo admin capability"
+
+
 def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     settings = settings or Settings()
     sessions = {}
@@ -59,6 +62,8 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
         return sessions[session_id]
 
     def launch(session, action):
+        if session.closed:
+            raise HTTPException(409, "This session was replaced; reload to continue")
         if not session.launch(action):
             raise HTTPException(409, "A turn is already running")
         return {"ok": True}
@@ -87,10 +92,15 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     @app.post("/session/{session_id}/mode")
     async def change_mode(session_id: str, body: ModeInput):
         session = get_session(session_id)
+        if session.closed:
+            raise HTTPException(409, "This session was replaced; reload to continue")
         if session.busy:
             raise HTTPException(409, "Wait for the current action before changing mode")
         async with session.lock:
-            return await new_session(body.ui_mode, body.timezone or session.timezone)
+            metadata = await new_session(body.ui_mode, body.timezone or session.timezone)
+        # The replaced session stays readable (SSE replay, audit) but releases its MCP connection.
+        await session.retire()
+        return metadata
 
     @app.get("/session/{session_id}/events")
     async def events(session_id: str, request: Request):
@@ -122,10 +132,11 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     @app.post("/session/{session_id}/turn")
     async def turn(session_id: str, body: TurnInput):
         session = get_session(session_id)
-        if session.ui_mode == "scripted" and not (
-            session.pending_approval and agent.is_affirmation(body.text)
-        ):
+        affirming = bool(session.pending_approval) and agent.is_affirmation(body.text)
+        if session.ui_mode == "scripted" and not affirming:
             raise HTTPException(409, "Free input requires a new voice session")
+        if affirming and not session.consent_token:
+            raise HTTPException(409, NO_CONSENT)
         return launch(session, lambda: agent.turn(session, body.text))
 
     @app.post("/session/{session_id}/approve")
@@ -133,6 +144,8 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
         session = get_session(session_id)
         if not session.pending_approval:
             raise HTTPException(409, "No pending approval")
+        if not session.consent_token:
+            raise HTTPException(409, NO_CONSENT)
         return launch(session, lambda: agent.turn(session, "Yes, charge it."))
 
     @app.post("/session/{session_id}/script/next")

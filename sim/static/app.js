@@ -2,7 +2,7 @@
 
    Every state, time, counter and spoken phrase on screen comes from the receipt JSON.
 
-   Only Clara's utterances and the narrative titles per turn (PRD §5.1) are script copy. */
+   Only the user's utterances and the narrative titles per turn (PRD §5.1) are script copy. */
 
 (() => {
 
@@ -24,23 +24,23 @@ const SCRIPT = {
 
   '1':  { user: 'Book the plumber tomorrow nine to ten and pay the sixty-dollar deposit to Ridge Plumbing.',
 
-          title: 'Tomorrow, a little more settled.', sub: 'Clara plans her next day from the kitchen.', next: 'Clara says yes' },
+          title: 'Tomorrow, a little more settled.', sub: 'You plan your next day from the kitchen.', next: 'You say yes' },
 
   '2':  { user: 'Yes, charge it.',
 
-          title: 'Your OK, for this task only.', sub: 'Clara confirms the amount and the payee.', next: 'A few seconds later' },
+          title: 'Your OK, for this task only.', sub: 'You confirm the amount and the payee.', next: 'A few seconds later' },
 
   '2b': { user: null,
 
-          title: 'The agent checked on its own.', sub: 'The agent checked the operation on its own.', next: 'Clara changes her plan' },
+          title: 'The agent checked on its own.', sub: 'The agent checked the operation on its own.', next: 'You change the plan' },
 
   '3':  { user: "I'm running late. Move the plumber to ten.",
 
-          title: 'Asking is not the same as done.', sub: 'The calendar answers, and the read-back decides.', next: 'Clara asks to try again' },
+          title: 'Asking is not the same as done.', sub: 'The calendar answers, and the read-back decides.', next: 'You ask to try again' },
 
   '4':  { user: 'Try that again.',
 
-          title: 'Same task, read back again.', sub: 'Same task, new attempt.', next: 'Clara asks for a recap' },
+          title: 'Same task, read back again.', sub: 'Same task, new attempt.', next: 'You ask for a recap' },
 
   '5':  { user: 'Recap tomorrow. And what did you charge?',
 
@@ -427,7 +427,7 @@ function renderState(stateId) {
 
   const hist = get('history'); hist.replaceChildren();
 
-  past.forEach(s => { const row = el('div', 'de-past'); row.append(el('b', null, clock(timeOf(s))), el('p', null, 'Clara: ' + SCRIPT[s.state].user), el('p', null, 'Alexa+: ' + spokenOf(s))); hist.append(row); });
+  past.forEach(s => { const row = el('div', 'de-past'); row.append(el('b', null, clock(timeOf(s))), el('p', null, 'You: ' + SCRIPT[s.state].user), el('p', null, 'Alexa+: ' + spokenOf(s))); hist.append(row); });
 
   text('history-label', past.length ? `Earlier in this conversation · ${plural(past.length, 'turn', 'turns')}` : 'The conversation starts here');
 
@@ -503,6 +503,15 @@ get('voice').addEventListener('click', () => {
 const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 function note(msg) { const n = get('input-note'); n.hidden = !msg; n.textContent = msg || ''; }
+// FastAPI puts a string in `detail` for HTTPException and a list of {msg} for validation errors.
+async function detailOf(response, fallback) {
+  try {
+    const d = (await response.json()).detail;
+    if (Array.isArray(d)) return d.map(x => x.msg || JSON.stringify(x)).join(' ');
+    if (d) return String(d);
+  } catch (_) { /* no JSON body */ }
+  return fallback;
+}
 
 if (!Recognition) { get('mic').disabled = true; get('mic').title = 'Speech recognition is not supported in this browser'; }
 
@@ -641,9 +650,15 @@ get('approve').addEventListener('click', () => LIVE ? postLive('/approve') : go(
 
 /* ---------- demo controls ---------- */
 
-get('next').addEventListener('click', () => LIVE ? postLive('/script/next') : go(index + 1));
+get('next').addEventListener('click', () => {
+  if (!LIVE) { go(index + 1); return; }
+  // After Back, Continue first walks forward through states already received; only at the
+  // latest state does it ask the server for the next scripted step.
+  if (index < STATES.length - 1) { index++; receiptIndex = Number.MAX_SAFE_INTEGER; renderLive(); return; }
+  postLive('/script/next');
+});
 
-get('prev').addEventListener('click', () => { if (index > 0) { if (LIVE) { index--; renderLive(); } else go(index - 1); } });
+get('prev').addEventListener('click', () => { if (index > 0) { if (LIVE) { index--; receiptIndex = Number.MAX_SAFE_INTEGER; renderLive(); } else go(index - 1); } });
 
 
 
@@ -658,7 +673,8 @@ function liveBusy(value) {
 function updateControls() {
   if (!LIVE) return;
   const busy = LIVE_BUSY || controlBusy || Boolean(recognizing);
-  get('next').disabled = busy || LIVE_STEP >= 5 || !LIVE.admin_enabled;
+  const browsing = index < STATES.length - 1;
+  get('next').disabled = busy || (!browsing && (LIVE_STEP >= 5 || !LIVE.admin_enabled));
   get('approve').disabled = busy;
   get('input').querySelector('[type="submit"]').disabled = busy;
   get('text').disabled = busy;
@@ -686,7 +702,7 @@ async function postLive(path, body) {
 
     });
 
-    if (!response.ok) throw new Error((await response.json()).detail || `HTTP ${response.status}`);
+    if (!response.ok) throw new Error(await detailOf(response, `HTTP ${response.status}`));
 
     return true;
   } catch (error) { LIVE_ERROR = error.message; note(error.message); liveBusy(false); return false; }
@@ -726,7 +742,7 @@ async function faultControl(kind, uses) {
       const response = await fetch(`/session/${LIVE.session_id}/faults`, {
         method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({kind, uses})
       });
-      if (!response.ok) throw new Error((await response.json()).detail || 'Fault could not be armed.');
+      if (!response.ok) throw new Error(await detailOf(response, 'Fault could not be armed.'));
     }
     note('');
   } catch (error) { note(`${error.message} No automatic retry.`); }
@@ -749,7 +765,7 @@ async function restartSession() {
     const response = await fetch(`/session/${LIVE.session_id}/mode`, {
       method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ui_mode, timezone})
     });
-    if (!response.ok) throw new Error((await response.json()).detail || 'Could not restart the session.');
+    if (!response.ok) throw new Error(await detailOf(response, 'Could not restart the session.'));
     eventSource?.close();
     if ('speechSynthesis' in window) speechSynthesis.cancel();
     speaking = false;
@@ -766,7 +782,7 @@ function renderLive() {
 
   text('count', `Step ${LIVE_STEP} of 5 · live MCP`);
 
-  text('next', LIVE_STEP >= 5 ? 'Demo complete' : 'Continue');
+  text('next', index < STATES.length - 1 ? 'Continue' : LIVE_STEP >= 5 ? 'Demo complete' : 'Continue');
 
   get('prev').disabled = index <= 0;
 
@@ -797,7 +813,8 @@ function renderLive() {
 
     }))});
 
-    const req = r.approval_request;
+    // The pending approval belongs to the conversation, not to the receipt tab on screen.
+    const req = index === STATES.length - 1 ? state.receipts.map(x => x.result.approval_request).find(Boolean) : null;
 
     get('approve-wrap').hidden = !req || !LIVE.admin_enabled || LIVE_BUSY;
 
@@ -813,9 +830,9 @@ function renderLive() {
 
   const history = get('history'); history.replaceChildren();
 
-  STATES.slice(0, index).forEach(s => { const row = el('div', 'de-past'); row.append(el('p', null, `Clara: ${s.user || ''}`), el('p', null, s.answer || '')); history.append(row); });
+  STATES.slice(0, index).forEach(s => { const row = el('div', 'de-past'); row.append(el('p', null, `You: ${s.user || ''}`), el('p', null, s.answer || '')); history.append(row); });
 
-  text('history-label', `Earlier in this conversation · ${plural(index, 'turn', 'turns')}`);
+  text('history-label', index ? `Earlier in this conversation · ${plural(index, 'turn', 'turns')}` : 'The conversation starts here');
 
 }
 
@@ -880,16 +897,23 @@ function connectEvents() {
     LIVE.fault_state = data.state; renderFaults();
   });
 
+  let streamNote = false;
   eventSource.addEventListener('open', () => {
+    if (streamNote) { streamNote = false; note(LIVE_ERROR); }
     refreshFaults().catch(() => { LIVE.fault_state = null; renderFaults(); });
   });
 
   eventSource.addEventListener('error', e => {
-
-    if (e.data) { LIVE_ERROR = JSON.parse(e.data).message; note(LIVE_ERROR); }
-
-    else note('Event stream disconnected. Reconnecting to the same session…');
-
+    if (e.data) {
+      // Server-side turn errors arrive as named events; replayed ones belong to earlier turns.
+      if (Number(e.lastEventId) <= replayThrough) return;
+      LIVE_ERROR = JSON.parse(e.data).message; note(LIVE_ERROR); return;
+    }
+    streamNote = true;
+    if (eventSource.readyState === EventSource.CLOSED) {
+      liveBusy(false);
+      note('Event stream closed: the session is gone (server restarted?). Reload the page to start a new one.');
+    } else note('Event stream disconnected. Reconnecting to the same session…');
   });
 
 }
@@ -920,13 +944,14 @@ function loadSession(session) {
   }
   for (const id of ['facts', 'evidence', 'op-history', 'records', 'history', 'audit-ops', 'receipt-tabs']) get(id).replaceChildren();
   for (const id of ['approve-wrap', 'fault-tag', 'status', 'receipt-tabs', 'gap']) get(id).hidden = true;
+  text('history-label', 'The conversation starts here');
   note('');
 
   text('mode', LIVE.mode); get('mode').dataset.mode = LIVE.mode;
 
   text('preview-right', `Live MCP · run ${RUN_ID}`);
 
-  text('title', 'An evening with Clara'); text('subtitle', 'Results checked through MCP.');
+  text('title', 'An evening with DoneWise'); text('subtitle', 'Results checked through MCP.');
 
   text('answer', ''); text('receipt-title', 'No receipts yet');
 
@@ -964,7 +989,7 @@ async function boot() {
 
   try { await tryConnect(); return; }
 
-  catch (_) { LIVE = null; text('preview-left', 'Fixture mode · server not connected'); text('bottom', 'Fixture mode · server not connected. These are recorded receipts, not operations executed now.'); }
+  catch (_) { LIVE = null; get('mic').disabled = true; get('mic').title = 'Fixture mode: no live session to speak to'; text('preview-left', 'Fixture mode · server not connected'); text('bottom', 'Fixture mode · server not connected. These are recorded receipts, not operations executed now.'); }
 
   let data;
 

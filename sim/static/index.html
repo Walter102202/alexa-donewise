@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DoneWise · An evening with Clara</title>
+<title>DoneWise · Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Red+Hat+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/styles.css">
+<link rel="stylesheet" href="/static/styles.css?v=2026-10-18b">
 </head>
 <body>
-<div id="dw-evening" aria-label="DoneWise: an evening with Clara">
+<div id="dw-evening" aria-label="DoneWise simulator">
  <header class="de-head">
   <div class="de-brand-wrap"><div class="de-brand">DoneWise</div><span class="de-tagline">Verification add-on for agents · reads the result back before it says done</span></div>
   <div class="de-head-right">
@@ -19,13 +19,13 @@
    <span class="de-mode" id="de-session-label" hidden></span>
   </div>
  </header>
- <div class="de-preview"><span id="de-preview-left">An evening with Clara · 3-minute cut</span><span id="de-preview-right"></span></div>
+ <div class="de-preview"><span id="de-preview-left">An evening with DoneWise · 3-minute cut</span><span id="de-preview-right"></span></div>
  <p class="de-loading" id="de-loading">Loading receipts…</p>
  <div class="de-grid" id="de-grid" hidden>
-  <section class="de-talk" aria-label="Clara's conversation with Alexa+">
+  <section class="de-talk" aria-label="Your conversation with Alexa+">
    <div class="de-talk-head"><div class="de-heading"><h2 id="de-title"></h2><time class="de-clock" id="de-time"></time></div><p class="de-subtitle" id="de-subtitle"></p></div>
    <div class="de-gap" id="de-gap" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg><span id="de-gap-text"></span></div>
-   <div class="de-turn de-user" id="de-user-wrap"><span class="de-turn-who">Clara</span><p id="de-user"></p></div>
+   <div class="de-turn de-user" id="de-user-wrap"><span class="de-turn-who">You</span><p id="de-user"></p></div>
    <div class="de-turn">
     <span class="de-turn-who">Alexa+</span>
     <div class="de-turn-body">
@@ -65,7 +65,7 @@
     <p class="de-small de-mono" id="de-audit-session">MCP session: not connected</p>
     <div id="de-audit-ops"></div>
    </section>
-   <section class="de-saved"><h3 class="de-label">Clara's tasks · this conversation</h3><div id="de-records"></div></section>
+   <section class="de-saved"><h3 class="de-label">Your tasks · this conversation</h3><div id="de-records"></div></section>
   </aside>
   <aside class="de-rail" aria-label="Demo controls">
    <section class="de-session-controls" id="de-session-controls" aria-label="Session controls" hidden>
@@ -85,7 +85,7 @@
      <p class="de-small de-mono" id="de-fault-state" role="status"></p>
     </div>
    </section>
-   <footer class="de-director" aria-label="Demo controls">
+   <footer class="de-director">
     <div class="de-director-label de-label">Demo controls · not part of the product</div>
     <div class="de-controls">
      <nav class="de-chapters" aria-label="Chapters" id="de-chapters"></nav>
@@ -96,6 +96,6 @@
  </div>
  <p class="de-bottom" id="de-bottom">Week 1 build: states, times and receipts are read from a fixture of validated receipts. Nothing is connected to Alexa, Google Calendar or Stripe yet. The demo bar shows the next receipt; in the product it sends the next scripted input.</p>
 </div>
-<script src="/static/app.js"></script>
+<script src="/static/app.js?v=2026-10-18b"></script>
 </body>
 </html>

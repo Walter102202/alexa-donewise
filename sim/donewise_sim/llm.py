@@ -31,7 +31,7 @@ Never claim a mutation without a receipt.
 
 def system_prompt(timezone="America/Los_Angeles"):
     now = datetime.now(ZoneInfo(timezone))
-    static = "You assist Clara.\n" + SYSTEM
+    static = "You assist the user.\n" + SYSTEM
     return [
         # Stable prefix (tools come before it and are stable too): cached across requests.
         {"type": "text", "text": static, "cache_control": {"type": "ephemeral"}},

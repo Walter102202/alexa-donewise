@@ -53,6 +53,7 @@ class Session:
         self.task = None
         self.tools = []
         self.step = 0
+        self.closed = False
         self.script_args = {}
         self.turn_spoken = {}
         self._seen_receipts = set()
@@ -249,3 +250,10 @@ class Session:
         if self.task:
             await self.task
         await self.client.close()
+
+    async def retire(self):
+        """Keep receipts and events for readers; refuse new actions and drop the MCP connection."""
+        if self.closed:
+            return
+        self.closed = True
+        await self.close()
