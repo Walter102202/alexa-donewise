@@ -139,6 +139,7 @@ class Session:
             self.pending_approval = {
                 "request": result["approval_request"],
                 "arguments": dict(arguments),
+                "turns_since": 0,
             }
         deadline = asyncio.get_running_loop().time() + 15
         while result.get("outcome") == "PENDING":

@@ -889,6 +889,7 @@ function connectEvents() {
     text('answer', data.text); if (!replayed) speak(data.text);
 
     if (data.source === 'model') text('source', 'Model · no operation result');
+    else if (data.source === 'session') text('source', 'Session · no operation, nothing charged');
 
   });
 

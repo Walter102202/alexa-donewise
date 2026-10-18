@@ -6,17 +6,47 @@ from uuid import uuid4
 
 from .session import ToolCallError
 
-AFFIRMATIONS = {"yes", "yes charge it", "charge it", "go ahead", "ok", "do it"}
+STRONG_YES = re.compile(
+    r"\b(yes|yep|yup|yeah go ahead|go ahead|do it|charge it|approve|confirm|please do)\b"
+)
+WEAK_YES = re.compile(r"^(ok|okay|sure|yeah|yep|yup|fine|alright|sounds good)$")
+NO = re.compile(r"\b(no|nope|don't|do not|cancel|stop|never mind|nevermind|not now|forget it)\b")
+CHANGE = re.compile(r"\d|\$|\bbut\b|\binstead\b|\bfifty\b|\bforty\b|\bhundred\b")
+DECLINED = "OK, I won't charge it. Nothing was charged."
 
 
-def is_affirmation(text):
-    return " ".join(re.sub(r"[^\w\s]", "", text.lower()).split()) in AFFIRMATIONS
+def normalize(text):
+    return " ".join(re.sub(r"[^\w\s$']", " ", text.lower()).split())
+
+
+def classify_consent(text, pending):
+    """Deterministic yes/no against the pending approval; anything else goes to the model."""
+    if not pending:
+        return None
+    words = normalize(text)
+    if NO.search(words):
+        return "no"
+    if CHANGE.search(words):
+        return None
+    if STRONG_YES.search(words):
+        return "yes"
+    if pending.get("turns_since", 0) == 0 and WEAK_YES.match(words):
+        return "yes"
+    return None
 
 
 async def turn(session, text):
     await session.emit("user", {"text": text})
     session.messages.append({"role": "user", "content": [{"type": "text", "text": text}]})
-    if session.pending_approval and is_affirmation(text):
+    consent = classify_consent(text, session.pending_approval)
+    if consent == "no":
+        session.pending_approval = None
+        session.messages.append(
+            {"role": "assistant", "content": [{"type": "text", "text": DECLINED}]}
+        )
+        await session.emit("assistant", {"text": DECLINED, "source": "session"})
+        return
+    if consent == "yes":
         if session.ui_mode == "scripted" and session.step == 1:
             await session.arm("drop_response_after_write")
         result = await session.approve()
@@ -31,6 +61,8 @@ async def turn(session, text):
         )
         await session.speak_receipts()
         return
+    if session.pending_approval:
+        session.pending_approval["turns_since"] += 1
     attempted = set()
     called = False
     for _ in range(6):

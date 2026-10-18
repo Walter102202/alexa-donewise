@@ -8,6 +8,7 @@ import httpx
 import pytest
 from donewise_server.app import build_app as build_server
 from donewise_server.config import Settings as ServerSettings
+from donewise_sim import agent as agent_module
 from donewise_sim.app import build_app
 from donewise_sim.config import Settings
 from donewise_sim.llm import NoLLM, Reply, ToolCall
@@ -719,3 +720,79 @@ async def test_mode_change_retires_the_previous_session(mcp):
         assert (await client.get(prefix + "/state")).json()["receipts"] == old_state["receipts"]
         assert (await client.post(prefix + "/script/next")).status_code == 409
         assert (await client.post(prefix + "/mode", json={"ui_mode": "voice"})).status_code == 409
+
+
+PENDING_NOW = {"request": {}, "arguments": {}, "turns_since": 0}
+PENDING_LATER = {"request": {}, "arguments": {}, "turns_since": 1}
+
+
+@pytest.mark.parametrize(
+    ("text", "pending", "expected"),
+    [
+        ("Yes, charge it.", PENDING_NOW, "yes"),
+        ("Yes, please charge it.", PENDING_LATER, "yes"),
+        ("Yeah go ahead", PENDING_LATER, "yes"),
+        ("Sure, do it", PENDING_LATER, "yes"),
+        ("please approve it", PENDING_LATER, "yes"),
+        ("ok", PENDING_NOW, "yes"),
+        ("Okay.", PENDING_NOW, "yes"),
+        ("sure", PENDING_NOW, "yes"),
+        ("ok", PENDING_LATER, None),
+        ("sure", PENDING_LATER, None),
+        ("yeah", PENDING_LATER, None),
+        ("No, cancel that.", PENDING_NOW, "no"),
+        ("don't charge it", PENDING_LATER, "no"),
+        ("nope", PENDING_NOW, "no"),
+        ("never mind", PENDING_LATER, "no"),
+        ("no, don't", PENDING_NOW, "no"),
+        ("yes but make it fifty", PENDING_NOW, None),
+        ("yes, $50", PENDING_NOW, None),
+        ("how much is it?", PENDING_NOW, None),
+        ("I know, move it to ten", PENDING_NOW, None),
+        ("yes", None, None),
+        ("no", None, None),
+    ],
+)
+def test_classify_consent_phrases(text, pending, expected):
+    assert agent_module.classify_consent(text, pending) == expected
+
+
+PAY_ARGS = {
+    "submission_id": "pay-voice-consent",
+    "amount_minor": 6000,
+    "currency": "USD",
+    "payee": "Ridge Plumbing",
+    "concept": "deposit",
+}
+
+
+@pytest.mark.anyio
+async def test_voice_decline_clears_pending_and_charges_nothing(mcp):
+    llm = OneCallLLM("payment_charge_verified", PAY_ARGS)
+    async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, _):
+        sid = metadata["session_id"]
+        state = await act(client, sid, "/turn", {"text": "Pay the deposit"})
+        assert state["pending_approval"]
+        state = await act(client, sid, "/turn", {"text": "No, cancel that."})
+        assert state["pending_approval"] is None
+        said = [e["data"] for e in events if e["event"] == "assistant"]
+        assert said[-1] == {"text": agent_module.DECLINED, "source": "session"}
+        # A later bare "ok" is an ordinary model turn: nothing pending, nothing charged.
+        await act(client, sid, "/turn", {"text": "ok"})
+        assert len(mcp[0].state.harness.payments.intents()) == 0
+        assert not [e for e in events if e["event"] == "error"]
+
+
+@pytest.mark.anyio
+async def test_weak_affirmation_counts_only_right_after_the_question(mcp):
+    llm = OneCallLLM("payment_charge_verified", PAY_ARGS)
+    async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, _):
+        sid = metadata["session_id"]
+        await act(client, sid, "/turn", {"text": "Pay the deposit"})
+        state = await act(client, sid, "/turn", {"text": "how much is it?"})
+        assert state["pending_approval"]  # the question keeps the approval open
+        await act(client, sid, "/turn", {"text": "ok"})
+        assert len(mcp[0].state.harness.payments.intents()) == 0  # weak word, too late
+        state = await act(client, sid, "/turn", {"text": "Yes, charge it."})
+        assert state["pending_approval"] is None
+        assert len(mcp[0].state.harness.payments.intents()) == 1

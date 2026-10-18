@@ -132,10 +132,10 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
     @app.post("/session/{session_id}/turn")
     async def turn(session_id: str, body: TurnInput):
         session = get_session(session_id)
-        affirming = bool(session.pending_approval) and agent.is_affirmation(body.text)
-        if session.ui_mode == "scripted" and not affirming:
+        consent = agent.classify_consent(body.text, session.pending_approval)
+        if session.ui_mode == "scripted" and consent != "yes":
             raise HTTPException(409, "Free input requires a new voice session")
-        if affirming and not session.consent_token:
+        if consent == "yes" and not session.consent_token:
             raise HTTPException(409, NO_CONSENT)
         return launch(session, lambda: agent.turn(session, body.text))
 
