@@ -509,7 +509,7 @@ function speak(phrase, opts) {
   try {
     speechSynthesis.cancel();
     // One utterance per sentence: natural pauses, and Chrome's long-utterance cut-off avoided.
-    const sentences = utterance.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g) || [utterance];
+    const sentences = utterance.split(/(?<=[.!?]["']?)\s+/).filter(Boolean);
     speaking = true; speakingInterim = Boolean(opts && opts.interim); updateControls();
     const done = () => { speaking = false; speakingInterim = false; updateControls(); };
     sentences.forEach((sentence, i) => {
@@ -901,7 +901,7 @@ function connectEvents() {
     const working = data.status === 'thinking' || String(data.status).startsWith('calling ');
     if (data.status === 'idle') clearWait();
     else if (working && !waitSpoken && !waitTimer && voiceOn) {
-      waitTimer = setTimeout(() => { waitTimer = null; waitSpoken = true; speak(WAIT_PHRASE, {interim: true}); }, WAIT_AFTER_MS);
+      waitTimer = setTimeout(() => { waitTimer = null; if (ttsActive()) return; waitSpoken = true; speak(WAIT_PHRASE, {interim: true}); }, WAIT_AFTER_MS);
     }
 
     liveBusy(data.status !== 'idle');
@@ -932,7 +932,7 @@ function connectEvents() {
 
     if (STATES.length) STATES.at(-1).answer = data.text;
 
-    text('answer', data.text); if (!replayed) { clearWait(); speak(data.text); }
+    text('answer', data.text); if (!replayed) { clearWait(); waitSpoken = true; speak(data.text); }
 
     if (data.source === 'model') text('source', 'Model · no operation result');
     else if (data.source === 'session') text('source', 'Session · no operation, nothing charged');

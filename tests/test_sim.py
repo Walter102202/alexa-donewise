@@ -751,6 +751,18 @@ PENDING_LATER = {"request": {}, "arguments": {}, "turns_since": 1}
         ("I know, move it to ten", PENDING_NOW, None),
         ("yes", None, None),
         ("no", None, None),
+        # Questions, negations and compound requests are not affirmations (review C1).
+        ("can you confirm the amount", PENDING_NOW, None),
+        ("how do I approve it", PENDING_NOW, None),
+        ("should I do it", PENDING_NOW, None),
+        ("did you charge it yesterday", PENDING_NOW, None),
+        ("I didn't say yes", PENDING_NOW, None),
+        ("I never said yes", PENDING_NOW, None),
+        ("I can't approve that", PENDING_NOW, None),
+        ("don’t charge it", PENDING_NOW, "no"),
+        ("yes make it seventy", PENDING_NOW, None),
+        ("yes charge it and move the plumber to ten", PENDING_NOW, None),
+        ("Yes, charge it, thanks.", PENDING_LATER, "yes"),
     ],
 )
 def test_classify_consent_phrases(text, pending, expected):
@@ -777,6 +789,7 @@ async def test_voice_decline_clears_pending_and_charges_nothing(mcp):
         assert state["pending_approval"] is None
         said = [e["data"] for e in events if e["event"] == "assistant"]
         assert said[-1] == {"text": agent_module.DECLINED, "source": "session"}
+        assert "charged" not in agent_module.DECLINED  # a decline claims no result
         # A later bare "ok" is an ordinary model turn: nothing pending, nothing charged.
         await act(client, sid, "/turn", {"text": "ok"})
         assert len(mcp[0].state.harness.payments.intents()) == 0
@@ -796,3 +809,25 @@ async def test_weak_affirmation_counts_only_right_after_the_question(mcp):
         state = await act(client, sid, "/turn", {"text": "Yes, charge it."})
         assert state["pending_approval"] is None
         assert len(mcp[0].state.harness.payments.intents()) == 1
+
+
+@pytest.mark.anyio
+async def test_granted_approval_is_consumed_even_if_the_charge_call_fails(mcp, monkeypatch):
+    from donewise_sim.session import Session
+
+    llm = OneCallLLM("payment_charge_verified", PAY_ARGS)
+    real_execute = Session.execute
+
+    async def failing_charge(self, tool, arguments):
+        if tool == "payment_charge_verified" and "approval_id" in arguments:
+            raise RuntimeError("simulated loss after the grant")
+        return await real_execute(self, tool, arguments)
+
+    monkeypatch.setattr(Session, "execute", failing_charge)
+    async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, _):
+        sid = metadata["session_id"]
+        await act(client, sid, "/turn", {"text": "Pay the deposit"})
+        state = await act(client, sid, "/turn", {"text": "Yes, charge it."})
+        assert [e for e in events if e["event"] == "error"]
+        # The grant was consumed: a later "no" must not pretend the approval is still open.
+        assert state["pending_approval"] is None

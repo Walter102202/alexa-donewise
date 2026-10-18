@@ -57,7 +57,7 @@ def test_receipt_facts_and_recap_tone():
 
 def test_mic_interrupts_speech_instead_of_waiting_for_it():
     assert "get('mic').disabled = recognizing ? false : (busy || !Recognition);" in JS
-    assert "ttsActive()) return;" not in JS  # the mic click no longer bails out while speaking
+    assert "controlBusy || ttsActive()) return;" not in JS  # the mic click no longer bails out while speaking
     assert "function stopSpeaking()" in JS
     assert "?v=2026-10-19a" in HTML
 
@@ -76,3 +76,16 @@ def test_voice_choice_and_two_stage_endpointing():
     assert "const FINAL_SILENCE_MS = 700, INTERIM_SILENCE_MS = 2000" in JS
     assert "const SILENCE_MS = 2000" not in JS
     assert "resetSilence(last && last.isFinal ? FINAL_SILENCE_MS : INTERIM_SILENCE_MS)" in JS
+
+
+def test_sentences_split_only_at_punctuation_followed_by_space():
+    assert "utterance.split(/(?<=[.!?][\"']?)\\s+/)" in JS  # "$12.50" stays one sentence
+
+
+def test_wait_cue_never_speaks_over_a_phrase_of_the_same_turn():
+    timer = (
+        "waitTimer = setTimeout(() => { waitTimer = null; if (ttsActive()) return; "
+        "waitSpoken = true; speak(WAIT_PHRASE, {interim: true}); }, WAIT_AFTER_MS);"
+    )
+    assert timer in JS
+    assert "if (!replayed) { clearWait(); waitSpoken = true; speak(data.text); }" in JS

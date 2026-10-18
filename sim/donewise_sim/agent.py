@@ -6,17 +6,25 @@ from uuid import uuid4
 
 from .session import ToolCallError
 
-STRONG_YES = re.compile(
-    r"\b(yes|yep|yup|yeah go ahead|go ahead|do it|charge it|approve|confirm|please do)\b"
+# "yes" needs every word to belong to this vocabulary, so questions ("should I do it"),
+# negations ("I didn't say yes") and compound requests ("yes, and move it to ten") reach the
+# model instead of charging. A decline wins over everything.
+YES_WORDS = frozenset(
+    "yes yeah yep yup sure ok okay please go ahead do it charge approve confirm confirmed "
+    "that thanks thank you fine alright sounds good right absolutely course of".split()
 )
-WEAK_YES = re.compile(r"^(ok|okay|sure|yeah|yep|yup|fine|alright|sounds good)$")
-NO = re.compile(r"\b(no|nope|don't|do not|cancel|stop|never mind|nevermind|not now|forget it)\b")
-CHANGE = re.compile(r"\d|\$|\bbut\b|\binstead\b|\bfifty\b|\bforty\b|\bhundred\b")
-DECLINED = "OK, I won't charge it. Nothing was charged."
+STRONG_YES = re.compile(
+    r"\b(yes|yep|yup|go ahead|do it|charge it|approve|confirm|confirmed|absolutely|of course)\b"
+)
+NO = re.compile(
+    r"\b(no|nope|don't|do not|cancel|stop|never mind|nevermind|not now|forget it)\b"
+)
+DECLINED = "OK, I won't charge it."
 
 
 def normalize(text):
-    return " ".join(re.sub(r"[^\w\s$']", " ", text.lower()).split())
+    text = text.replace("\u2019", "'").lower()
+    return " ".join(re.sub(r"[^\w\s']", " ", text).split())
 
 
 def classify_consent(text, pending):
@@ -26,13 +34,13 @@ def classify_consent(text, pending):
     words = normalize(text)
     if NO.search(words):
         return "no"
-    if CHANGE.search(words):
+    tokens = words.split()
+    if not tokens or any(token not in YES_WORDS for token in tokens):
         return None
     if STRONG_YES.search(words):
         return "yes"
-    if pending.get("turns_since", 0) == 0 and WEAK_YES.match(words):
-        return "yes"
-    return None
+    # Weak words alone ("ok", "sure") count only as the first answer to the question.
+    return "yes" if pending.get("turns_since", 0) == 0 else None
 
 
 async def turn(session, text):

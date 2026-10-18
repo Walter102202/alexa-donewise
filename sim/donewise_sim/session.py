@@ -174,11 +174,11 @@ class Session:
             )
         if is_error or grant is None:
             raise RuntimeError("Approval was not granted")
-        result = await self.execute(
+        # The grant is consumed now: a failed charge call must not leave it reusable.
+        self.pending_approval = None
+        return await self.execute(
             "payment_charge_verified", {**pending["arguments"], "approval_id": grant["approval_id"]}
         )
-        self.pending_approval = None
-        return result
 
     async def arm(self, kind, uses=1):
         state = await self.refresh_faults()
