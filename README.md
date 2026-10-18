@@ -59,6 +59,13 @@ five times, waiting for each result. The sequence books, requests consent, recov
 response, refuses to confirm a failed move, retries on request, and recaps receipts.
 The second Continue is the scripted human approval. Payments are local Fake records.
 
+The screen has three columns from 1200px wide: your conversation with the assistant on the
+left, the receipt that backs each answer in the centre, and a grey rail of demo controls on the
+right (labelled as not part of the product). Back and Continue step through the states already
+received; only at the latest state does Continue ask the server for the next scripted step. The
+approval button appears only while an approval is pending. Changing mode or timezone starts a
+new conversation; the previous one stays readable but accepts no more actions.
+
 Compose reads `.env.example` directly: `DONEWISE_MODE=sandbox`, `LLM_PROVIDER=none` and a public
 local-demo admin capability. That value is not a production secret. MCP is at
 `http://localhost:8765/mcp`; only loopback ports are published. Do not expose this configuration
@@ -80,8 +87,11 @@ Never put private credentials in `.env.example`.
 
 ## Screenshots from the real UI
 
-Captured from `sim/static` served by Docker, Scripted mode, sandbox adapters, live MCP; voice off.
-These are application screenshots, not the mockup or offline fixture.
+Captured on 13 October 2026 from `sim/static` served by Docker, Scripted mode, sandbox adapters,
+live MCP; voice off. These are application screenshots, not the mockup or offline fixture. They
+show the previous visual design: on 18 October 2026 the simulator moved to the three-column
+"Editorial plano" layout specified in `design/mockups/B2-Editorial.dc.html`. The flow and the
+receipts are unchanged; new captures are pending the recording session.
 
 ![Bound approval before any charge](docs/screenshots/01-approval.png)
 
