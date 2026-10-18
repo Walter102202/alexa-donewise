@@ -81,7 +81,7 @@ body{display:grid;place-items:start center}
 #dw-evening .de-status svg{width:22px;height:22px;stroke-width:2.5}
 #dw-evening .de-status svg{display:none}#dw-evening .de-status[data-tone=ok]{color:var(--de-ink)}#dw-evening .de-status[data-tone=ok] svg{display:block}
 #dw-evening .de-fault-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;color:var(--de-accent);margin:0 0 12px}
-#dw-evening .de-facts{display:grid;grid-template-columns:minmax(0,1fr) auto;margin:0;font-size:13px}
+#dw-evening .de-facts{display:grid;grid-template-columns:max-content minmax(0,1fr);margin:0;font-size:13px}
 #dw-evening dt,#dw-evening dd{padding:7px 0;border-top:1px solid var(--de-line)}
 #dw-evening dt{color:var(--de-muted);padding-right:16px}#dw-evening dd{margin:0;text-align:right;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 #dw-evening .de-evidence,#dw-evening .de-contrast,#dw-evening .de-audit,#dw-evening .de-saved{margin-top:18px;padding-top:14px;border-top:1px solid var(--de-line);font-size:12px;color:var(--de-muted)}
