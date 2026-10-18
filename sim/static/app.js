@@ -189,7 +189,7 @@ function renderReceipt(receipt, meta) {
 
     value = plural(r.items.length, 'result', 'results'); valueSub = 'from stored receipts · no new reads, no writes';
 
-    status = `From receipts · generated ${clock(r.generated_at)}`; tone = 'ok';
+    status = `From receipts · generated ${clock(r.generated_at)}`; tone = 'recap';
 
     r.items.forEach(it => facts.push([it.summary, `${it.outcome} · ${clock(it.observed_at)}`]));
 

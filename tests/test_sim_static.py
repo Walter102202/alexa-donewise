@@ -41,3 +41,13 @@ def test_editorial_plano_layout_details():
     assert "@media(max-width:1199px)" in CSS.replace(" ", "")
     # Header carries the product tagline from the B2 artboard.
     assert "reads the result back before it says done" in HTML
+
+
+def test_receipt_facts_and_recap_tone():
+    # Free-text recap labels must be allowed to wrap instead of forcing a max-content column.
+    css = CSS.replace(" ", "")
+    assert "de-facts{display:grid;grid-template-columns:fit-content(" in css
+    assert "overflow-wrap:anywhere" in css.split("#dw-eveningdt{")[1].split("}")[0]
+    # The verified check mark is keyed on the VERIFIED outcome only; recaps use their own tone.
+    assert "tone = 'recap'" in JS
+    assert "data-tone=recap" in css

@@ -619,3 +619,58 @@ async def test_timezone_toggle_restarts_the_session_and_reaches_the_recap(mcp):
         assert kept.json()["timezone"] == "America/Santiago"
         bad = await client.post("/session", json={"ui_mode": "scripted", "timezone": "UTC"})
         assert bad.status_code == 422
+
+
+@pytest.mark.anyio
+async def test_scripted_step_can_be_retried_after_approve_fails_once(mcp, monkeypatch):
+    from donewise_sim.session import Session
+
+    original = Session.approve
+    calls = {"n": 0}
+
+    async def flaky(self):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise RuntimeError("simulated lost response during approval")
+        return await original(self)
+
+    monkeypatch.setattr(Session, "approve", flaky)
+    async with simulation(mcp) as (client, metadata, events, app):
+        sid = metadata["session_id"]
+        assert (await act(client, sid, "/script/next"))["step"] == 1
+        state = await act(client, sid, "/script/next")  # arms the fault, approve fails
+        assert state["step"] == 1
+        assert state["fault_state"]["armed"] == {"drop_response_after_write": 1}
+        state = await act(client, sid, "/script/next")  # retry: must not re-arm
+        assert state["step"] == 2
+        assert state["fault_state"]["armed"] == {}
+        assert state["fault_state"]["fired"] == ["drop_response_after_write"]
+        payments = [
+            e["data"]["result"]
+            for e in events
+            if e["event"] == "receipt" and e["data"]["result"].get("action") == "PAYMENT_CHARGE"
+        ]
+        assert payments[-1]["outcome"] == "VERIFIED" and payments[-1]["charges_applied"] == 1
+        assert len([e for e in events if e["event"] == "error"]) == 1
+
+
+@pytest.mark.anyio
+async def test_expired_approval_clears_pending_and_says_so(mcp):
+    from datetime import timedelta
+
+    from donewise_harness.clock import SystemClock
+
+    class Shifted(SystemClock):
+        def now(self):
+            return super().now() + timedelta(minutes=6)
+
+    async with simulation(mcp) as (client, metadata, events, app):
+        sid = metadata["session_id"]
+        assert (await act(client, sid, "/script/next"))["step"] == 1
+        mcp[0].state.harness.clock = Shifted()
+        state = await act(client, sid, "/script/next")
+        assert state["step"] == 1
+        assert (await client.post(f"/session/{sid}/approve")).status_code == 409
+        errors = [e["data"]["message"] for e in events if e["event"] == "error"]
+        assert errors and "expired" in errors[-1].lower()
+        assert len(mcp[0].state.harness.payments.intents()) == 0

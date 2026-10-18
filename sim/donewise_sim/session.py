@@ -8,6 +8,10 @@ from .config import USER_TIMEZONES
 from .mcp_client import MCPClient
 
 
+class ApprovalExpired(RuntimeError):
+    """The bound approval request passed its TTL before the user's OK reached the server."""
+
+
 class ToolCallError(RuntimeError):
     """A deliberate MCP tool error, already sanitized by the server."""
 
@@ -153,13 +157,19 @@ class Session:
         if not self.pending_approval or not self.consent_token:
             raise RuntimeError("No approvable payment or consent capability")
         pending = self.pending_approval
-        grant, is_error, _ = await self.client.call(
+        grant, is_error, text = await self.client.call(
             "approval_grant",
             {
                 "approval_request_id": pending["request"]["approval_request_id"],
                 "consent_token": self.consent_token,
             },
         )
+        if is_error and "APPROVAL_EXPIRED" in text:
+            self.pending_approval = None
+            raise ApprovalExpired(
+                "The approval expired before it was granted; nothing was charged. "
+                "Start a new session to run the story again."
+            )
         if is_error or grant is None:
             raise RuntimeError("Approval was not granted")
         result = await self.execute(
@@ -170,8 +180,13 @@ class Session:
 
     async def arm(self, kind, uses=1):
         state = await self.refresh_faults()
-        if state is None or state["armed"]:
-            raise RuntimeError("Fault state unavailable or a fault is already armed")
+        if state is None:
+            raise RuntimeError("Fault state unavailable")
+        if state["armed"] == {kind: uses}:
+            # A retried scripted step must not accumulate uses or fail on its own earlier arm.
+            return
+        if state["armed"]:
+            raise RuntimeError("A fault is already armed")
         try:
             self.fault_state = await self.client.admin("faults", {"kind": kind, "uses": uses})
         except Exception:
@@ -211,6 +226,9 @@ class Session:
                 self.turn_spoken = {}
                 try:
                     await action()
+                except ApprovalExpired as exc:
+                    await self.emit("error", {"message": str(exc)})
+                    await self.speak_receipts()
                 except Exception:
                     await self.emit(
                         "error",
