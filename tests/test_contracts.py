@@ -2,6 +2,7 @@ import json
 import runpy
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 from donewise_harness import contracts as c
@@ -206,14 +207,12 @@ def test_story_shapes_spoken_and_shared_identity():
         "For the deposit: a $60 test charge for Ridge Plumbing. Should I charge it?",
         "I'm on it. I'll confirm in a moment.",
         "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. "
-        "Confirmation pi_story_deposit. You don't need to try again.",
+        "Confirmation ending in o s i t. You don't need to try again.",
         "I couldn't confirm the change. I tried twice; the latest calendar check still shows 9 AM.",
         "The plumber is now at 10 to 11 AM. I read it back from your calendar.",
-        "From the saved receipts: the plumber is at 10 to 11 AM, read back at "
-        "2026-09-16 at 7:44 PM America/Los_Angeles (UTC-0700). "
-        "One $60 test charge for the deposit, read back at "
-        "2026-09-16 at 7:40 PM America/Los_Angeles (UTC-0700). "
-        "0 operations remain unverified or pending. "
+        "From the saved receipts: the plumber is at 10 to 11 AM, read back today at 7:44 PM. "
+        "One $60 test charge for the deposit, read back today at 7:40 PM. "
+        "Nothing is unverified or pending. "
         "Nothing new was written to your calendar or payments.",
     ]
     for result, phrase in zip(results, expected, strict=True):
@@ -317,3 +316,16 @@ def test_every_input_property_has_a_description():
             if not prop.get("description", "").strip():
                 missing.append(f"{spec.name}.{name}")
     assert missing == []
+
+
+def test_recap_reads_the_day_relative_to_generation():
+    assert ROWS[6]["tool"] == "receipts_recap"
+    recap = SPECS["receipts_recap"].output_model.model_validate(ROWS[6]["result"])
+    la = ZoneInfo("America/Los_Angeles")
+    observed = recap.items[0].observed_at.astimezone(la)
+    same_day = recap.model_copy(update={"generated_at": observed + timedelta(hours=1)})
+    next_day = recap.model_copy(update={"generated_at": observed + timedelta(days=1)})
+    later = recap.model_copy(update={"generated_at": observed + timedelta(days=9)})
+    assert "read back today at 7:44 PM" in render_spoken(same_day)
+    assert "read back yesterday at 7:44 PM" in render_spoken(next_day)
+    assert "read back on September 16 at 7:44 PM" in render_spoken(later)

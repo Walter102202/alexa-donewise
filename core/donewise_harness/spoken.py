@@ -21,7 +21,7 @@ TEMPLATES = {
     "move": "{title} is now at {span}. I read it back from your calendar.",
     "charge": (
         "Done: a {amount} test charge is recorded for {payee}'s {concept}, charged once. "
-        "Confirmation {payment_intent_id}."
+        "Confirmation ending in {confirmation}."
     ),
     "historical": "I checked at {observed_at}; the calendar shows {span}.",
     "pending": "I'm on it. I'll confirm in a moment.",
@@ -47,7 +47,8 @@ TEMPLATES = {
         "Nothing new was written to your calendar or payments."
     ),
     "recovered": " You don't need to try again.",
-    "recap_item": "{summary}, read back at {observed_at}.",
+    "recap_item": "{summary}, read back {when}.",
+    "recap_none_unverified": "Nothing is unverified or pending.",
     "grant": "Your approval is recorded. Nothing has been charged by this approval.",
     "rejected": "I couldn't carry out this request.",
     "payment_not_observed": "I couldn't confirm the charge from the latest payment check.",
@@ -60,6 +61,18 @@ def clock_time(value: datetime, zone: str, *, suffix: bool = True) -> str:
     return f"{local.hour % 12 or 12}{minute}" + (
         f" {'AM' if local.hour < 12 else 'PM'}" if suffix else ""
     )
+
+
+def spoken_day(value: datetime, now: datetime, zone: str) -> str:
+    """'today at 7 PM', 'yesterday at 7 PM' or 'on September 16 at 7 PM' for the ear."""
+    local = value.astimezone(timezone_for(zone))
+    days = (now.astimezone(timezone_for(zone)).date() - local.date()).days
+    clock = clock_time(value, zone)
+    if days == 0:
+        return f"today at {clock}"
+    if days == 1:
+        return f"yesterday at {clock}"
+    return f"on {local:%B} {local.day} at {clock}"
 
 
 def span(target: CalendarTarget) -> str:
@@ -96,20 +109,17 @@ def render_spoken(
         items = " ".join(
             TEMPLATES["recap_item"].format(
                 summary=item.summary.rstrip("."),
-                observed_at=(
-                    f"{item.observed_at.astimezone(timezone_for(receipt.timezone)):%Y-%m-%d} "
-                    f"at {clock_time(item.observed_at, receipt.timezone)} {receipt.timezone} "
-                    f"(UTC{item.observed_at.astimezone(timezone_for(receipt.timezone)):%z})"
-                ),
+                when=spoken_day(item.observed_at, receipt.generated_at, receipt.timezone),
             )
             for item in receipt.items
         )
         count = recap_unverified_count
-        unverified = (
-            "1 operation remains unverified or pending."
-            if count == 1
-            else f"{count} operations remain unverified or pending."
-        )
+        if count == 0:
+            unverified = TEMPLATES["recap_none_unverified"]
+        elif count == 1:
+            unverified = "1 operation remains unverified or pending."
+        else:
+            unverified = f"{count} operations remain unverified or pending."
         return TEMPLATES["recap"].format(
             items=items or "No verified operations were recorded.",
             unverified=unverified,
@@ -141,7 +151,7 @@ def render_spoken(
                 amount=amount(target),
                 payee=target.payee,
                 concept=target.concept,
-                payment_intent_id=confirmation,
+                confirmation=" ".join(confirmation[-4:]),
             )
             if receipt.reason_code == ReasonCode.WRITE_RESPONSE_LOST_RECOVERED:
                 text += TEMPLATES["recovered"]

@@ -484,16 +484,14 @@ async def test_saved_recap_from_second_mcp_session_without_history(tmp_path):
             speech = recap["spoken"]
             assert "From the saved receipts:" in speech
             assert "1 operation remains unverified or pending." in speech
-            assert "America/Santiago (UTC" in speech
+            # The voice gives the Santiago wall-clock time; zone and offset stay on screen.
             from datetime import datetime
-            from zoneinfo import ZoneInfo
 
-            date = (
-                datetime.fromisoformat(created["observed_at"])
-                .astimezone(ZoneInfo("America/Santiago"))
-                .strftime("%Y-%m-%d")
-            )
-            assert date in speech
+            from donewise_harness.spoken import clock_time
+
+            observed = datetime.fromisoformat(created["observed_at"])
+            assert f"read back today at {clock_time(observed, 'America/Santiago')}" in speech
+            assert "America/Santiago" not in speech and "UTC" not in speech
             assert (h.calendar.write_calls, h.payments.write_calls) == writes
         finally:
             await second.close()

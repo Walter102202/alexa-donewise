@@ -157,7 +157,7 @@
         {
           "tool": "operation_get",
           "result": {
-            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation pi_story_deposit. You don't need to try again.",
+            "spoken": "Done: a $60 test charge is recorded for Ridge Plumbing's deposit, charged once. Confirmation ending in o s i t. You don't need to try again.",
             "structured_version": "1.0",
             "schema_version": "1.0",
             "operation_id": "op_payment",
@@ -370,7 +370,7 @@
         {
           "tool": "receipts_recap",
           "result": {
-            "spoken": "From the saved receipts: the plumber is at 10 to 11 AM, read back at 2026-09-16 at 7:44 PM America/Los_Angeles (UTC-0700). One $60 test charge for the deposit, read back at 2026-09-16 at 7:40 PM America/Los_Angeles (UTC-0700). 0 operations remain unverified or pending. Nothing new was written to your calendar or payments.",
+            "spoken": "From the saved receipts: the plumber is at 10 to 11 AM, read back today at 7:44 PM. One $60 test charge for the deposit, read back today at 7:40 PM. Nothing is unverified or pending. Nothing new was written to your calendar or payments.",
             "structured_version": "1.0",
             "run_id": "run_story_3min",
             "items": [
