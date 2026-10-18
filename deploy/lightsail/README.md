@@ -9,6 +9,10 @@ No container service: SQLite needs persistent disk. Existing budget alerts are u
 Deployed as `donewise-mcp-20261013`, static IP `52.55.245.231`, at
 `https://donewise-mcp.duckdns.org/mcp`. [Remote proof and measured latencies](../../docs/traces/lightsail-2026-10-13.md)
 cover five connected turns. Confirm STS account before provisioning. Never use a Hosli profile.
+Redeployed on 18 October 2026 from snapshot `11445c4` (spoken phrases written for the ear): the
+previous source tree was kept as `/opt/donewise/source-prev-20261018-11445c4`, the registry and
+secrets were untouched, and the classic Alexa skill answered the recap question with the new
+wording through SMAPI (3.8 s, RequestIntent).
 
 1. Create the dedicated instance and static IP. Allow 80/443 publicly; restrict SSH
    to the operator's current IP. Do not open 8765, 8080 or `/admin` to the internet.

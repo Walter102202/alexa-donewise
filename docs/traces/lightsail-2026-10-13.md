@@ -47,5 +47,9 @@ Windows httpx2/truststore raised a native certificate-chain access violation. Us
 `SSL_CERT_FILE` pointing to the isolated environment's certifi CA bundle retained full TLS
 verification and allowed the native MCP client to connect. No certificate check was disabled.
 
-The remote server is git snapshot `218f1c2` plus the deployment configuration.
+The remote server was git snapshot `218f1c2` plus the deployment configuration until 18 October
+2026, when it was rebuilt from snapshot `11445c4` (receipt phrases written for the ear). The SMAPI
+recap after the rebuild read: "From the saved receipts: plumber is at 10 to 11 AM, read back on
+October 12 at 11:01 PM. One $60 test charge for the deposit, read back on October 12 at 11 PM.
+Nothing is unverified or pending. Nothing new was written to your calendar or payments."
 Private full trace: `data/strands-lightsail-five-turns-2026-10-13-v3.json`.
