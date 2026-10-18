@@ -66,6 +66,14 @@ received; only at the latest state does Continue ask the server for the next scr
 approval button appears only while an approval is pending. Changing mode or timezone starts a
 new conversation; the previous one stays readable but accepts no more actions.
 
+In free voice mode the OK for a charge is classified without the model: natural affirmations
+("yes, please charge it", "go ahead") grant it, a decline ("no, cancel that") clears it and says
+so, and a bare "ok" counts only as the first answer to the question. Tapping the microphone while
+the assistant speaks interrupts it and listens; a turn that is still working after 1.5 s says
+"One moment, I'm checking that." and turn errors are spoken as well as shown. Receipt phrases
+are written for the ear: relative day, no timezone in the voice, confirmation by its last four
+characters; the receipt column keeps the full detail.
+
 Compose reads `.env.example` directly: `DONEWISE_MODE=sandbox`, `LLM_PROVIDER=none` and a public
 local-demo admin capability. That value is not a production secret. MCP is at
 `http://localhost:8765/mcp`; only loopback ports are published. Do not expose this configuration
