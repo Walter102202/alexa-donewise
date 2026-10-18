@@ -26,7 +26,7 @@
 2. "Yes" plus a changed amount ("yes but make it fifty" / "yes, $50") must NOT charge; the turn goes to the model; covered by the digit/`$`/"but" rule in `test_classify_consent_phrases` (Task 1).
 3. A decline when nothing is pending is an ordinary model turn, never an error; `test_voice_decline_clears_pending_and_charges_nothing` second half (Task 1).
 4. The wait cue must never be spoken over a receipt phrase or after the turn ended; `clearWait()` runs on `assistant`, `error` and `idle` events, verified in the browser (Task 4).
-5. Tap-to-interrupt during the wait cue or during a long recap stops speech within one tick and starts listening; verified in the browser (Task 3).
+5. Tap-to-interrupt during a long recap (after the turn ended) stops speech within one tick and starts listening; verified in the browser (Task 3). The wait cue itself cannot be interrupted: the mic is locked while a turn is busy, by design (ruling of 18-oct-2026 in the ledger).
 
 ---
 
