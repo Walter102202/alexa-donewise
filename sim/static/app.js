@@ -471,12 +471,23 @@ function speakable(phrase) {
     .trim();
 }
 
+// A wait cue claims nothing: it is spoken only when a turn is still thinking or calling a
+// tool after WAIT_AFTER_MS, and any real answer, error or idle status cancels it.
+const WAIT_PHRASE = "One moment, I'm checking that.";
+const WAIT_AFTER_MS = 1500;
+let speakingInterim = false, waitTimer = null, waitSpoken = false;
+
 function stopSpeaking() {
   try { speechSynthesis.cancel(); } catch (_) { /* no synthesis */ }
-  speaking = false; updateControls();
+  speaking = false; speakingInterim = false; updateControls();
 }
 
-function speak(phrase) {
+function clearWait() {
+  clearTimeout(waitTimer); waitTimer = null;
+  if (speakingInterim) stopSpeaking();
+}
+
+function speak(phrase, opts) {
 
   const utterance = speakable(phrase);
   if (!voiceOn || !('speechSynthesis' in window) || !utterance || recognizing) return;
@@ -484,10 +495,10 @@ function speak(phrase) {
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(utterance); u.lang = 'en-US';
-    speaking = true; updateControls();
-    u.onend = u.onerror = () => { speaking = false; updateControls(); };
+    speaking = true; speakingInterim = Boolean(opts && opts.interim); updateControls();
+    u.onend = u.onerror = () => { speaking = false; speakingInterim = false; updateControls(); };
     speechSynthesis.speak(u);
-  } catch (_) { speaking = false; updateControls(); }
+  } catch (_) { speaking = false; speakingInterim = false; updateControls(); }
 
 }
 
@@ -850,6 +861,7 @@ function connectEvents() {
   const on = (name, fn) => eventSource.addEventListener(name, e => fn(JSON.parse(e.data), Number(e.lastEventId) <= replayThrough));
 
   on('user', data => {
+    clearWait(); waitSpoken = false;
 
     STATES.push({state: String(STATES.length + 1), user: data.text, receipts: [], answer: ''});
 
@@ -863,6 +875,11 @@ function connectEvents() {
     if (replayed) return;
 
     if (data.step != null) LIVE_STEP = data.step;
+    const working = data.status === 'thinking' || String(data.status).startsWith('calling ');
+    if (data.status === 'idle') clearWait();
+    else if (working && !waitSpoken && !waitTimer && voiceOn) {
+      waitTimer = setTimeout(() => { waitTimer = null; waitSpoken = true; speak(WAIT_PHRASE, {interim: true}); }, WAIT_AFTER_MS);
+    }
 
     liveBusy(data.status !== 'idle');
 
@@ -892,7 +909,7 @@ function connectEvents() {
 
     if (STATES.length) STATES.at(-1).answer = data.text;
 
-    text('answer', data.text); if (!replayed) speak(data.text);
+    text('answer', data.text); if (!replayed) { clearWait(); speak(data.text); }
 
     if (data.source === 'model') text('source', 'Model · no operation result');
     else if (data.source === 'session') text('source', 'Session · no operation, nothing charged');
@@ -914,7 +931,8 @@ function connectEvents() {
     if (e.data) {
       // Server-side turn errors arrive as named events; replayed ones belong to earlier turns.
       if (Number(e.lastEventId) <= replayThrough) return;
-      LIVE_ERROR = JSON.parse(e.data).message; note(LIVE_ERROR); return;
+      clearWait();
+      LIVE_ERROR = JSON.parse(e.data).message; note(LIVE_ERROR); speak(LIVE_ERROR); return;
     }
     streamNote = true;
     if (eventSource.readyState === EventSource.CLOSED) {

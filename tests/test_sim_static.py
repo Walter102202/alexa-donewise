@@ -60,3 +60,12 @@ def test_mic_interrupts_speech_instead_of_waiting_for_it():
     assert "ttsActive()) return;" not in JS  # the mic click no longer bails out while speaking
     assert "function stopSpeaking()" in JS
     assert "?v=2026-10-19a" in HTML
+
+
+def test_wait_cue_claims_nothing_and_errors_are_spoken():
+    assert "const WAIT_PHRASE = \"One moment, I'm checking that.\";" in JS
+    assert "const WAIT_AFTER_MS = 1500;" in JS
+    assert "function clearWait()" in JS
+    for banned in ("done", "charged", "booked", "calendar", "confirmed"):
+        assert banned not in "One moment, I'm checking that.".lower()
+    assert "LIVE_ERROR = JSON.parse(e.data).message; note(LIVE_ERROR); speak(LIVE_ERROR);" in JS
