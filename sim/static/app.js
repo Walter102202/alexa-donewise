@@ -487,6 +487,20 @@ function clearWait() {
   if (speakingInterim) stopSpeaking();
 }
 
+// The best en-US voice the browser offers: Google's in Chrome, a Natural one in Edge, else any.
+const VOICE_PREFERENCE = [/Google US English/, /Microsoft .* Online \(Natural\) - English \(United States\)/, /^en-US$/i];
+let chosenVoice = null;
+function pickVoice() {
+  if (!('speechSynthesis' in window)) return null;
+  const voices = speechSynthesis.getVoices();
+  for (const pref of VOICE_PREFERENCE) {
+    const found = voices.find(v => pref.test(v.name) || pref.test(v.lang));
+    if (found) { chosenVoice = found; return found; }
+  }
+  chosenVoice = null; return null;
+}
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+
 function speak(phrase, opts) {
 
   const utterance = speakable(phrase);
@@ -494,10 +508,17 @@ function speak(phrase, opts) {
 
   try {
     speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(utterance); u.lang = 'en-US';
+    // One utterance per sentence: natural pauses, and Chrome's long-utterance cut-off avoided.
+    const sentences = utterance.match(/[^.!?]+[.!?]+["']?|[^.!?]+$/g) || [utterance];
     speaking = true; speakingInterim = Boolean(opts && opts.interim); updateControls();
-    u.onend = u.onerror = () => { speaking = false; speakingInterim = false; updateControls(); };
-    speechSynthesis.speak(u);
+    const done = () => { speaking = false; speakingInterim = false; updateControls(); };
+    sentences.forEach((sentence, i) => {
+      const u = new SpeechSynthesisUtterance(sentence.trim()); u.lang = 'en-US'; u.rate = 1;
+      if (chosenVoice) u.voice = chosenVoice;
+      if (i === sentences.length - 1) u.onend = done;
+      u.onerror = done;
+      speechSynthesis.speak(u);
+    });
   } catch (_) { speaking = false; speakingInterim = false; updateControls(); }
 
 }
@@ -532,9 +553,10 @@ async function detailOf(response, fallback) {
 if (!Recognition) { get('mic').disabled = true; get('mic').title = 'Speech recognition is not supported in this browser'; }
 
 // Listening works like a speaker, not a walkie-talkie: recognition stays open across pauses and
-// closes on its own after SILENCE_MS without speech, or earlier when the mic is tapped again.
+// closes on its own after a short silence (shorter once the recognizer marked a result final),
+// or earlier when the mic is tapped again.
 // Chrome may end a continuous session by itself; while still armed we restart it and keep the text.
-const SILENCE_MS = 2000, MAX_RESTARTS = 5;
+const FINAL_SILENCE_MS = 700, INTERIM_SILENCE_MS = 2000, MAX_RESTARTS = 5;
 
 get('mic').addEventListener('click', () => {
 
@@ -551,7 +573,7 @@ get('mic').addEventListener('click', () => {
 
   const transcript = () => [...committed, sessionFinal, interim].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 
-  const resetSilence = () => { clearTimeout(silence); silence = setTimeout(finish, SILENCE_MS); };
+  const resetSilence = ms => { clearTimeout(silence); silence = setTimeout(finish, ms); };
 
   function finish() {
     if (!armed) return;
@@ -577,7 +599,8 @@ get('mic').addEventListener('click', () => {
       sessionFinal = results.filter(r => r.isFinal).map(r => r[0].transcript).join(' ').trim();
       interim = results.filter(r => !r.isFinal).map(r => r[0].transcript).join(' ').trim();
       get('text').value = transcript();
-      if (armed) resetSilence();
+      const last = results.at(-1);
+      if (armed) resetSilence(last && last.isFinal ? FINAL_SILENCE_MS : INTERIM_SILENCE_MS);
     };
 
     rec.onerror = e => {

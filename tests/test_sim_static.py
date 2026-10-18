@@ -69,3 +69,10 @@ def test_wait_cue_claims_nothing_and_errors_are_spoken():
     for banned in ("done", "charged", "booked", "calendar", "confirmed"):
         assert banned not in "One moment, I'm checking that.".lower()
     assert "LIVE_ERROR = JSON.parse(e.data).message; note(LIVE_ERROR); speak(LIVE_ERROR);" in JS
+
+
+def test_voice_choice_and_two_stage_endpointing():
+    assert "function pickVoice()" in JS and "VOICE_PREFERENCE" in JS
+    assert "const FINAL_SILENCE_MS = 700, INTERIM_SILENCE_MS = 2000" in JS
+    assert "const SILENCE_MS = 2000" not in JS
+    assert "resetSilence(last && last.isFinal ? FINAL_SILENCE_MS : INTERIM_SILENCE_MS)" in JS
