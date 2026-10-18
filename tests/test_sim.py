@@ -831,3 +831,8 @@ async def test_granted_approval_is_consumed_even_if_the_charge_call_fails(mcp, m
         assert [e for e in events if e["event"] == "error"]
         # The grant was consumed: a later "no" must not pretend the approval is still open.
         assert state["pending_approval"] is None
+
+
+def test_model_label_names_sonnet_55():
+    settings = Settings(llm_provider="anthropic", anthropic_model="claude-sonnet-5-5")
+    assert settings.model_label == "Model: Claude Sonnet 5.5 · Anthropic API"

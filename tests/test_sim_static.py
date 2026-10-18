@@ -57,7 +57,8 @@ def test_receipt_facts_and_recap_tone():
 
 def test_mic_interrupts_speech_instead_of_waiting_for_it():
     assert "get('mic').disabled = recognizing ? false : (busy || !Recognition);" in JS
-    assert "controlBusy || ttsActive()) return;" not in JS  # the mic click no longer bails out while speaking
+    # The mic click no longer bails out while speaking.
+    assert "controlBusy || ttsActive()) return;" not in JS
     assert "function stopSpeaking()" in JS
     assert "?v=2026-10-19a" in HTML
 
