@@ -471,6 +471,11 @@ function speakable(phrase) {
     .trim();
 }
 
+function stopSpeaking() {
+  try { speechSynthesis.cancel(); } catch (_) { /* no synthesis */ }
+  speaking = false; updateControls();
+}
+
 function speak(phrase) {
 
   const utterance = speakable(phrase);
@@ -494,7 +499,7 @@ get('voice').addEventListener('click', () => {
 
   try { localStorage.setItem('dw-voice', voiceOn ? 'on' : 'off'); } catch (e) { /* ignore */ }
 
-  if (!voiceOn && 'speechSynthesis' in window) { speechSynthesis.cancel(); speaking = false; updateControls(); }
+  if (!voiceOn && 'speechSynthesis' in window) stopSpeaking();
 
 });
 
@@ -526,7 +531,8 @@ get('mic').addEventListener('click', () => {
 
   if (recognizing) { recognizing.finish(); return; }
 
-  if (!LIVE || LIVE_BUSY || controlBusy || ttsActive()) return;
+  if (!LIVE || LIVE_BUSY || controlBusy) return;
+  if (ttsActive()) stopSpeaking(); // tap to interrupt: the answer stops, listening starts
 
   const committed = []; // final transcripts from earlier sessions of this same listen
   let rec = null, sessionFinal = '', interim = '', silence = null, restarts = 0;
@@ -678,7 +684,7 @@ function updateControls() {
   get('approve').disabled = busy;
   get('input').querySelector('[type="submit"]').disabled = busy;
   get('text').disabled = busy;
-  get('mic').disabled = recognizing ? false : (busy || !Recognition || ttsActive());
+  get('mic').disabled = recognizing ? false : (busy || !Recognition);
   get('session-mode').disabled = busy;
   get('session-timezone').disabled = busy;
   const armed = !LIVE.fault_state || Object.keys(LIVE.fault_state.armed).length > 0;
