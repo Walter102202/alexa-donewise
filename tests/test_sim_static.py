@@ -19,8 +19,9 @@ def test_every_id_app_js_reads_exists_in_index_html():
 
 def test_every_class_app_js_creates_or_queries_is_styled():
     created = set(re.findall(r"el\('[a-z]+', '(de-[a-z-]+)'", JS)) | {"de-director"}
-    unstyled = sorted(c for c in created if f".{c}" not in CSS)
+    unstyled = sorted(c for c in created if not re.search(rf"\.{c}(?![\w-])", CSS))
     assert unstyled == []
+    assert 'class="de-director"' in HTML
     assert "[hidden]{display:none!important}" in CSS.replace(" ", "")
 
 
@@ -30,3 +31,13 @@ def test_editorial_plano_tokens_are_in_place():
     assert "light-dark(" not in CSS
     assert re.findall(r"border-radius:\s*(?!0\b)[^;}]+", CSS) == []  # solo radio 0
     assert "#1F3BFF" in CSS.upper() and "#111111" in CSS.upper()
+
+
+def test_editorial_plano_layout_details():
+    # Rail shows "Demo controls" once when session controls and the director bar are both visible.
+    once = ".de-session-controls:not([hidden])+.de-director.de-director-label{display:none}"
+    assert once in CSS.replace(" ", "")
+    # Evidence column never drops under ~340px: three columns only from 1200px up.
+    assert "@media(max-width:1199px)" in CSS.replace(" ", "")
+    # Header carries the product tagline from the B2 artboard.
+    assert "reads the result back before it says done" in HTML
