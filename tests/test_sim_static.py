@@ -1,4 +1,4 @@
-"""Static contract between sim/static/app.js and the served HTML/CSS (Editorial plano, 2026-10-18)."""
+"""Static contract between sim/static/app.js and the served HTML/CSS (Editorial plano)."""
 
 import re
 from pathlib import Path
