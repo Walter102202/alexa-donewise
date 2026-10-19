@@ -34,6 +34,25 @@ Reproduce: `uv run donewise-evals --runner deterministic --output-dir "evals/res
 
 This table is not a live LLM, Google or Stripe run. A separate Claude Code/Sonnet sandbox session is recorded below. Voice controls are implemented; human microphone/TTS rehearsal remains pending.
 
+## Three real models on Bedrock · Fake adapters
+
+Live Bedrock calls on 13 October 2026 UTC: the model acts as the agent, Calendar and Stripe are
+Fake adapters, ten scenarios, one execution per scenario and variant, identical faults in both.
+
+| Model / run | False claims baseline | False claims DoneWise | Extra charges | Mutations | Protections |
+| --- | --- | --- | --- | --- | --- |
+| Amazon Nova Pro · `run_875c1f8032ae425d9a10992d93e2a0cc` | 5/14 | 0/11 | 0/4 → 0/4 | 4/7 → 6/7 | 2/3 → 3/3 |
+| Claude Sonnet 4.6 · `run_0a0de9bdf889470aa0d5bfe96b581016` | 5/19 | 0/14 | 0/4 → 0/4 | 4/7 → 6/7 | 2/3 → 3/3 |
+| gpt-oss-120b · `run_59f4bdf161024dd09e3311780371032b` | 4/15 | 0/11 | 0/4 → 0/4 | 4/7 → 6/7 | 2/3 → 3/3 |
+
+False claims are counted per utterance against an independent snapshot of the Fake state; the
+semantic review was done by Codex, not by a human. The DoneWise zero is an application outcome,
+receipt-based speech included, not a guarantee about model prose. **Zero in a finite sample does not mean never.**
+
+Reproduce: `LLM_PROVIDER=bedrock BEDROCK_MODEL_ID=<model> uv run --env-file .env donewise-evals --runner llm --output-dir data/new-eval`
+
+[Nova](evals/results/2026-10-13-sandbox-llm.json) · [Sonnet](evals/results/2026-10-13-sandbox-llm-run_0a0de9bdf889470aa0d5bfe96b581016.json) · [gpt-oss](evals/results/2026-10-13-sandbox-llm-run_59f4bdf161024dd09e3311780371032b.json) · [Protocol, review method and limits](evals/README.md).
+
 ## What is real / what is simulated
 
 | Component | Implemented and evidenced | Boundary |
