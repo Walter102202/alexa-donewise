@@ -60,7 +60,7 @@ def test_mic_interrupts_speech_instead_of_waiting_for_it():
     # The mic click no longer bails out while speaking.
     assert "controlBusy || ttsActive()) return;" not in JS
     assert "function stopSpeaking()" in JS
-    assert "?v=2026-10-19a" in HTML
+    assert "?v=2026-10-19b" in HTML
 
 
 def test_wait_cue_claims_nothing_and_errors_are_spoken():

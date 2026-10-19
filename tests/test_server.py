@@ -594,3 +594,20 @@ def test_invalid_input_hides_validator_messages_outside_the_public_list():
     message = _invalid(Leaky, {"code": "secret-xyz"})
     assert "code: invalid value" in message
     assert "secret-xyz" not in message and "bad code" not in message
+
+
+@pytest.mark.anyio
+async def test_admin_faults_delete_disarms_the_run(live):
+    app, url = live
+    headers = {"X-Demo-Admin-Token": "admin"}
+    async with httpx2.AsyncClient() as client:
+        assert (await client.delete(url + "/admin/faults?run_id=run_x")).status_code == 401
+        armed = await client.post(
+            url + "/admin/faults",
+            json={"run_id": "run_x", "kind": "drop_response_after_write"},
+            headers=headers,
+        )
+        assert armed.json()["armed"] == {"drop_response_after_write": 1}
+        cleared = await client.delete(url + "/admin/faults?run_id=run_x", headers=headers)
+        assert cleared.status_code == 200
+        assert cleared.json() == {"armed": {}, "fired": []}

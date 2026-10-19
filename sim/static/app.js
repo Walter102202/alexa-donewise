@@ -723,7 +723,7 @@ function updateControls() {
   get('session-timezone').disabled = busy;
   const armed = !LIVE.fault_state || Object.keys(LIVE.fault_state.armed).length > 0;
   get('fault-drop').disabled = get('fault-ack').disabled = busy || armed || LIVE.ui_mode !== 'voice';
-  get('fault-refresh').disabled = busy;
+  get('fault-reset').disabled = busy;
 }
 
 async function postLive(path, body) {
@@ -778,12 +778,12 @@ async function faultControl(kind, uses) {
   if (LIVE_BUSY || controlBusy || recognizing) return;
   controlBusy = true; updateControls();
   try {
-    if (kind) {
-      const response = await fetch(`/session/${LIVE.session_id}/faults`, {
-        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({kind, uses})
-      });
-      if (!response.ok) throw new Error(await detailOf(response, 'Fault could not be armed.'));
-    }
+    const response = kind
+      ? await fetch(`/session/${LIVE.session_id}/faults`, {
+          method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({kind, uses})
+        })
+      : await fetch(`/session/${LIVE.session_id}/faults/reset`, {method: 'POST'});
+    if (!response.ok) throw new Error(await detailOf(response, kind ? 'Fault could not be armed.' : 'Faults could not be reset.'));
     note('');
   } catch (error) { note(`${error.message} No automatic retry.`); }
   finally {
@@ -794,7 +794,7 @@ async function faultControl(kind, uses) {
 
 get('fault-drop').addEventListener('click', () => faultControl('drop_response_after_write', 1));
 get('fault-ack').addEventListener('click', () => faultControl('ack_without_write', 2));
-get('fault-refresh').addEventListener('click', () => faultControl());
+get('fault-reset').addEventListener('click', () => faultControl());
 // Mode and timezone both restart the conversation through the same endpoint.
 async function restartSession() {
   const ui_mode = get('session-mode').value, timezone = get('session-timezone').value;

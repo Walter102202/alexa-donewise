@@ -182,6 +182,20 @@ def build_app(settings: Settings | None = None, *, llm=None) -> FastAPI:
                 raise HTTPException(400, "Fault could not be armed") from None
         return {"ok": True, "fault_state": session.fault_state}
 
+    @app.post("/session/{session_id}/faults/reset")
+    async def faults_reset(session_id: str):
+        if not settings.demo_admin_token:
+            raise HTTPException(404, "Demo controls disabled")
+        session = get_session(session_id)
+        if session.busy:
+            raise HTTPException(409, "Wait for the current action before resetting faults")
+        async with session.lock:
+            try:
+                await session.disarm()
+            except RuntimeError:
+                raise HTTPException(400, "Faults could not be reset") from None
+        return {"ok": True, "fault_state": session.fault_state}
+
     app.mount("/static", StaticFiles(directory=SIM_ROOT / "static"), name="static")
     app.mount("/fixtures", StaticFiles(directory=SIM_ROOT / "fixtures"), name="fixtures")
     return app

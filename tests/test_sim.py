@@ -836,3 +836,18 @@ async def test_granted_approval_is_consumed_even_if_the_charge_call_fails(mcp, m
 def test_model_label_names_sonnet_55():
     settings = Settings(llm_provider="anthropic", anthropic_model="claude-sonnet-5-5")
     assert settings.model_label == "Model: Claude Sonnet 5.5 · Anthropic API"
+
+
+@pytest.mark.anyio
+async def test_fault_reset_disarms_without_restarting_the_session(mcp):
+    async with simulation(mcp, ui_mode="voice") as (client, metadata, events, app):
+        prefix = f"/session/{metadata['session_id']}"
+        fault = {"kind": "drop_response_after_write", "uses": 1}
+        assert (await client.post(prefix + "/faults", json=fault)).status_code == 200
+        reset = await client.post(prefix + "/faults/reset")
+        assert reset.status_code == 200
+        assert reset.json()["fault_state"]["armed"] == {}
+        state = (await client.get(prefix + "/state")).json()
+        assert state["run_id"] == metadata["run_id"]
+        assert state["fault_state"]["armed"] == {}
+        assert (await client.post(prefix + "/faults", json=fault)).status_code == 200

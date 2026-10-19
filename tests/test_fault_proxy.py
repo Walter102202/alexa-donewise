@@ -83,3 +83,13 @@ def test_proxy_run_isolation_and_single_consumption(upstream):
             statuses = list(pool.map(read, ["run_b", "run_a", "run_a", "run_b"]))
     assert statuses.count(503) == 1 and len(calls) == 3
     assert faults.fired("run_b") == []
+
+
+def test_disarm_clears_only_the_given_run():
+    faults = FaultBoard()
+    faults.arm(FaultKind.DROP_RESPONSE_AFTER_WRITE, "run_a")
+    faults.arm(FaultKind.ACK_WITHOUT_WRITE, "run_b", 2)
+    faults.disarm("run_a")
+    assert faults.armed("run_a") == {}
+    assert faults.armed("run_b") == {FaultKind.ACK_WITHOUT_WRITE: 2}
+    assert faults.fired("run_a") == []

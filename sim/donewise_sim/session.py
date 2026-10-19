@@ -197,6 +197,12 @@ class Session:
             raise
         await self.emit("fault", {"kind": kind, "state": self.fault_state})
 
+    async def disarm(self):
+        try:
+            self.fault_state = await self.client.admin("faults", delete=True)
+        finally:
+            await self.refresh_faults(kind="reset")
+
     async def refresh_faults(self, kind=None):
         if not self.settings.demo_admin_token:
             return None

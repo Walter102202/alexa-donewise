@@ -45,6 +45,12 @@ class FaultBoard:
         """For adapters: consume against the run the harness is currently serving."""
         return self.active_run is not None and self.consume(kind, self.active_run)
 
+    def disarm(self, run_id: RunId) -> None:
+        """Drop every armed fault of one run. Fired history is kept."""
+        with self.lock:
+            for key in [k for k in self._armed if k[1] == run_id]:
+                del self._armed[key]
+
     def armed(self, run_id: RunId) -> dict[FaultKind, int]:
         with self.lock:
             return {k: n for (k, r), n in self._armed.items() if r == run_id and n > 0}

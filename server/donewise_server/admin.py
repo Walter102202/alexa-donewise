@@ -51,7 +51,7 @@ def register_admin(server, settings, harness):
             return JSONResponse({"error": "Invalid run_id"}, status_code=400)
         return JSONResponse({"consent_token": settings.consent_token_for(data.run_id)})
 
-    @server.custom_route("/admin/faults", methods=["POST", "GET"])
+    @server.custom_route("/admin/faults", methods=["POST", "GET", "DELETE"])
     async def faults(request: Request):
         if response := denied(request):
             return response
@@ -61,6 +61,8 @@ def register_admin(server, settings, harness):
                 harness.faults.arm(data.kind, data.run_id, data.uses)
             else:
                 data = RunInput.model_validate(dict(request.query_params))
+                if request.method == "DELETE":
+                    harness.faults.disarm(data.run_id)
         except (ValidationError, json.JSONDecodeError):
             return JSONResponse({"error": "Invalid fault request"}, status_code=400)
         return JSONResponse(

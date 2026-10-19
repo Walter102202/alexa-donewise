@@ -253,7 +253,8 @@ the 6500 ms gate. Deterministic eval timing uses a logical clock and is not this
 | Lightsail | [HTTPS MCP deployed](docs/traces/lightsail-2026-10-13.md), persistent SQLite, five remote connected turns; bearer and private-admin boundaries verified | Single instance, no high availability; temporary Stripe sandbox must be renewed |
 | Classic Alexa Skill | [Development skill → Lambda → AgentCore](docs/traces/alexa-test-2026-10-13.json); 3/3 real Test-console text requests returned exact receipt speech | Classic skill, not Alexa+ add-on; Echo, human microphone and final video not verified |
 
-The local demo remains **Claude Sonnet 4.6 · Anthropic API**. Bedrock development and
+The local demo runs on **Claude Sonnet 5.5 · Anthropic API** since 18 October 2026 (the
+recorded sandbox runs above used Sonnet 4.6). Bedrock development and
 Strands use **Nova Pro**. GPT frontier models are unavailable to this account and
 are excluded; gpt-oss-120b is the third evaluated model. Existing AWS budget alerts
 were left unchanged at Walter's request; this work does not assert a hard spending cap.
