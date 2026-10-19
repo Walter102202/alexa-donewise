@@ -86,11 +86,17 @@ class MCPClient:
         text = "\n".join(item.text for item in result.content if hasattr(item, "text"))
         return result.structured_content, result.is_error, text
 
+    @property
+    def admin_base(self):
+        if self.settings.admin_url:
+            return self.settings.admin_url.rstrip("/")
+        parts = urlsplit(self.settings.mcp_url)
+        return urlunsplit((parts.scheme, parts.netloc, "", "", ""))
+
     async def admin(self, path, payload=None, *, delete=False):
         if not self.settings.demo_admin_token:
             raise RuntimeError("Demo admin capability is not configured")
-        parts = urlsplit(self.settings.mcp_url)
-        url = urlunsplit((parts.scheme, parts.netloc, "/admin/" + path, "", ""))
+        url = self.admin_base + "/admin/" + path
         async with httpx2.AsyncClient(
             headers={"X-Demo-Admin-Token": self.settings.demo_admin_token}
         ) as client:

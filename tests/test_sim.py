@@ -851,3 +851,20 @@ async def test_fault_reset_disarms_without_restarting_the_session(mcp):
         assert state["run_id"] == metadata["run_id"]
         assert state["fault_state"]["armed"] == {}
         assert (await client.post(prefix + "/faults", json=fault)).status_code == 200
+
+
+@pytest.mark.anyio
+async def test_admin_url_can_point_at_a_tunnel_instead_of_the_mcp_host(mcp):
+    # Against Lightsail the MCP URL is public HTTPS while /admin is only reachable through an
+    # SSH forward: DONEWISE_ADMIN_URL names that forward. Default stays the MCP host.
+    from donewise_sim.mcp_client import MCPClient
+
+    plain = Settings(mcp_url="https://example.invalid/mcp", demo_admin_token="admin")
+    assert MCPClient(plain, "run_x").admin_base == "https://example.invalid"
+    tunnel = Settings(
+        mcp_url="https://example.invalid/mcp", demo_admin_token="admin", admin_url=mcp[1]
+    )
+    client = MCPClient(tunnel, "run_tunnel")
+    assert client.admin_base == mcp[1]
+    state = await client.admin("faults")
+    assert state == {"armed": {}, "fired": []}

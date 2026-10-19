@@ -11,6 +11,9 @@ class Settings:
     mcp_url: str = field(default_factory=lambda: os.getenv("MCP_URL", "http://127.0.0.1:8765/mcp"))
     mcp_bearer_token: str = field(default_factory=lambda: os.getenv("MCP_BEARER_TOKEN", ""))
     demo_admin_token: str = field(default_factory=lambda: os.getenv("DEMO_ADMIN_TOKEN", ""))
+    # Where /admin lives when it is not on the MCP host (a remote server reached through an SSH
+    # forward). Empty: same scheme and host as MCP_URL.
+    admin_url: str = field(default_factory=lambda: os.getenv("DONEWISE_ADMIN_URL", "").strip())
     mode: str = field(default_factory=lambda: os.getenv("DONEWISE_MODE", "sandbox"))
     llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "bedrock"))
     aws_region: str = field(default_factory=lambda: os.getenv("AWS_REGION", "us-west-2"))
