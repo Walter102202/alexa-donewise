@@ -552,13 +552,13 @@ async function detailOf(response, fallback) {
 
 if (!Recognition) { get('mic').disabled = true; get('mic').title = 'Speech recognition is not supported in this browser'; }
 
-// Listening works like a speaker, not a walkie-talkie: recognition stays open across pauses and
-// closes on its own after a short silence (shorter once the recognizer marked a result final),
-// or earlier when the mic is tapped again.
+// Listening works two ways. Tap: recognition stays open across pauses and closes on its own after
+// a silence (1.5 s once the recognizer marked a result final, 2 s otherwise), or earlier when the
+// mic is tapped again. Hold: while the mic is pressed no silence timer runs; releasing ends the turn.
 // Chrome may end a continuous session by itself; while still armed we restart it and keep the text.
-const FINAL_SILENCE_MS = 700, INTERIM_SILENCE_MS = 2000, MAX_RESTARTS = 5;
+const FINAL_SILENCE_MS = 1500, INTERIM_SILENCE_MS = 2000, MAX_RESTARTS = 5, HOLD_MS = 350;
 
-get('mic').addEventListener('click', () => {
+function startListening() {
 
   if (!Recognition) { note('Speech recognition is not supported in this browser. Type instead.'); return; }
 
@@ -569,11 +569,12 @@ get('mic').addEventListener('click', () => {
 
   const committed = []; // final transcripts from earlier sessions of this same listen
   let rec = null, sessionFinal = '', interim = '', silence = null, restarts = 0;
-  let armed = true, failed = false, sent = false;
+  let armed = true, failed = false, sent = false, holding = true;
 
   const transcript = () => [...committed, sessionFinal, interim].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
 
-  const resetSilence = ms => { clearTimeout(silence); silence = setTimeout(finish, ms); };
+  const resetSilence = ms => { clearTimeout(silence); if (holding) return; silence = setTimeout(finish, ms); };
+  function release() { holding = false; resetSilence(INTERIM_SILENCE_MS); }
 
   function finish() {
     if (!armed) return;
@@ -625,11 +626,30 @@ get('mic').addEventListener('click', () => {
     }
   }
 
-  recognizing = { finish }; updateControls();
+  recognizing = { finish, release }; updateControls();
   get('mic').setAttribute('aria-pressed', 'true');
-  note('Listening… sends after a short pause, or tap the mic when you are done.');
+  note('Listening… hold the mic while you speak and release to send, or tap and pause when you are done.');
   startSession();
+}
 
+// Pointer protocol: press starts listening in hold mode. A release before HOLD_MS was a tap, so the
+// silence timers take over; a longer press ends the turn on release. Pressing while listening ends it.
+let pressStart = 0, pressToStop = false;
+get('mic').addEventListener('pointerdown', e => {
+  if (e.button) return;
+  if (recognizing) { pressToStop = true; recognizing.finish(); return; }
+  pressStart = Date.now(); startListening();
+});
+get('mic').addEventListener('pointerup', () => {
+  if (pressToStop) { pressToStop = false; return; }
+  if (!recognizing) return;
+  if (Date.now() - pressStart >= HOLD_MS) recognizing.finish(); else recognizing.release();
+});
+get('mic').addEventListener('pointercancel', () => { if (recognizing && !pressToStop) recognizing.release(); pressToStop = false; });
+get('mic').addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  e.preventDefault();
+  if (recognizing) recognizing.finish(); else { startListening(); if (recognizing) recognizing.release(); }
 });
 
 get('input').addEventListener('submit', e => {
