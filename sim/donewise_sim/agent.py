@@ -16,9 +16,7 @@ YES_WORDS = frozenset(
 STRONG_YES = re.compile(
     r"\b(yes|yep|yup|go ahead|do it|charge it|approve|confirm|confirmed|absolutely|of course)\b"
 )
-NO = re.compile(
-    r"\b(no|nope|don't|do not|cancel|stop|never mind|nevermind|not now|forget it)\b"
-)
+NO = re.compile(r"\b(no|nope|don't|do not|cancel|stop|never mind|nevermind|not now|forget it)\b")
 DECLINED = "OK, I won't charge it."
 
 
