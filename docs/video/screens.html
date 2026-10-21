@@ -49,7 +49,9 @@ body:not(:has(.screen:target)) #s1{display:flex}
 /* #s1 · two states, hard cut */
 #s1[data-state=a] .s1-b,#s1[data-state=b] .s1-a{display:none}
 .s1-a,.s1-b{flex:1;display:flex;flex-direction:column;min-height:0}
-.s1-a{align-items:center;justify-content:center}
+.s1-a-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s1-fact{margin-top:calc(40 * var(--u));font-size:calc(40 * var(--u));font-weight:500;letter-spacing:-.01em;line-height:1.2}
+.s1-denoms{margin-top:calc(16 * var(--u));font-size:calc(24 * var(--u));color:var(--muted)}
 .generic{font-family:system-ui,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:calc(48 * var(--u)) calc(56 * var(--u)) calc(48 * var(--u)) calc(48 * var(--u));border:1px solid #E6E6E6;border-radius:calc(28 * var(--u));background:#FFFFFF}
 .bubble{display:inline-block;padding:calc(34 * var(--u)) calc(44 * var(--u));background:#F0F0F2;border-radius:calc(32 * var(--u)) calc(32 * var(--u)) calc(32 * var(--u)) calc(8 * var(--u))}
 .bubble-done{font-size:calc(72 * var(--u));font-weight:600;line-height:1.05;color:#1A1A1A}
@@ -113,24 +115,29 @@ body:not(:has(.screen:target)) #s1{display:flex}
 
 <!-- #s1 · Said done, charged twice. State A: generic reply (illustration). State B: what the provider recorded. -->
 <section class="screen" id="s1" data-state="a">
-  <span class="badge">SCRIPTED BASELINE · FAKE ADAPTERS · NO MODEL</span>
   <div class="s1-a">
-    <div class="generic">
-      <div class="bubble">
-        <p class="bubble-done">Done.</p>
-        <p class="bubble-detail">Your $60 deposit is paid.</p>
+    <span class="badge">THREE REAL MODELS ON BEDROCK · SANDBOX</span>
+    <div class="s1-a-body">
+      <div class="generic">
+        <div class="bubble">
+          <p class="bubble-done">Done.</p>
+          <p class="bubble-detail">Your $60 deposit is paid.</p>
+        </div>
       </div>
+      <p class="s1-fact">Said "done" with nothing written: 4 to 5 times per model</p>
+      <p class="s1-denoms num">Nova Pro: 5 of 14 · Claude Sonnet 4.6: 5 of 19 · gpt-oss-120b: 4 of 15 "done"s</p>
+      <p class="generic-caption">Generic assistant reply · illustration · counts in the results screen and the repo</p>
     </div>
-    <p class="generic-caption">Generic assistant reply · illustration</p>
   </div>
   <div class="s1-b">
+    <span class="badge">WORST CASE · SCRIPTED RUN · NO MODEL</span>
     <div class="ledger">
       <h2>What the payment provider recorded</h2>
-      <div class="charge"><span>Ridge Plumbing deposit</span><span class="num">$60.00</span></div>
-      <div class="charge"><span>Ridge Plumbing deposit</span><span class="num">$60.00</span></div>
+      <div class="charge"><span>Plumber deposit</span><span class="num">$60.00</span></div>
+      <div class="charge"><span>Plumber deposit</span><span class="num">$60.00</span></div>
       <p class="total num">2 charges · $120.00</p>
     </div>
-    <p class="foot">run_e7b86bb65212467fa87e40c8053e6c48 · matrix 2026-09-17-v2 · client output: 'Result not confirmed.' 'Done.'</p>
+    <p class="foot">run_e7b86bb65212467fa87e40c8053e6c48 · matrix 2026-09-17-v2 · user retried after a lost answer · client output: 'Result not confirmed.' 'Done.'</p>
   </div>
 </section>
 
@@ -179,11 +186,11 @@ body:not(:has(.screen:target)) #s1{display:flex}
   <h2 class="title">Same fault. Two outcomes.</h2>
   <div class="split">
     <div class="pane">
-      <span class="badge">SCRIPTED BASELINE · FAKE ADAPTERS</span>
+      <span class="badge">WORST CASE · SCRIPTED RUN · NO MODEL</span>
       <div class="pane-body">
         <p class="fault">Response lost after the charge</p>
         <p class="figure num">2 charges · $120.00</p>
-        <p class="verdict">Retried blindly</p>
+        <p class="verdict">User retried · new request</p>
       </div>
       <dl class="ids">
         <dt>Run</dt><dd>run_e7b86bb65212467fa87e40c8053e6c48</dd>
@@ -223,7 +230,7 @@ body:not(:has(.screen:target)) #s1{display:flex}
   <table class="results">
     <colgroup><col style="width:34%"><col style="width:28%"><col style="width:19%"><col style="width:19%"></colgroup>
     <thead>
-      <tr><th>Model</th><th>False confirmations without DoneWise</th><th class="accent">With DoneWise</th><th>Duplicate charges</th></tr>
+      <tr><th>Model</th><th>False confirmations without DoneWise</th><th class="accent">With DoneWise</th><th>Duplicate charges, either way</th></tr>
     </thead>
     <tbody>
       <tr><td>Amazon Nova Pro</td><td class="num">5 / 14</td><td class="num accent">0 / 11</td><td class="num">0 / 4</td></tr>
@@ -236,7 +243,7 @@ body:not(:has(.screen:target)) #s1{display:flex}
       <p class="suite-title">Deterministic suite <span class="num">· run_671d3192be484121aafb6368d4928291</span></p>
       <div class="suite-row"><span>False success claims</span><span class="num">4/10 → <span class="accent">0/11</span></span></div>
       <div class="suite-row"><span>Extra charges</span><span class="num">2/4 → <span class="accent">0/4</span></span></div>
-      <div class="suite-row"><span>Idempotency keys alone, no read-back</span><span class="num">1/4 charges · 4/13 false claims</span></div>
+      <div class="suite-row"><span>Idempotency keys, no read-back</span><span class="num">still 4 false "done"s</span></div>
     </div>
     <div class="note">
       <p class="note-text">Finite runs. Zero in a sample is not never. Denominators, run IDs and the review method are in the repo.</p>

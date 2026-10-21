@@ -2,6 +2,7 @@
 
 import json
 import re
+import sys
 from uuid import uuid4
 
 from .session import ToolCallError
@@ -127,6 +128,11 @@ async def turn(session, text):
                     else ("Tool failed or denied; do not retry writes")
                 )
                 payload, error = {"error": message}, True
+                print(
+                    f"tool error {call.name}: {message} :: args={json.dumps(args)[:600]}",
+                    file=sys.stderr,
+                    flush=True,
+                )
                 await session.emit("error", {"message": "Tool failed or denied: " + call.name})
             outputs.append(
                 {
