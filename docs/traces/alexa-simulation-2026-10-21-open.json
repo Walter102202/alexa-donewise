@@ -1,0 +1,95 @@
+{
+  "id": "b0c0b7db-de65-44a0-92f2-b73cf8ace243",
+  "status": "SUCCESSFUL",
+  "result": {
+    "alexaExecutionInfo": {
+      "alexaResponses": [
+        {
+          "type": "Speech",
+          "content": {
+            "caption": "Ask what I charged last night, and when the plumber is scheduled."
+          }
+        }
+      ],
+      "consideredIntents": [
+        {
+          "name": "<LaunchRequest>"
+        }
+      ]
+    },
+    "skillExecutionInfo": {
+      "invocations": [
+        {
+          "invocationRequest": {
+            "endpoint": "arn:aws:lambda:us-east-1:027018013541:function:donewise-alexa",
+            "body": {
+              "version": "1.0",
+              "session": {
+                "new": true,
+                "sessionId": "amzn1.echo-api.session.82819d9a-f1cf-4437-88cd-1c4f9fab9224",
+                "application": {
+                  "applicationId": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b"
+                },
+                "attributes": {},
+                "user": {
+                  "userId": "amzn1.ask.account.<redacted>"
+                },
+                "affiliatedResources": []
+              },
+              "context": {
+                "Extensions": {
+                  "available": {
+                    "aplext:backstack:10": {}
+                  }
+                },
+                "Advertising": {
+                  "advertisingId": "00000000-0000-0000-0000-000000000000",
+                  "limitAdTracking": true
+                },
+                "System": {
+                  "application": {
+                    "applicationId": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b"
+                  },
+                  "user": {
+                    "userId": "amzn1.ask.account.<redacted>"
+                  },
+                  "device": {
+                    "deviceId": "amzn1.ask.device.<redacted>",
+                    "supportedInterfaces": {}
+                  },
+                  "apiEndpoint": "https://api.amazonalexa.com",
+                  "apiAccessToken": "<redacted>"
+                }
+              },
+              "request": {
+                "type": "LaunchRequest",
+                "requestId": "amzn1.echo-api.request.f78253a8-6c1b-4ee6-bcf7-9b068555adc9",
+                "locale": "en-US",
+                "timestamp": "2026-10-21T16:18:28Z",
+                "shouldLinkResultBeReturned": false
+              }
+            }
+          },
+          "invocationResponse": {
+            "body": {
+              "version": "1.0",
+              "response": {
+                "outputSpeech": {
+                  "type": "SSML",
+                  "ssml": "<speak>Ask what I charged last night, and when the plumber is scheduled.</speak>"
+                },
+                "shouldEndSession": false,
+                "type": "_DEFAULT_RESPONSE"
+              },
+              "sessionAttributes": {},
+              "userAgent": "ask-python/1.19.0 Python/3.12.14"
+            }
+          },
+          "metrics": {
+            "skillExecutionTimeInMilliseconds": 55
+          }
+        }
+      ]
+    }
+  }
+}

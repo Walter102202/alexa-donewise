@@ -38,7 +38,7 @@ Reproduce: `uv run donewise-evals --runner deterministic --output-dir "evals/res
 
 [Full evidence and S01 contrast](evals/results/2026-10-21-sandbox-run_671d3192be484121aafb6368d4928291.json) · [Historical two-variant run](evals/results/2026-09-17-sandbox-run_c1489defba8445f1a7592d550df68884.json) · [Approved matrix and limits](evals/README.md).
 
-This table is not a live LLM, Google or Stripe run. A separate Claude Code/Sonnet sandbox session is recorded below. Voice controls are implemented; human microphone/TTS rehearsal remains pending.
+This table is not a live LLM, Google or Stripe run. A separate Claude Code/Sonnet sandbox session is recorded below. Voice controls were used in rehearsals and in the demo recording of 20 October 2026; a typed phrase takes the same path.
 
 ## Three real models on Bedrock · Fake adapters
 
@@ -69,7 +69,7 @@ Reproduce: `LLM_PROVIDER=bedrock BEDROCK_MODEL_ID=<model> uv run --env-file .env
 | Offline preview | Same UI loading `sim/fixtures/story-3min.json` | Invented fixture; labelled disconnected; not acceptance evidence |
 | Claude Code | Sonnet completed five turns in the [recorded sandbox run](docs/traces/claude-code-client.md) | Not the simulator's live LLM path or an Alexa integration |
 | Google Calendar / Stripe test | [Connected provider smoke passed](docs/stripe-sandbox.md): calendar create/move/read and one $1 Stripe test payment, replayed with the same identity | [Five connected fault turns and measured remote latency](docs/traces/lightsail-2026-10-13.md); finite sample |
-| Voice / Alexa+ | Browser speech controls and a simulated Alexa+ experience | No official Alexa+ integration, account linking or certification; human audio rehearsal pending |
+| Voice / Alexa+ | Browser speech controls and a simulated Alexa+ experience | No official Alexa+ integration, account linking or certification; no Echo test |
 
 ## Quickstart: no keys, no real money
 
@@ -124,7 +124,7 @@ Captured on 13 October 2026 from `sim/static` served by Docker, Scripted mode, s
 live MCP; voice off. These are application screenshots, not the mockup or offline fixture. They
 show the previous visual design: on 18 October 2026 the simulator moved to the three-column
 "Editorial plano" layout specified in `design/mockups/B2-Editorial.dc.html`. The flow and the
-receipts are unchanged; new captures are pending the recording session.
+receipts are unchanged; the demo video recorded on 20 October 2026 shows the current layout.
 
 ![Bound approval before any charge](docs/screenshots/01-approval.png)
 
@@ -272,14 +272,14 @@ the 6500 ms gate. Deterministic eval timing uses a logical clock and is not this
 | Component | Verified evidence | Remaining boundary |
 | --- | --- | --- |
 | Amazon Bedrock | Nova Pro, Sonnet 4.6 and gpt-oss-120b passed Converse/tool smoke; [three live-model fault evaluations](evals/README.md) with reviewed claims | Finite Fake-adapter evaluation; billing cost not retrieved |
-| Connected simulator | [Five backend/MCP turns](docs/traces/bedrock-sim-2026-10-12.md) with Nova on Bedrock and Sonnet via Anthropic, real Google Calendar and Stripe test; configured model shown in header | Human microphone/TTS and final recording pending; Nova needed a corrected tool call |
+| Connected simulator | [Five backend/MCP turns](docs/traces/bedrock-sim-2026-10-12.md) with Nova on Bedrock and Sonnet via Anthropic, real Google Calendar and Stripe test; configured model shown in header | Nova needed a corrected tool call; the demo video (20 October 2026) ran on Claude Haiku 5.5 |
 | Strands SDK | [Native MCP client](agents/strands_client/README.md), five connected turns, exact receipt speech; new-session recap without history | Separate dependency environment; single-user demo, not multi-tenant authorization |
 | AgentCore Runtime | [Deployed ARM64 Strands/Nova agent](docs/traces/agentcore-2026-10-13.md), exact receipt, one recap per trace; 50 actual exported spans | Small first-session/warm sample; read-only historical recap, no multi-user account binding |
 | Lightsail | [HTTPS MCP deployed](docs/traces/lightsail-2026-10-13.md), persistent SQLite, five remote connected turns; bearer and private-admin boundaries verified | Single instance, no high availability; temporary Stripe sandbox must be renewed |
-| Classic Alexa Skill | [Development skill → Lambda → AgentCore](docs/traces/alexa-test-2026-10-13.json); 3/3 real Test-console text requests returned exact receipt speech | Classic skill, not Alexa+ add-on; Echo, human microphone and final video not verified |
+| Classic Alexa Skill | [Development skill → Lambda → AgentCore](docs/traces/alexa-test-2026-10-13.json); 3/3 real Test-console text requests returned exact receipt speech | Classic skill, not Alexa+ add-on; no Echo test. The video (21 October 2026) uses the Developer Console simulator with typed text: its microphone returned "No Content" ([friction log 23](docs/friction-log.md)) |
 
-The local demo runs on **Claude Sonnet 5.5 · Anthropic API** since 18 October 2026 (the
-recorded sandbox runs above used Sonnet 4.6). Bedrock development and
+The demo video was recorded on 20 October 2026 with **Claude Haiku 5.5 · Anthropic API**; the
+18 October rehearsals used Sonnet 5.5 and the recorded sandbox runs above used Sonnet 4.6. Bedrock development and
 Strands use **Nova Pro**. GPT frontier models are unavailable to this account and
 are excluded; gpt-oss-120b is the third evaluated model. Existing AWS budget alerts
 were left unchanged at Walter's request; this work does not assert a hard spending cap.
@@ -359,9 +359,9 @@ trace. The reusable MIT package is in `core/`;
 - Simulator sessions/SSE history do not survive restart. Recap is historical evidence.
 - Replay windows are bounded; unresolved effects can remain UNKNOWN rather than be resent.
 - Google/Stripe smoke and five connected backend/MCP fault turns passed with Nova and Sonnet.
-  Cloud latency and classic Alexa Test are recorded; human audio rehearsal and final recording remain pending.
+  Cloud latency and classic Alexa Test are recorded; the demo video was recorded on 20 and 21 October 2026.
 - Inspector CLI, Python ClientSession and Claude Code have evidence; Desktop and official Alexa+ do not.
-- Authenticated MCP is hosted; the skill stays in Development. No package release or final video claimed. Source: https://github.com/Walter102202/alexa-donewise.
+- Authenticated MCP is hosted; the skill stays in Development. No package release claimed; the demo video is linked from the Devpost submission. Source: https://github.com/Walter102202/alexa-donewise.
 
 [Product feedback](docs/product-feedback.md) · [Friction log](docs/friction-log.md) ·
 [MIT license](LICENSE).

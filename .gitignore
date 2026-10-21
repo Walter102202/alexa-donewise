@@ -17,6 +17,10 @@ docs/briefs/
 docs/guion-video.md
 docs/devpost.md
 
+# Recording leftovers (script lines and browser-tool output)
+docs/video/subtitulos-walter.txt
+.playwright-mcp/
+
 # Build and local data
 *.egg-info/
 core/build/

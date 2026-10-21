@@ -1,0 +1,198 @@
+{
+  "id": "7710555e-ae32-48d9-b88f-5ed6a6295698",
+  "status": "SUCCESSFUL",
+  "result": {
+    "alexaExecutionInfo": {
+      "alexaResponses": [
+        {
+          "type": "Speech",
+          "content": {
+            "caption": "From the saved receipts: plumber is at 2 to 3 PM, read back yesterday at 11:19 PM. One $60 test charge for the deposit, read back yesterday at 11:17 PM. Nothing is unverified or pending. Nothing new was written to your calendar or payments."
+          }
+        }
+      ],
+      "consideredIntents": [
+        {
+          "name": "RequestIntent",
+          "confirmationStatus": "NONE",
+          "slots": {
+            "request": {
+              "name": "request",
+              "value": "what did you charge last night and when is the plumber",
+              "resolutions": {
+                "resolutionsPerAuthority": [
+                  {
+                    "authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b.RequestPhrase",
+                    "status": {
+                      "code": "ER_SUCCESS_MATCH"
+                    },
+                    "values": [
+                      {
+                        "value": {
+                          "name": "what did you charge last night and when is the plumber",
+                          "id": "616f37e9306debafaea21d2b56a71bc7"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "confirmationStatus": "NONE",
+              "source": "USER",
+              "slotValue": {
+                "type": "Simple",
+                "value": "what did you charge last night and when is the plumber",
+                "resolutions": {
+                  "resolutionsPerAuthority": [
+                    {
+                      "authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b.RequestPhrase",
+                      "status": {
+                        "code": "ER_SUCCESS_MATCH"
+                      },
+                      "values": [
+                        {
+                          "value": {
+                            "name": "what did you charge last night and when is the plumber",
+                            "id": "616f37e9306debafaea21d2b56a71bc7"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "<IntentForDifferentSkill>"
+        }
+      ]
+    },
+    "skillExecutionInfo": {
+      "invocations": [
+        {
+          "invocationRequest": {
+            "endpoint": "arn:aws:lambda:us-east-1:027018013541:function:donewise-alexa",
+            "body": {
+              "version": "1.0",
+              "session": {
+                "new": false,
+                "sessionId": "amzn1.echo-api.session.82819d9a-f1cf-4437-88cd-1c4f9fab9224",
+                "application": {
+                  "applicationId": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b"
+                },
+                "attributes": {},
+                "user": {
+                  "userId": "amzn1.ask.account.<redacted>"
+                },
+                "affiliatedResources": []
+              },
+              "context": {
+                "Extensions": {
+                  "available": {
+                    "aplext:backstack:10": {}
+                  }
+                },
+                "Advertising": {
+                  "advertisingId": "00000000-0000-0000-0000-000000000000",
+                  "limitAdTracking": true
+                },
+                "System": {
+                  "application": {
+                    "applicationId": "amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b"
+                  },
+                  "user": {
+                    "userId": "amzn1.ask.account.<redacted>"
+                  },
+                  "device": {
+                    "deviceId": "amzn1.ask.device.<redacted>",
+                    "supportedInterfaces": {}
+                  },
+                  "apiEndpoint": "https://api.amazonalexa.com",
+                  "apiAccessToken": "<redacted>"
+                }
+              },
+              "request": {
+                "type": "IntentRequest",
+                "requestId": "amzn1.echo-api.request.4df275c9-ac5b-4f9e-a756-8fc2e5ab0c71",
+                "locale": "en-US",
+                "timestamp": "2026-10-21T16:18:38Z",
+                "intent": {
+                  "name": "RequestIntent",
+                  "confirmationStatus": "NONE",
+                  "slots": {
+                    "request": {
+                      "name": "request",
+                      "value": "what did you charge last night and when is the plumber",
+                      "resolutions": {
+                        "resolutionsPerAuthority": [
+                          {
+                            "authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b.RequestPhrase",
+                            "status": {
+                              "code": "ER_SUCCESS_MATCH"
+                            },
+                            "values": [
+                              {
+                                "value": {
+                                  "name": "what did you charge last night and when is the plumber",
+                                  "id": "616f37e9306debafaea21d2b56a71bc7"
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "confirmationStatus": "NONE",
+                      "source": "USER",
+                      "slotValue": {
+                        "type": "Simple",
+                        "value": "what did you charge last night and when is the plumber",
+                        "resolutions": {
+                          "resolutionsPerAuthority": [
+                            {
+                              "authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.34982f14-6b4a-47c6-9b65-f0649d1c6a0b.RequestPhrase",
+                              "status": {
+                                "code": "ER_SUCCESS_MATCH"
+                              },
+                              "values": [
+                                {
+                                  "value": {
+                                    "name": "what did you charge last night and when is the plumber",
+                                    "id": "616f37e9306debafaea21d2b56a71bc7"
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "invocationResponse": {
+            "body": {
+              "version": "1.0",
+              "response": {
+                "outputSpeech": {
+                  "type": "SSML",
+                  "ssml": "<speak>From the saved receipts: plumber is at 2 to 3 PM, read back yesterday at 11:19 PM. One $60 test charge for the deposit, read back yesterday at 11:17 PM. Nothing is unverified or pending. Nothing new was written to your calendar or payments.</speak>"
+                },
+                "shouldEndSession": false,
+                "type": "_DEFAULT_RESPONSE"
+              },
+              "sessionAttributes": {},
+              "userAgent": "ask-python/1.19.0 Python/3.12.14"
+            }
+          },
+          "metrics": {
+            "skillExecutionTimeInMilliseconds": 2709
+          }
+        }
+      ]
+    }
+  }
+}

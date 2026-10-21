@@ -305,3 +305,14 @@ with dates/timezone preserved. The original fixed-response evidence remains hist
 | Workaround | Walter authorized chat coordination; assigned one writer per surface, kept the original demo run_b7d652a00a1e444d9ba6e54b0823107c copied to Lightsail, reused runtime v1, removed duplicate trigger, preserved each evidence set separately |
 | Suggestion | Record demo versus smoke run provenance explicitly alongside runtime configuration |
 | Command / evidence | `aws bedrock-agentcore-control get-agent-runtime --agent-runtime-id donewise_receipts-wbsa177WJQ --profile donewise --region us-east-1` (do not publish its secret environment); [final receipt identity](traces/alexa-connected-2026-10-13.json) |
+
+## 23. Developer Console simulator microphone returns "No Content" — 21 October 2026
+
+| Field | Observation |
+| --- | --- |
+| Task / steps | Record the Alexa scene of the demo video in the Developer Console Test tab (Development stage, en-US): click the microphone, say `open done wise`, then the question |
+| Expected / observed | Expected a transcript and the spoken receipt. Observed `No Content` on every attempt, although Chrome had microphone permission and `getUserMedia` captured audio in the same tab. Typing `open donewise` (one word) answered "I'm not quite sure how to help you with that"; typing `open done wise` (the invocation name, two words) opened the skill. The typed question returned the exact receipt in 2709 ms of skill execution |
+| Severity | Medium: voice testing in the console blocked; typed testing unaffected |
+| Workaround | Type the utterances in the Test tab, prewarm Lambda and AgentCore with the same pair through SMAPI right before recording, and record the typed exchange |
+| Suggestion | Report why captured audio produced no content (permission, device, recognition) instead of `No Content`; when a typed utterance matches no enabled invocation name, say so |
+| Command / evidence | `ask smapi simulate-skill --skill-id <id> --stage development --device-locale en-US --input-content "open done wise"`, then `ask smapi get-skill-simulation`; [open](traces/alexa-simulation-2026-10-21-open.json) and [question](traces/alexa-simulation-2026-10-21-question.json) simulations (account, device and token values redacted) |
