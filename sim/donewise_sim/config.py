@@ -26,6 +26,9 @@ class Settings:
     user_timezone: str = field(
         default_factory=lambda: os.getenv("USER_TIMEZONE", USER_TIMEZONES[0]).strip()
     )
+    # How long one turn keeps polling a PENDING write before handing the pending receipt to the
+    # user (RF-34). Tests widen it together with the server's background budget.
+    pending_poll_seconds: float = 15.0
 
     def __post_init__(self):
         if self.user_timezone not in USER_TIMEZONES:

@@ -141,7 +141,7 @@ class Session:
                 "arguments": dict(arguments),
                 "turns_since": 0,
             }
-        deadline = asyncio.get_running_loop().time() + 15
+        deadline = asyncio.get_running_loop().time() + self.settings.pending_poll_seconds
         while result.get("outcome") == "PENDING":
             await self.emit("status", {"status": "pending"})
             if asyncio.get_running_loop().time() >= deadline:

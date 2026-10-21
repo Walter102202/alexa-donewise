@@ -12,7 +12,10 @@ from donewise_sim import agent as agent_module
 from donewise_sim.app import build_app
 from donewise_sim.config import Settings
 from donewise_sim.llm import NoLLM, Reply, ToolCall
+from donewise_sim.mcp_client import MCPClient
 from test_server import calendar_args, serving
+
+WIDE_BUDGET = 60.0  # seconds; see the mcp fixture
 
 
 @pytest.fixture
@@ -31,7 +34,11 @@ def mcp(tmp_path):
             # delay stays above it so the PENDING path is still exercised.
             pending_after=2.0,
             fake_payment_delay_seconds=3.0,
-        )
+        ),
+        # The approval story writes twice (lost response, replay), so a stalled runner can
+        # exceed the 15 s product budget and get UNKNOWN/READ_TIMEOUT. The server and the
+        # simulator wait longer here; the product defaults are unchanged.
+        background_timeout=WIDE_BUDGET,
     )
     with serving(app) as url:
         yield app, url
@@ -49,6 +56,7 @@ async def simulation(
             demo_admin_token=admin_token,
             llm_provider="none",
             user_timezone=user_timezone,
+            pending_poll_seconds=WIDE_BUDGET,
         ),
         llm=llm,
     )
@@ -84,7 +92,7 @@ async def act(client, session_id, path, body=None):
     prefix = f"/session/{session_id}"
     response = await client.post(prefix + path, json=body)
     assert response.status_code == 200, response.text
-    for _ in range(250):
+    for _ in range(int(WIDE_BUDGET * 20) + 100):
         state = (await client.get(prefix + "/state")).json()
         if not state["busy"]:
             await asyncio.sleep(0.05)  # let the independent SSE connection deliver its final frame
@@ -155,18 +163,53 @@ class NeverLLM(NoLLM):
         raise AssertionError("Consent must not invoke the model")
 
 
+async def settled_payment(mcp, run_id, state):
+    """The payment receipt once it is terminal.
+
+    The approval write loses its response and is replayed, so the Fake adapter sleeps twice.
+    A stalled CI runner can push that past the harness's background budget (15 s in the product,
+    WIDE_BUDGET here), which then reports UNKNOWN/READ_TIMEOUT by design ("I'll keep checking").
+    Checking the operation again resolves it once the write has landed, which is what the receipt
+    tells a client to do.
+    """
+    payments = [
+        r["result"]
+        for r in state["receipts"].values()
+        if r["result"].get("action") == "PAYMENT_CHARGE"
+    ]
+    assert payments, state["receipts"]
+    result = payments[-1]
+    if result["outcome"] not in ("PENDING", "UNKNOWN"):
+        return result
+    transport = MCPClient(Settings(mcp_url=mcp[1] + "/mcp", mcp_bearer_token="bearer"), run_id)
+    await transport.start()
+    try:
+        for _ in range(30):
+            await asyncio.sleep(1)
+            result, is_error, text = await transport.call(
+                "operation_get", {"operation_id": result["operation_id"]}
+            )
+            assert not is_error and result is not None, text
+            if result["outcome"] not in ("PENDING", "UNKNOWN"):
+                return result
+    finally:
+        await transport.close()
+    pytest.fail(f"Payment never settled: {result}")
+
+
 @pytest.mark.anyio
 async def test_deterministic_approval_and_reconnect(mcp):
     async with simulation(mcp, NeverLLM()) as (client, metadata, events, app):
         sid = metadata["session_id"]
         await act(client, sid, "/script/next")
         state = await act(client, sid, "/turn", {"text": "YES, charge it!!!"})
-        assert any(r["result"].get("charges_applied") == 1 for r in state["receipts"].values())
+        payment = await settled_payment(mcp, metadata["run_id"], state)
+        assert payment["charges_applied"] == 1, state["receipts"]
+        assert len(mcp[0].state.harness.payments.intents()) == 1
         assert not [e for e in events if e["event"] == "error"]
         assert (
             await client.post(f"/session/{sid}/approve", headers={"Origin": "https://evil.example"})
         ).status_code == 403
-    from donewise_sim.mcp_client import MCPClient
 
     settings = Settings(mcp_url=mcp[1] + "/mcp", mcp_bearer_token="bearer")
     transport = MCPClient(settings, metadata["run_id"])
@@ -866,8 +909,6 @@ async def test_fault_reset_disarms_without_restarting_the_session(mcp):
 async def test_admin_url_can_point_at_a_tunnel_instead_of_the_mcp_host(mcp):
     # Against Lightsail the MCP URL is public HTTPS while /admin is only reachable through an
     # SSH forward: DONEWISE_ADMIN_URL names that forward. Default stays the MCP host.
-    from donewise_sim.mcp_client import MCPClient
-
     plain = Settings(mcp_url="https://example.invalid/mcp", demo_admin_token="admin")
     assert MCPClient(plain, "run_x").admin_base == "https://example.invalid"
     tunnel = Settings(

@@ -73,7 +73,9 @@ def live(tmp_path):
             # delay stays above it so the PENDING path is still exercised.
             pending_after=2.0,
             fake_payment_delay_seconds=3.0,
-        )
+        ),
+        # The lost-response story writes twice; a stalled runner must not hit UNKNOWN/READ_TIMEOUT.
+        background_timeout=60.0,
     )
     with serving(app) as url:
         yield app, url

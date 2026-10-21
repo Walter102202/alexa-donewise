@@ -82,7 +82,13 @@ class BearerMiddleware:
         await self.app(scope, receive, capture)
 
 
-def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=24)) -> Starlette:
+def build_app(
+    settings: Settings,
+    *,
+    clock=None,
+    payment_window=timedelta(hours=24),
+    background_timeout=15.0,
+) -> Starlette:
     # Settings is mutable: revalidate immediately before constructing any provider or state.
     settings.__post_init__()
     faults = FaultBoard()
@@ -126,6 +132,7 @@ def build_app(settings: Settings, *, clock=None, payment_window=timedelta(hours=
         faults=faults,
         consent_token_for=settings.consent_token_for,
         pending_after=settings.pending_after,
+        background_timeout=background_timeout,
         clock=clock,
     )
     reconciler = Reconciler(registry, harness)
