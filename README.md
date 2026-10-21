@@ -136,7 +136,7 @@ Capture conditions and persisted-store checks: [Docker acceptance](docs/traces/d
 
 ## Video claims → evidence
 
-Every narration segment from [PRD §9.1](docs/prd.md) is mapped below. No final video exists yet.
+Every narration segment from [PRD §9.1](docs/prd.md) is mapped below. The demo video recorded on 20 and 21 October 2026 uses a shorter script over the same scenario.
 Use the qualified wording. The table preserves the original sandbox evidence; the AWS section below adds connected/cloud proof. Official Alexa+ integration remains unsupported.
 
 | Segment / planned claim | Receipt, trace or test | Supported wording today |
