@@ -285,9 +285,10 @@ async def test_rejected_write_shows_the_question_and_writes_only_after_the_answe
 
         await act(client, sid, "/turn", {"text": "Tomorrow at 8 a.m. then"})
         receipts = [e["data"]["result"] for e in events if e["event"] == "receipt"]
-        assert len(receipts) == 1 and receipts[0]["outcome"] == "VERIFIED"
+        receipt = settled(receipts)
+        assert receipt["outcome"] == "VERIFIED", receipts
         speech = [e["data"] for e in events if e["event"] == "assistant"]
-        assert speech[-1] == {"text": receipts[0]["spoken"], "source": "spoken"}
+        assert speech[-1] == {"text": receipt["spoken"], "source": "spoken"}
         assert "Done, I booked it." not in json.dumps(speech)
 
 
@@ -308,6 +309,13 @@ class OneCallLLM:
 
 
 INVENTED = "a1b2c3d4-e5f6-7890-abcd-ef1234567890"  # the kind of "UUID" a model repeats
+
+
+def settled(receipts):
+    """The terminal receipt of one write. A slow runner may emit PENDING before it."""
+    assert receipts and receipts[-1]["outcome"] != "PENDING", receipts
+    assert all(r["outcome"] == "PENDING" for r in receipts[:-1]), receipts
+    return receipts[-1]
 
 
 @pytest.mark.anyio
@@ -336,8 +344,9 @@ async def test_same_invented_submission_id_in_two_sessions_creates_two_events(mc
         async with simulation(mcp, llm, ui_mode="voice") as (client, metadata, events, app):
             await act(client, metadata["session_id"], "/turn", {"text": "Book " + title})
             receipts = [e["data"]["result"] for e in events if e["event"] == "receipt"]
-            assert [r["outcome"] for r in receipts] == ["VERIFIED"], receipts
-            assert receipts[0]["expected"]["title"] == title
+            receipt = settled(receipts)
+            assert receipt["outcome"] == "VERIFIED", receipts
+            assert receipt["expected"]["title"] == title
     titles = sorted(row["title"] for row in mcp[0].state.harness.calendar.events().values())
     assert titles == ["Dentist", "Plumber"]
 
