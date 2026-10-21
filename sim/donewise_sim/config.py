@@ -38,6 +38,7 @@ class Settings:
         model = self.bedrock_model_id if self.llm_provider == "bedrock" else self.anthropic_model
         name = {
             "claude-sonnet-5-5": "Claude Sonnet 5.5",
+            "claude-haiku-5-5": "Claude Haiku 5.5",
             "claude-sonnet-4-6": "Claude Sonnet 4.6",
             "us.anthropic.claude-sonnet-4-6": "Claude Sonnet 4.6",
             "us.amazon.nova-pro-v1:0": "Amazon Nova Pro",

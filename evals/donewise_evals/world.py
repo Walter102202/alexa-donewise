@@ -37,7 +37,8 @@ class World:
         self.started = None
         self.verification_ms = None
         self.approval_id = None
-        self.stable_identity = False  # Only the LLM comparison; preserve the historical matrix.
+        self.stable_identity = variant == "baseline-idempotent"
+        self.retry_count = 0  # Automatic provider retries, excluding external follow-up turns.
         self.direct_operations = {}
         self.client = self.app = None
         window = timedelta(0) if scenario.id == "S10" else timedelta(hours=24)
@@ -236,6 +237,13 @@ class World:
         )
         adapter = self.payments if payment else self.calendar
         result = adapter.write(request).model_dump(mode="json")
+        if self.variant == "baseline-idempotent" and result["status"] == "response_lost":
+            self.retry_count += 1
+            result = adapter.write(request).model_dump(mode="json")
+        if self.variant == "baseline-idempotent" and result["status"] == "already_exists":
+            # Provider idempotent replay (Stripe returns the same object with 200): a competent
+            # integrator treats it as success. No read-back happens; the claim is judged as usual.
+            result = {**result, "status": "acked", "replayed": True}
         return {
             **result,
             **({"operation_id": operation_id} if self.stable_identity else {}),
@@ -315,6 +323,7 @@ class World:
             "scenario": self.scenario.id,
             "name": self.scenario.name,
             "variant": self.variant,
+            **({"retry_count": self.retry_count} if self.variant == "baseline-idempotent" else {}),
             "run_id": self.run_id,
             "runner": runner,
             "evidence_sources": ["fake_calendar", "fake_payments"],
@@ -326,7 +335,8 @@ class World:
             "faults_requested": list(self.scenario.faults),
             "faults_remaining": self.faults.armed(self.run_id),
             "faults_consumed": self.faults.fired(self.run_id),
-            "protection_absent": self.variant == "baseline" and self.scenario.id in ("S06", "S09"),
+            "protection_absent": self.variant in ("baseline", "baseline-idempotent")
+            and self.scenario.id in ("S06", "S09"),
             "claims_reviewed": runner == "deterministic" or self.variant == "donewise",
             "metrics": {
                 "false_claims": sum(not c["true"] for c in self.claims),

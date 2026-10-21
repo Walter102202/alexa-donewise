@@ -4,10 +4,11 @@ import json
 
 import pytest
 from donewise_evals.llm_runner import run_llm
-from donewise_evals.report import summarize
+from donewise_evals.report import markdown, summarize
 from donewise_evals.runner import main, run_suite
-from donewise_evals.scenarios import SCENARIOS
+from donewise_evals.scenarios import SCENARIOS, TOOLS, VARIANTS
 from donewise_evals.world import World, matches
+from donewise_harness.ports import WriteResult
 from donewise_sim.config import Settings
 from donewise_sim.llm import Reply, ToolCall
 
@@ -20,7 +21,7 @@ def anyio_backend():
 @pytest.mark.anyio
 async def test_approved_matrix_over_mcp_and_independent_oracle(tmp_path):
     rows = await run_suite(tmp_path)
-    assert len(rows) == 20
+    assert len(rows) == 30
     row = {(r["scenario"], r["variant"]): r for r in rows}
     summary = summarize(rows)
     assert summary["donewise"]["false_claims"] == 0
@@ -70,6 +71,101 @@ async def test_approved_matrix_over_mcp_and_independent_oracle(tmp_path):
     next(iter(altered["payments"]["intents"].values()))["amount_minor"] = 9000
     assert not matches(altered, trace["result"]["expected"])
     assert "consent_token" not in json.dumps(rows)
+    competent = [r for r in rows if r["variant"] == "baseline-idempotent"]
+    assert len(competent) == 10
+    for result in competent:
+        assert result["retry_count"] == int(result["scenario"] in ("S01", "S05", "S10"))
+        assert result["metrics"]["verification_ms"] is None
+        assert all(t["tool"] in (*TOOLS.values(), "operation_get") for t in result["trace"])
+    for sid in ("S01", "S07"):
+        payment = row[sid, "baseline-idempotent"]
+        charges = payment["final"]["payments"]["intents"]
+        assert len(charges) == 1
+        assert next(iter(charges.values()))["amount_minor"] == 6000
+        assert payment["metrics"]["extra_charges"] == 0
+        calls = payment["trace"]
+        assert calls[0]["result"]["provider_key"] == calls[1]["result"]["provider_key"]
+        # Idempotent replay is success for a competent integrator; the claim is true (one charge).
+        assert calls[-1]["result"]["spoken"] == "Done."
+        assert calls[-1]["result"]["replayed"] is True
+        assert payment["metrics"]["completed"]
+    s01 = row["S01", "baseline-idempotent"]
+    assert s01["metrics"]["write_attempts"] == 3  # Initial, automatic retry, external retry.
+    assert (
+        s01["trace"][1]["arguments"]["retry_of_operation_id"]
+        == s01["trace"][0]["result"]["operation_id"]
+    )
+    assert row["S07", "baseline-idempotent"]["metrics"]["write_attempts"] == 2
+    for sid in ("S02", "S03"):
+        calendar = row[sid, "baseline-idempotent"]
+        assert calendar["final"]["calendar"] == calendar["initial"]["calendar"]
+        assert calendar["trace"][0]["result"]["spoken"] == "Done."
+        assert calendar["metrics"]["false_claims"] == 1
+        assert not calendar["metrics"]["completed"]
+    assert summary["baseline-idempotent"]["false_claims"] == 4
+    report = markdown(
+        dict(
+            runner="deterministic",
+            run_id="test",
+            matrix_version="test",
+            command="test",
+            rows=rows,
+            summary=summary,
+        )
+    )
+    assert "| Metric | Baseline | Baseline-idempotent | DoneWise |" in report
+    for scenario in SCENARIOS:
+        assert [r["variant"] for r in rows if r["scenario"] == scenario.id] == list(VARIANTS)
+        for variant in VARIANTS:
+            assert report.count(f"| {scenario.id} | {variant} |") == 1
+
+
+@pytest.mark.parametrize(
+    "status", ["acked", "response_lost", "already_exists", "precondition_failed", "error"]
+)
+def test_idempotent_baseline_retries_same_request_once_and_only_claims_ack(
+    tmp_path, monkeypatch, status
+):
+    world = World(tmp_path / "competent", SCENARIOS[0], "baseline-idempotent")
+    requests = []
+
+    def write(request):
+        requests.append(request)
+        return WriteResult(
+            status="response_lost" if len(requests) == 1 else status,
+            provider_ref=None,
+            version=None,
+            error=None,
+        )
+
+    monkeypatch.setattr(world.payments, "write", write)
+    result = world.direct("payment_charge_verified", world.scenario.inputs)
+    assert len(requests) == 2 and requests[0] is requests[1]
+    assert world.retry_count == 1
+    success = status in ("acked", "already_exists")
+    assert result["status"] == ("acked" if success else status)
+    assert result.get("replayed", False) is (status == "already_exists")
+    assert result["spoken"] == ("Done." if success else "Result not confirmed.")
+    assert world.payments.read_calls == world.calendar.read_calls == 0
+
+
+@pytest.mark.parametrize("scenario", SCENARIOS[:2], ids=lambda s: s.action)
+def test_idempotent_baseline_reuses_submission_and_explicit_retry_identity(tmp_path, scenario):
+    world = World(tmp_path / "competent", scenario, "baseline-idempotent")
+    first = world.direct(TOOLS[scenario.action], scenario.inputs)
+    repeated = world.direct(TOOLS[scenario.action], scenario.inputs)
+    retried = world.direct(
+        TOOLS[scenario.action],
+        {
+            **scenario.inputs,
+            "submission_id": "retry",
+            "retry_of_operation_id": first["operation_id"],
+        },
+    )
+    assert first["provider_key"] == repeated["provider_key"] == retried["provider_key"]
+    assert first["operation_id"] == repeated["operation_id"] == retried["operation_id"]
+    snapshot = world.snapshot()
+    assert len(snapshot["payments"]["intents"]) + len(snapshot["calendar"]["events"]) == 1
 
 
 @pytest.mark.anyio

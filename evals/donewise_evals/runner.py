@@ -15,14 +15,15 @@ from donewise_sim.config import Settings
 
 from .llm_runner import run_llm
 from .report import markdown, summarize
-from .scenarios import NOW, SCENARIOS, VERSION, deterministic
+from .scenarios import NOW, SCENARIOS, VARIANTS, VERSION, deterministic
 from .world import World
 
 
 async def run_suite(root, *, runner="deterministic", settings=None, model_factory=None):
     rows = []
+    variants = VARIANTS if runner == "deterministic" else ("baseline", "donewise")
     for scenario in SCENARIOS:
-        for variant in ("baseline", "donewise"):
+        for variant in variants:
             world = World(root / f"{scenario.id}-{variant}", scenario, variant)
             async with world.connect():
                 timed_out = False

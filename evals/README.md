@@ -9,10 +9,13 @@ Zero in a finite sample does not mean never: **cero en muestra finita no es nunc
 
 One completed execution per scenario and variant, ten scenarios, three Bedrock models,
 Fake adapters. **These are live model calls, not connected Google/Stripe evaluation.**
-Baseline mutation schemas retain submission_id, retry_of_operation_id, approval_id and
-event_query. Stable provider identity and optional post-loss lookup are available in both
-variants; execution/verification and receipt presentation policies differ. The deterministic
-historical baseline below remains a separate intentionally naive experiment.
+**The model baseline here is already a competent integration**: it keeps submission_id,
+retry_of_operation_id, approval_id and event_query, derives stable idempotency keys from them,
+and has calendar_read and payment_read available after a lost response. That is why no model
+duplicated a charge in either variant. It still produced 4 to 5 false confirmations per model
+without DoneWise, and 0 with it: idempotency keys stop the second charge; they do not tell the
+agent whether the first one happened. The two deterministic baselines below (naive and
+idempotent) are separate experiments without a model.
 
 | Model / run | Variant | False claims | Extra charges | Mutations | Protections | Tokens in / out | Model latency per turn p50 / p95 | Cost |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -66,8 +69,14 @@ The statements below about no live runs describe the older September acceptance 
 
 One execution per row and variant, independent Fake JSON files and SQLite registry, a fixed logical
 clock, and the same initial state and external inputs. DoneWise goes through the official MCP client
-over local TCP. The deterministic baseline writes directly, says done only for `acked`, never reads
+over local TCP. The deterministic **naive baseline** writes directly, says done only for `acked`, never reads
 or retries automatically, and generates a fresh payment key or creation ID for every invocation.
+The deterministic **idempotent baseline** (`baseline-idempotent`, added 21 October 2026) derives the
+provider key from `submission_id`, reuses it through `retry_of_operation_id`, retries once automatically
+when the write response is lost, treats a provider replay (`already_exists`) as success, and never reads
+back. Result in `results/2026-10-21-sandbox-run_671d3192be484121aafb6368d4928291.md`: one charge in S01 and S07,
+the same four false "Done" claims as the naive baseline (S02, S03, S08), and one duplicate in S10 where
+the idempotency window had expired before the automatic retry.
 Calendar updates retain the existing event ID and original precondition. Provider faults are armed
 identically; the report records actual consumption, including an unconsumed read fault in baseline.
 

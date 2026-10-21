@@ -7,22 +7,28 @@ The five-turn demo uses real MCP calls and receipt-derived speech; no real money
 
 ## Deterministic sandbox · Fake adapters · no model
 
-Run `run_c1489defba8445f1a7592d550df68884` · matrix `2026-09-17-v2`.
+Run `run_671d3192be484121aafb6368d4928291` · matrix `2026-09-17-v2`. Three variants: the historical naive baseline (fresh
+provider key per attempt, no retry), a **competent baseline** (Stripe-style idempotency keys, one
+automatic retry on a lost response, replay treated as success, no read-back), and DoneWise.
 
-| Metric | Baseline | DoneWise |
-| --- | --- | --- |
-| False success claims / success claims | 4/10 | 0/11 |
-| Scenarios with false claims / executed | 3/10 | 0/10 |
-| Extra charges / authorized payment intents | 2/4 | 0/4 |
-| Extra events / authorized creation intents | 0/3 | 0/3 |
-| Completed mutations / mutation scenarios | 2/7 | 6/7 |
-| Completed protections / protection scenarios | 1/3 | 3/3 |
-| Verified mutations / mutation scenarios | 0/7 | 6/7 |
-| Unauthorized writes | 1 | 0 |
-| External turns | 16 | 16 |
-| Tool calls (excluding setup) | 16 | 16 |
-| Adapter write attempts | 14 | 15 |
-| Timeouts | 0 | 0 |
+| Metric | Baseline | Baseline-idempotent | DoneWise |
+| --- | --- | --- | --- |
+| False success claims / success claims | 4/10 | 4/13 | 0/11 |
+| Scenarios with false claims / executed | 3/10 | 3/10 | 0/10 |
+| Extra charges / authorized payment intents | 2/4 | 1/4 | 0/4 |
+| Extra events / authorized creation intents | 0/3 | 0/3 | 0/3 |
+| Completed mutations / mutation scenarios | 2/7 | 3/7 | 6/7 |
+| Completed protections / protection scenarios | 1/3 | 1/3 | 3/3 |
+| Verified mutations / mutation scenarios | 0/7 | 0/7 | 6/7 |
+| Unauthorized writes | 1 | 1 | 0 |
+| External turns | 16 | 16 | 16 |
+| Tool calls (excluding setup) | 16 | 16 | 16 |
+| Adapter write attempts | 14 | 17 | 15 |
+| Timeouts | 0 | 0 | 0 |
+
+Idempotency keys stop the second charge (S01, S07). They do not tell the agent whether the first
+one happened: the competent baseline still says "Done" four times with nothing written (S02, S03,
+S08) and duplicates the charge once the key window has expired (S10). DoneWise reads back.
 
 Timing is diagnostic only: logical clock; read window not simulated. Real verification latency requires RF-13 with real adapters.
 Harness-only protection rows are not an identical-provider-fault comparison.
@@ -30,7 +36,7 @@ Harness-only protection rows are not an identical-provider-fault comparison.
 
 Reproduce: `uv run donewise-evals --runner deterministic --output-dir "evals/results"`
 
-[Full evidence and S01 contrast](evals/results/2026-09-17-sandbox-run_c1489defba8445f1a7592d550df68884.json) · [Approved matrix and limits](evals/README.md).
+[Full evidence and S01 contrast](evals/results/2026-10-21-sandbox-run_671d3192be484121aafb6368d4928291.json) · [Historical two-variant run](evals/results/2026-09-17-sandbox-run_c1489defba8445f1a7592d550df68884.json) · [Approved matrix and limits](evals/README.md).
 
 This table is not a live LLM, Google or Stripe run. A separate Claude Code/Sonnet sandbox session is recorded below. Voice controls are implemented; human microphone/TTS rehearsal remains pending.
 

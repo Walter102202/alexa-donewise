@@ -2,11 +2,15 @@
 
 from math import ceil
 
+from .scenarios import VARIANTS
+
 
 def summarize(rows):
     summaries = {}
-    for variant in ("baseline", "donewise"):
+    for variant in VARIANTS:
         group = [r for r in rows if r["variant"] == variant]
+        if not group and variant == "baseline-idempotent":
+            continue
         metrics = [r["metrics"] for r in group]
 
         def total(key):
@@ -49,6 +53,12 @@ def summarize(rows):
 
 
 def markdown(report):
+    groups = report["summary"]
+    labels = {
+        "baseline": "Baseline",
+        "baseline-idempotent": "Baseline-idempotent",
+        "donewise": "DoneWise",
+    }
     lines = [
         "## Deterministic sandbox · Fake adapters · no model"
         if report["runner"] == "deterministic"
@@ -58,10 +68,9 @@ def markdown(report):
         "",
         f"Run `{report['run_id']}` · matrix `{report['matrix_version']}`.",
         "",
-        "| Metric | Baseline | DoneWise |",
-        "| --- | --- | --- |",
+        "| Metric | " + " | ".join(labels[v] for v in groups) + " |",
+        "| --- | " + " | ".join("---" for _ in groups) + " |",
     ]
-    groups = report["summary"]
     for title, numerator, denominator in (
         ("False success claims / success claims", "false_claims", "success_claims"),
         ("Scenarios with false claims / executed", "false_claim_scenarios", "scenarios"),
@@ -85,7 +94,22 @@ def markdown(report):
         ("Adapter write attempts", "write_attempts"),
         ("Timeouts", "timeouts"),
     ):
-        lines.append(f"| {title} | {groups['baseline'][key]} | {groups['donewise'][key]} |")
+        lines.append(f"| {title} | " + " | ".join(str(s[key]) for s in groups.values()) + " |")
+    if "baseline-idempotent" in groups:
+        lines += [
+            "",
+            "| Scenario | Variant | False claims | Extra charges | Extra events | Completed | "
+            "Write attempts | Direct automatic retries |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- |",
+        ]
+        for row in report["rows"]:
+            m = row["metrics"]
+            retries = row.get("retry_count", 0 if row["variant"] == "baseline" else "N/A")
+            lines.append(
+                f"| {row['scenario']} | {row['variant']} | {m['false_claims']} | "
+                f"{m['extra_charges']} | {m['extra_events']} | {m['completed']} | "
+                f"{m['write_attempts']} | {retries} |"
+            )
     lines += [
         "",
         "Timing is diagnostic only: logical clock; read window not simulated. "
