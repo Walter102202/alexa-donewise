@@ -17,7 +17,7 @@ current provider availability; the dated traces identify what was reverified.
 | Pydantic and SQLite | Contracts, operation identity, approvals and append-only receipts | [Contracts](../tests/test_contracts.py), [harness tests](../tests/test_harness.py) |
 | pytest, respx, Ruff and uv | Locked dependencies, mocked provider HTTP, verification and formatting | [Verification](traces/docker-compose.md) |
 | Docker Compose | Two local services without provider keys; persisted bind-mount data | [Acceptance](traces/docker-compose.md) |
-| Browser speech APIs | Voice controls and UI wiring checks with doubles | [Voice trace](traces/simulator-flow.md); acoustic rehearsal pending |
+| Browser speech APIs | Voice controls and UI wiring checks with doubles | [Voice trace](traces/simulator-flow.md); live voice controls used in the 20 October 2026 recording |
 | Google Calendar API / google-auth | Service-account access to a dedicated test calendar; create, read, move and delete events, with conditional updates | [Connected evidence](stripe-sandbox.md#verification-performed), [smoke test](../tests/test_connected_providers.py) |
 | Stripe PaymentIntents API / Stripe CLI 1.51.0 | Provision a temporary sandbox, create a test payment and verify identity-preserving replay and read-back | [Setup and evidence](stripe-sandbox.md), [smoke test](../tests/test_connected_providers.py) |
 
@@ -41,7 +41,7 @@ These are observed results from the evidence linked above, scoped to the recorde
 | Ruff | Lint and format checks passed in the recorded Windows and Linux packaging runs, giving both environments the same source checks. |
 | uv | Installed the locked workspace dependencies on Windows and in the Linux container; a separate environment let validation proceed while running services held the original launcher open. |
 | Docker Compose | Started both services using Fake adapters without provider keys, with data bound to the host. The five-turn browser run finished with one persisted event and one payment. |
-| Browser speech APIs | Recognition and synthesis doubles verified transcript submission and microphone gating. These were UI wiring checks; human microphone/TTS acceptance remains pending. |
+| Browser speech APIs | Recognition and synthesis doubles verified transcript submission and microphone gating. These were UI wiring checks; the 20 October 2026 recording used the live controls, and one misheard phrase was typed instead. |
 | Google Calendar API / google-auth | Created, reread, moved and deleted the test event. A stale ETag rejected the update; subsequent read-back confirmed the intended state. Service-account access worked with the dedicated calendar. |
 | Stripe PaymentIntents API | A USD 1.00 test payment and same-key replay returned the same PaymentIntent ID. Read-back checked amount, currency, metadata and status; an independent list found one payment with `livemode: false`. |
 | Stripe CLI | Provisioned a temporary sandbox without browser login or commercial account onboarding, enabling the API smoke check. |
@@ -72,8 +72,8 @@ The sandbox had a documented expiry of 25 September 2026 unless claimed. The cla
 permanent account onboarding from Chile were not validated, and current availability has not
 been rechecked. This temporary setup does not establish a durable demo environment.
 
-Actual audio rehearsal, full connected Google/Stripe fault acceptance, the five-turn browser flow
-with real providers, full simulator live-model acceptance and measured p50/p95 remain pending.
+The demo video of 20 October 2026 ran the five-turn browser flow with real providers, injected
+faults and live voice controls on Claude Haiku 5.5; measured p50/p95 latency remains unverified.
 Desktop setup is unvalidated. The historical Claude Code run did not record its negotiated
 protocol version; a separate official-client trace did.
 
@@ -100,7 +100,7 @@ that remain untested.
 | Ruff | Ran lint and format checks from the locked environment. The README's Python example needed formatting under the locked Ruff version before the format check passed. |
 | uv | Used the workspace and lockfile to install dependencies. Running services held the checkout's launcher open; `UV_PROJECT_ENVIRONMENT` selected a separate validation environment. |
 | Docker Compose | Built both targets and used host ports 18765/18080 because the defaults were occupied. In Scripted mode, the first Continue produced a verified Fake event and an approval request; all five turns then completed. |
-| Browser speech APIs | Connected recognition callbacks to turn submission and synthesis to receipt speech. Doubles checked submission timing, error handling and microphone gating. Actual microphone capture and acoustic rehearsal remain pending. |
+| Browser speech APIs | Connected recognition callbacks to turn submission and synthesis to receipt speech. Doubles checked submission timing, error handling and microphone gating. Live microphone capture was used in the 20 October 2026 recording. |
 | Google Calendar API / google-auth | Enabled the API, created a service account and shared a dedicated calendar with edit permission. Kept credential JSON outside the repo and its path in ignored `.env`. Created and independently reread an event; later corrected smoke-test timestamps to whole seconds. |
 | Stripe CLI | Ran `stripe sandbox create` and kept its credentials outside the repo. Provisioning required no browser login or commercial account onboarding. The temporary sandbox's claim path and permanence from Chile were not validated. |
 | Stripe PaymentIntents API | Configured the test key in ignored `.env` and checked an authenticated list request. Our adapter initially rejected the CLI key prefix; after the validation fix, a USD 1.00 test payment, same-key replay and read-back passed. |

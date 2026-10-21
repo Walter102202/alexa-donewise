@@ -4,6 +4,7 @@ An assistant that verifies external effects before claiming success. The asynchr
 MCP Streamable HTTP server and web simulator support persisted local Fake adapters and
 dedicated Google Calendar / Stripe test integrations.
 The five-turn demo uses real MCP calls and receipt-derived speech; no real money is moved.
+Demo video (20 and 21 October 2026): https://youtu.be/wYBuYsQYc8I
 
 ## Deterministic sandbox · Fake adapters · no model
 
@@ -361,7 +362,7 @@ trace. The reusable MIT package is in `core/`;
 - Google/Stripe smoke and five connected backend/MCP fault turns passed with Nova and Sonnet.
   Cloud latency and classic Alexa Test are recorded; the demo video was recorded on 20 and 21 October 2026.
 - Inspector CLI, Python ClientSession and Claude Code have evidence; Desktop and official Alexa+ do not.
-- Authenticated MCP is hosted; the skill stays in Development. No package release claimed; the demo video is linked from the Devpost submission. Source: https://github.com/Walter102202/alexa-donewise.
+- Authenticated MCP is hosted; the skill stays in Development. No package release claimed; the demo video is public at https://youtu.be/wYBuYsQYc8I. Source: https://github.com/Walter102202/alexa-donewise.
 
 [Product feedback](docs/product-feedback.md) · [Friction log](docs/friction-log.md) ·
 [MIT license](LICENSE).
